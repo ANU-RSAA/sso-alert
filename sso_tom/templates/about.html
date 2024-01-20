@@ -1,0 +1,12 @@
+{% extends 'tom_common/base.html' %}
+{% block content %}
+<p>
+    Here is a list of targets. <br/><br/>
+    <strong>Targets</strong>
+</p>
+<ul>
+    {% for target in targets %}
+    <li>{{ target.name }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
