@@ -1,0 +1,43 @@
+{% extends 'tom_common/base.html' %}
+{% load bootstrap4 static observation_extras dataproduct_extras %}
+{% block title %} Observation record: {{ object.id }} {% endblock %}
+{% block additional_css %}
+<link rel="stylesheet" href="{% static 'tom_observations/css/main.css' %}">
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>{{ object }}</h2>
+        <!-- {% if object.url %} -->
+        <!-- <a class="btn btn-success" href="{{ object.url }}">View at observatory »</a> -->
+        <!-- {% endif %} -->
+        <div class="col-md-6">
+            {% if editable %}
+            <p>{% update_observation_id_form object %}</p>
+            {% endif %}
+            <p class="my-auto"><strong>Observation ID:</strong> {{ object.observation_id }}</p>
+            <p class="my-auto"><strong>Created:</strong> {{ object.created }} <strong>Modified:</strong> {{ object.modified }}</p>
+            <p class="my-auto"><strong>Status:</strong> {{ object.status }}</p>
+        </div>
+        <p></p>
+    </div>
+    <div class="col-md-6">
+        {% if image %}
+        <img src="{{ image }}" class="display">
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        {% observationtemplate_from_record object %}
+        <p></p>
+        <h4>Request Parameters</h4><br>
+        <dl class="row">
+            {% for k,v in object.parameters.items %}
+            <dt class="col-sm-6">{{ k }}</dt>
+            <dd class="col-sm-6">{{ v }}</dt>
+            {% endfor %}
+        </dl>
+    </div>
+</div>
+{% endblock %}
