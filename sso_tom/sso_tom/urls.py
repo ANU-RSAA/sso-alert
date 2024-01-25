@@ -17,8 +17,13 @@ from django.urls import path, include
 from .views import AboutView
 
 urlpatterns = [
-    path('', include('tom_registration.registration_flows.open.urls', namespace='registration')),
+    path(
+        "",
+        include(
+            "tom_registration.registration_flows.open.urls", namespace="registration"
+        ),
+    ),
     # path('', include('tom_registration.registration_flows.approval_required.urls', namespace='registration')),
-    path('', include('tom_common.urls')),
-    path('about/', AboutView.as_view(), name='about'),
+    path("", include("tom_common.urls")),
+    path("about/", AboutView.as_view(), name="about"),
 ]
