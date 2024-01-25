@@ -3,7 +3,7 @@ from tom_observations.models import Target
 
 
 class AboutView(TemplateView):
-    template_name = 'about.html'
+    template_name = "about.html"
 
     def get_context_data(self, **kwargs):
-        return {'targets': Target.objects.all()}
+        return {"targets": Target.objects.all()}
