@@ -70,17 +70,17 @@ CHOICES = {
 }
 
 # Validators for form fields.
-validate_ra = RegexValidator(
-    regex=r"(?:[01][0-9]|[2][0-3])\s[0-5][0-9]\s[0-5][0-9][.][0-5][0-9]",
-    message="RA must be specified with the format 'HH MM SS.SS'.",
-    code="invalid",
-)
+# validate_ra = RegexValidator(
+#     regex=r"(?:[01][0-9]|[2][0-3])\s[0-5][0-9]\s[0-5][0-9][.][0-5][0-9]",
+#     message="RA must be specified with the format 'HH MM SS.SS'.",
+#     code="invalid",
+# )
 
-validate_dec = RegexValidator(
-    regex=r"^[-+]?(?:[0-8][0-9]\s[0-5][0-9]\s[0-5][0-9][.][0-9]|90\s00\s00[.]0)$",
-    message="Declination must be specified with the format 'sDD MM SS.S'.",
-    code="invalid",
-)
+# validate_dec = RegexValidator(
+#     regex=r"^[-+]?(?:[0-8][0-9]\s[0-5][0-9]\s[0-5][0-9][.][0-9]|90\s00\s00[.]0)$",
+#     message="Declination must be specified with the format 'sDD MM SS.S'.",
+#     code="invalid",
+# )
 
 # Class that displays a GUI form for users to create an observation.
 class ANU230cmForm(BaseRoboticObservationForm):
@@ -267,7 +267,6 @@ class ANU230cmForm(BaseRoboticObservationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.target_id = "6"
         self.helper.layout = Layout(
             self.common_layout,
             self.layout(),
@@ -493,13 +492,13 @@ class ANU230cmTemplateForm(GenericTemplateForm):
     )
     ra_0 = forms.CharField(
         label="RA",
-        validators=[validate_ra],
+        # validators=[validate_ra],
         required=False,
         disabled=True,
     )
     dec_0 = forms.CharField(
         label="Dec",
-        validators=[validate_dec],
+        # validators=[validate_dec],
         required=False,
         disabled=True,
     )
