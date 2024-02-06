@@ -18,7 +18,6 @@ git clone git@gitlab.com:CAS-eResearch/external/sso-alert/ui.git
 python3 -m venv <env_name>
 source <env_name>/bin/activate
 python3 -m pip install -r ui/requirements.txt 
-python ui/sso_tom/manage.py runserver
 ```
 
 ## Run project
