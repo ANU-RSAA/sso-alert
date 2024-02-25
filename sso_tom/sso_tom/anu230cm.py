@@ -1,8 +1,10 @@
 from django import forms
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
 import requests
 import json
+import logging
 from datetime import timedelta
 from django.utils import timezone
 
@@ -16,6 +18,7 @@ from tom_observations.facility import (
 )
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
+logger = logging.getLogger(__name__)
 
 CHOICES = {
     "TIMECONSTRAINT": [
@@ -768,18 +771,23 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             post_data["PAGESIZE"]=1000
             print(f"get_observation_status {observation_id}")
             response = requests.post(url, data=post_data, headers=headers)
-            content = json.loads(response.content.decode())
-            print(f"!content={content}")
-            found = False
-            data = content["data"]
-            print(f"Number of observations in this proposal {len(data)}")
-            state = "PENDING"
-            for i in range(len(data)):
-                print(f"CHECK {data[i]['userDefId']}  ==? {tokens[1]}")
-                if data[i]["userDefId"] == tokens[1]:
-                    found = True
-                    state = data[i]['obsStatus']
-            print(f"STATE={state}")
+            try:
+                content = json.loads(response.content.decode())
+                print(f"!content={content}")
+                found = False
+                data = content["data"]
+                print(f"Number of observations in this proposal {len(data)}")
+                state = "PENDING"
+                for i in range(len(data)):
+                    print(f"CHECK {data[i]['userDefId']}  ==? {tokens[1]}")
+                    if data[i]["userDefId"] == tokens[1]:
+                        found = True
+                        state = data[i]['obsStatus']
+                print(f"STATE={state}")
+            except Exception:
+                msg = f"Bad response"
+                logger.exception(msg)
+
             if not found:
                 return {}
 
@@ -962,8 +970,13 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             post_data[SKYA_DEC_+"0"]=observation_payload['params']['skya_dec_0']
             #
             response = requests.post(url, data=post_data, headers=headers)
-            content = json.loads(response.content.decode())
-            print(f"json response={content}")
+            try:
+                content = json.loads(response.content.decode())
+                print(f"json response={content}")
+            except Exception:
+                msg = f"Bad response"
+                logger.exception(msg)
+                raise ValidationError(f"{msg}")
 
             return [post_data[PROPOSAL]+"-"+post_data[USERDEFID]]
         return [1]
