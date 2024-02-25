@@ -2,6 +2,9 @@ from django import forms
 from django.core.validators import RegexValidator
 
 import requests
+import json
+from datetime import timedelta
+from django.utils import timezone
 
 from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
 from crispy_forms.helper import FormHelper
@@ -604,7 +607,6 @@ class ANU230cmTemplateForm(GenericTemplateForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print("ANU230 __INIT__")
         self.common_layout = Layout("facility", "template_name")
         self.helper = FormHelper()
         self.helper.add_input(Submit("submit", "Submit"))
@@ -740,6 +742,53 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         be able to be used to retrieve the status from the external service.
         """
         # Add ANU2.3m POST request here.
+        test_anu230cm_emulator = True
+        if test_anu230cm_emulator:
+            print(f"get_observation_status {observation_id}")
+            tokens = observation_id.split("-")
+            print(f"get_observation_status user email = {dir(self)}")
+            print(f"get_observation_status user email = {self.user}")
+            # local version of emuldate_common
+            ADACS_PROPOSALDB_token = "our_unique_secret_token"
+            emulate_ANU230cm="http://127.0.0.1:8001"
+            # Keyword dictionary
+            PROPOSAL="PROPOSAL"
+            USERDEFID="USERDEFID"
+            USERDEFPRI="USERDEFPRI"
+            NOBSBLK="NOBSBLK"
+
+            url = emulate_ANU230cm+'/propobsstat/'
+            headers = {}
+            headers["Authorization"] = ADACS_PROPOSALDB_token
+            headers["Username"] = "bob@swin.edu.au"
+
+            post_data = {}
+            post_data[PROPOSAL]=tokens[0]
+            post_data["OFFSET"]=0
+            post_data["PAGESIZE"]=1000
+            print(f"get_observation_status {observation_id}")
+            response = requests.post(url, data=post_data, headers=headers)
+            content = json.loads(response.content.decode())
+            print(f"!content={content}")
+            found = False
+            data = content["data"]
+            print(f"Number of observations in this proposal {len(data)}")
+            state = "PENDING"
+            for i in range(len(data)):
+                print(f"CHECK {data[i]['userDefId']}  ==? {tokens[1]}")
+                if data[i]["userDefId"] == tokens[1]:
+                    found = True
+                    state = data[i]['obsStatus']
+            print(f"STATE={state}")
+            if not found:
+                return {}
+
+            #return content["data"]
+            return {
+                'state': state,
+                'scheduled_start': timezone.now() + timedelta(hours=1),
+                'scheduled_end': timezone.now() + timedelta(hours=2)
+            }
 
         # ${SERVER}/aocs/propobsstat.php?PROPOSAL=<number>&OFFSET=<integer>&PAGESIZE=<integer>&FILTER=<string>
         # - OFFSET and PAGESIZE: for requesting multiple observations status updates.
@@ -747,7 +796,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         # - Status received in “data” array. Each entry a dict w. userDefId, obsStatus, tsExec, …
         # - tsExec is UTC timestamp of last status change: YYYY-MM-DDThh:mm:ss or ‘’
 
-        return ["Pending"]
+        return ['PENDING']
 
     def get_observing_sites(self):
         """
@@ -913,9 +962,10 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             post_data[SKYA_DEC_+"0"]=observation_payload['params']['skya_dec_0']
             #
             response = requests.post(url, data=post_data, headers=headers)
-            content = response.content
-            print(f"content={content}")
+            content = json.loads(response.content.decode())
+            print(f"json response={content}")
 
+            return [post_data[PROPOSAL]+"-"+post_data[USERDEFID]]
         return [1]
 
     def validate_observation(self, observation_payload):
