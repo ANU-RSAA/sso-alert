@@ -1,6 +1,5 @@
 from django import forms
 from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
 
 import requests
 import json
@@ -18,6 +17,8 @@ from tom_observations.facility import (
 )
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
+from decouple import config
+
 logger = logging.getLogger(__name__)
 
 CHOICES = {
@@ -752,25 +753,26 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             print(f"get_observation_status user email = {dir(self)}")
             print(f"get_observation_status user email = {self.user}")
             # local version of emuldate_common
-            ADACS_PROPOSALDB_token = "our_unique_secret_token"
-            emulate_ANU230cm="http://127.0.0.1:8001"
+            ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+            ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
+            emulate_ANU230cm="https://mortal.anu.edu.au/aocs/"
+            print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
+            #url_suffix = "/"
+            url_suffix = ".php"
             # Keyword dictionary
             PROPOSAL="PROPOSAL"
             USERDEFID="USERDEFID"
             USERDEFPRI="USERDEFPRI"
             NOBSBLK="NOBSBLK"
 
-            url = emulate_ANU230cm+'/propobsstat/'
-            headers = {}
-            headers["Authorization"] = ADACS_PROPOSALDB_token
-            headers["Username"] = "bob@swin.edu.au"
+            url = emulate_ANU230cm+'/propobsstat'+url_suffix
 
             post_data = {}
             post_data[PROPOSAL]=tokens[0]
             post_data["OFFSET"]=0
             post_data["PAGESIZE"]=1000
             print(f"get_observation_status {observation_id}")
-            response = requests.post(url, data=post_data, headers=headers)
+            response = requests.post(url, data=post_data, auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
             try:
                 content = json.loads(response.content.decode())
                 print(f"!content={content}")
@@ -785,7 +787,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                         state = data[i]['obsStatus']
                 print(f"STATE={state}")
             except Exception:
-                msg = f"Bad response"
+                msg = f"Bad response - I don't know how to show these in the tom message box."
                 logger.exception(msg)
 
             if not found:
@@ -833,8 +835,12 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         if test_anu230cm_emulator:
             print("submit_observation_payload")
             # local version of emuldate_common
-            ADACS_PROPOSALDB_token = "our_unique_secret_token"
-            emulate_ANU230cm="http://127.0.0.1:8001"
+            ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+            ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
+            emulate_ANU230cm="https://mortal.anu.edu.au/aocs/"
+            print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
+            #url_suffix = "/"
+            url_suffix = ".php"
             # Keyword dictionary
             PROPOSAL="PROPOSAL"
             USERDEFID="USERDEFID"
@@ -878,10 +884,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             SKYA_DEC_ = "SKYA_DEC_"
 
             #
-            url = emulate_ANU230cm+'/obsadd/'
-            headers = {}
-            headers["Authorization"] = ADACS_PROPOSALDB_token
-            headers["Username"] = self.user.email
+            url = emulate_ANU230cm+'/obsadd'+url_suffix
 
             post_data = {}
             post_data[PROPOSAL]=observation_payload['params']['proposal']
@@ -969,14 +972,13 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             post_data[SKYA_RA_+"0"]=observation_payload['params']['skya_ra_0']
             post_data[SKYA_DEC_+"0"]=observation_payload['params']['skya_dec_0']
             #
-            response = requests.post(url, data=post_data, headers=headers)
+            response = requests.post(url, data=post_data, auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
             try:
                 content = json.loads(response.content.decode())
                 print(f"json response={content}")
             except Exception:
                 msg = f"Bad response"
                 logger.exception(msg)
-                raise ValidationError(f"{msg}")
 
             return [post_data[PROPOSAL]+"-"+post_data[USERDEFID]]
         return [1]
