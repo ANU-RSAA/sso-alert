@@ -46,6 +46,7 @@ plotly==5.18.0
 prometheus-client==0.19.0
 pyerfa==2.0.1.1
 python-dateutil==2.8.2
+python-decouple==3.8
 pytz==2023.3.post1
 pyvo==1.5
 PyYAML==6.0.1
