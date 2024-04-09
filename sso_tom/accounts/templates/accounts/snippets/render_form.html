@@ -1,0 +1,15 @@
+<form class="form-row" method="post" enctype="multipart/form-data">
+    {{ form.media }}
+    <div class="col-md-12">
+        {% csrf_token %}
+        {% include 'accounts/snippets/messages.html' %}
+        {% include 'accounts/snippets/render_field.html' %}
+        <div class="row">
+            <div class="buttons col-md-12 text-md-right">
+                <input class="btn btn-warning" type="reset" tabindex="101" value="Reset"/>
+                <input class="btn btn-success" type="submit" tabindex="100"
+                       value="{% if submit_text %}{{ submit_text }}{% else %}Submit{% endif %}"/>
+            </div>
+        </div>
+    </div>
+</form>

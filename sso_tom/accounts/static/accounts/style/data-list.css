@@ -1,0 +1,8 @@
+.data-list a,
+.data-list a:hover,
+.data-list a:focus,
+.data-list a:visited
+{
+    text-decoration: none;
+    color: #343a40;
+}

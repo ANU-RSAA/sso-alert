@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "tom_dataproducts",
     "tom_registration",
     "fink_ui",
+    "accounts",
 ]
 
 SITE_ID = 1
