@@ -53,6 +53,8 @@
     <main role="main" class="container">
       {% bootstrap_messages %}
       <div class="content">
+          {% block page_header %}
+          {% endblock %}
         {% block content %}
         {% endblock %}
       </div>

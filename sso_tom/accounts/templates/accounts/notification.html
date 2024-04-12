@@ -1,0 +1,19 @@
+{% extends 'tom_common//base.html' %}
+
+{% block info-bar %}
+    Verification
+{% endblock info-bar %}
+
+{% block page_header %}
+    SSO ALERT
+    {% if type == 'registration_submitted' %}Registration submitted {% endif %}
+{% endblock page_header %}
+
+{% block content %}
+    {% if type == 'registration_submitted' %}
+        <p>Dear {{ data.first_name }} {{ data.last_name }},</p>
+        <p>Thanks for registering with us.</p>
+        <p>The account has been activated in the system.</p>
+        <p>You should now be able to log in the system via the login page.</p>
+    {% endif %}
+{% endblock content %}

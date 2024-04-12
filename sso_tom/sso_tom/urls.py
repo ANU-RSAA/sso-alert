@@ -24,6 +24,7 @@ urlpatterns = [
         ),
     ),
     # path('', include('tom_registration.registration_flows.approval_required.urls', namespace='registration')),
+    path("", include("accounts.urls")),
     path("", include("tom_common.urls")),
     path("about/", AboutView.as_view(), name="about"),
 ]
