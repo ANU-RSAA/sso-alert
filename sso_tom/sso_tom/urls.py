@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
+from .views import AboutView
 
 urlpatterns = [
     path(
@@ -25,5 +26,5 @@ urlpatterns = [
     # path('', include('tom_registration.registration_flows.approval_required.urls', namespace='registration')),
     path("", include("accounts.urls")),
     path("", include("tom_common.urls")),
-    path("fink/", include("fink_ui.urls")),
+    path("about/", AboutView.as_view(), name="about"),
 ]

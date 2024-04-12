@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     "tom_observations",
     "tom_dataproducts",
     "tom_registration",
-    "fink_ui",
     "accounts",
 ]
 
@@ -244,7 +243,7 @@ TOM_FACILITY_CLASSES = [
     # 'tom_observations.facilities.lco.LCOFacility',
     # 'tom_observations.facilities.gemini.GEMFacility',
     # 'tom_observations.facilities.soar.SOARFacility',
-    "fink_ui.anu230cm.ANU230cmFacility",
+    "sso_tom.anu230cm.ANU230cmFacility",
 ]
 
 TOM_ALERT_CLASSES = [
