@@ -833,7 +833,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         # Add ANU2.3m API query here.
         test_anu230cm_emulator = True
         if test_anu230cm_emulator:
-            print("submit_observation_payload")
+            print("new submit_observation_payload")
             # local version of emuldate_common
             ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
             ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
@@ -884,7 +884,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             SKYA_DEC_ = "SKYA_DEC_"
 
             #
-            url = emulate_ANU230cm+'/obsadd'+url_suffix
+            url = emulate_ANU230cm+'/addobsblockexec'+url_suffix
 
             post_data = {}
             post_data[PROPOSAL]=observation_payload['params']['proposal']
@@ -973,9 +973,11 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             post_data[SKYA_DEC_+"0"]=observation_payload['params']['skya_dec_0']
             #
             response = requests.post(url, data=post_data, auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
+            print(f"{response}")
+
             try:
-                content = json.loads(response.content.decode())
-                print(f"json response={content}")
+                #content = json.loads(response.content)
+                print(f"json response={response.content}")
             except Exception:
                 msg = f"Bad response"
                 logger.exception(msg)
