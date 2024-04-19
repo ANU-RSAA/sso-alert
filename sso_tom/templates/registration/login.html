@@ -1,0 +1,32 @@
+{% extends 'tom_common/base.html' %}
+{% load bootstrap4 %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-12">
+        <form action="{% url 'login' %}?next={{next}}" method="POST" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+            <button type="submit" class="btn btn-primary">Login</button>
+            {% endbuttons %}
+        </form>
+    </div>
+    <br />
+    <div class="row text-right">
+        <div class="col-md-12">
+            <label class="text-right" for="register">
+                Don't have an account yet? <a href="{% url 'registration:register' %}" id="register">Register</a>.
+            </label>
+        </div>
+    </div>
+    <br />
+    <div class="row text-right">
+        <div class="col-md-12">
+            <label class="text-right" for="change_password">
+                Forgot your password? <a href="{% url 'password_reset' %}" id="password_reset">Reset password</a>.
+            </label>
+        </div>
+    </div>
+</div>
+{% endblock %}
