@@ -739,6 +739,15 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         This method takes in an observation type and returns the form type that matches it.
         """
         return ANU230cmTemplateForm
+    
+    def cancel_observation(self, observation_id):
+        """
+        Takes an observation id and submits a request to the observatory that the observation be cancelled.
+
+        If the cancellation was successful, return True. Otherwise, return False.
+        """
+        print(f"Cancelling {observation_id}")
+        return True
 
     def get_observation_status(self, observation_id):
         """

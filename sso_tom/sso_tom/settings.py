@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "tom_dataproducts",
     "tom_registration",
     "accounts",
+    "chained",
 ]
 
 SITE_ID = 1
@@ -240,9 +241,9 @@ DATA_PROCESSORS = {
 }
 
 TOM_FACILITY_CLASSES = [
-    # 'tom_observations.facilities.lco.LCOFacility',
-    # 'tom_observations.facilities.gemini.GEMFacility',
-    # 'tom_observations.facilities.soar.SOARFacility',
+    'tom_observations.facilities.lco.LCOFacility',
+    'tom_observations.facilities.gemini.GEMFacility',
+    'tom_observations.facilities.soar.SOARFacility',
     "sso_tom.anu230cm.ANU230cmFacility",
 ]
 
@@ -272,6 +273,12 @@ TOM_HARVESTER_CLASSES = [
 ]
 
 HARVESTERS = {"TNS": {"api_key": ""}}
+
+TOM_CADENCE_STRATEGIES = [
+    'chained.models.SsoAlertCadenceStrategy',
+    'tom_observations.cadences.retry_failed_observations.RetryFailedObservationsStrategy',
+    'tom_observations.cadences.resume_cadence_after_failure.ResumeCadenceAfterFailureStrategy'
+]
 
 # Define extra target fields here. Types can be any of "number", "string", "boolean" or "datetime"
 # See https://tomtoolkit.github.io/docs/target_fields for documentation on this feature
