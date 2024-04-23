@@ -1,3 +1,5 @@
+import uuid
+
 from django import forms
 from django.core.validators import RegexValidator
 
@@ -168,6 +170,7 @@ class ANU230cmForm(BaseRoboticObservationForm):
     )
     aperturewheel_0 = forms.CharField(
         label="Aperture Wheel",
+        required=False,
         initial="Clear",
         disabled=True,
     )
@@ -835,8 +838,8 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         if test_anu230cm_emulator:
             print("new submit_observation_payload")
             # local version of emuldate_common
-            ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-            ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
+            ADACS_PROPOSALDB_TEST_PASSWORD = 'asdffdsafdsadfs' # config('ADACS_PROPOSALDB_TEST_PASSWORD')
+            ADACS_PROPOSALDB_TEST_USERNAME = 'uiooiuiiooiu' #config('ADACS_PROPOSALDB_TEST_USERNAME')
             emulate_ANU230cm="https://mortal.anu.edu.au/aocs/"
             print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
             #url_suffix = "/"
@@ -983,7 +986,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 logger.exception(msg)
 
             return [post_data[PROPOSAL]+"-"+post_data[USERDEFID]]
-        return [1]
+        return [uuid.uuid4()]  # update it to unique
 
     def validate_observation(self, observation_payload):
         """
