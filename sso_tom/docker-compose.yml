@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  #nginx:
+  #  image: 'jc21/nginx-proxy-manager:latest'
+  #  container_name: nginx-proxy-manager
+  #  ports:
+  #    - '81:81'
+  #    - '80:80'
+  #    - '443:443'
+  #  volumes:
+  #    - ./data:/data
+  #    - ./letsencrypt:/etc/letsencrypt
+  demo:
+    build: ./
+    container_name: a1
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/code
+  #  depends_on:
+  #   - db
+  #db:
+  #  image: postgres:12.1
+  #  container_name: a2
+  #  ports:
+  #    - "5432:5432"
+  #  volumes:
+  #    - ./postgresql/data:/var/lib/postgresql/data
+  #  #depends_on:
+  #  #  - nginx
