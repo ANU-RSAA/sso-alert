@@ -29,8 +29,8 @@ SECRET_KEY = "21+fgm=fgx41*$+4o1svu*^k_dfl@^74)!zbq#fa^2_#@ct5hj"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24'] # for mobile tests
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24', 'ssoalert.adacs-dev.cloud.edu.au'] # for mobile tests
+ALLOWED_HOSTS = ['ssoalert.adacs-dev.cloud.edu.au']
 
 # Application definition
 
