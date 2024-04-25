@@ -17,6 +17,7 @@ import tempfile
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(f"BASE_DIR={BASE_DIR}")
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,8 +29,8 @@ SECRET_KEY = "21+fgm=fgx41*$+4o1svu*^k_dfl@^74)!zbq#fa^2_#@ct5hj"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24'] # for mobile tests
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24', 'ssoalert.adacs-dev.cloud.edu.au'] # for mobile tests
+ALLOWED_HOSTS = ['ssoalert.adacs-dev.cloud.edu.au']
 
 # Application definition
 
@@ -168,11 +169,21 @@ DATE_FORMAT = "Y-m-d"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 MEDIA_ROOT = os.path.join(BASE_DIR, "data")
 MEDIA_URL = "/data/"
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+
+    # 'django_plotly_dash.finders.DashAssetFinder',
+    # 'django_plotly_dash.finders.DashComponentFinder',
+    # 'django_plotly_dash.finders.DashAppDirectoryFinder',
+]
+
 
 LOGGING = {
     "version": 1,
