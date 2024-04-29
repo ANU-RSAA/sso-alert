@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 from tom_observations.cadence import BaseCadenceForm, CadenceStrategy
@@ -9,11 +10,12 @@ from dateutil.parser import parse
 import logging
 import traceback
 
-from tom_observations.models import ObservationRecord
+from tom_observations.models import ObservationRecord, ObservationTemplate
 from tom_observations.facility import get_service_class
 
 from tom_observations.cadence import get_cadence_strategy
 from tom_observations.models import DynamicCadence
+from tom_targets.models import Target
 
 logger = logging.getLogger(__name__)
 
@@ -145,3 +147,46 @@ class SsoAlertCadenceStrategy(CadenceStrategy):
         observation_payload[end_keyword] = new_end.isoformat()
 
         return observation_payload
+
+
+DRAFT = 'DRAFT'
+SUBMITTED = 'SUBMITTED'
+COMPLETED = 'COMPLETED'
+
+CHAIN_STATUS = (
+    (DRAFT, DRAFT),
+    (SUBMITTED, SUBMITTED),
+    (COMPLETED, COMPLETED),
+)
+
+
+class Chain(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, null=False, blank=False)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(choices=CHAIN_STATUS, max_length=20, default=DRAFT)
+
+
+FAILED = 'FAILED'
+REJECTED = 'REJECTED'
+COMPLETED = 'COMPLETED'
+
+CONDITION_CHOICES = (
+    (FAILED, FAILED),
+    (REJECTED, REJECTED),
+    (COMPLETED, COMPLETED),
+)
+
+
+class ChainedObservation(models.Model):
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
+    facility = models.CharField(max_length=50)
+    parameters = models.JSONField()
+    observation = models.ForeignKey(ObservationRecord, on_delete=models.CASCADE, null=True, blank=True)
+    trigger_next_condition = models.CharField(choices=CONDITION_CHOICES, max_length=20, default=FAILED)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        status = "NOT SUBMITTED" if not self.observation else "SUBMITTED"
+        return f'{self.facility} ({ status })'

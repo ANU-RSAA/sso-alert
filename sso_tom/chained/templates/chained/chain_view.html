@@ -1,0 +1,24 @@
+{% extends 'tom_common/base.html' %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% block title %}Chain List{% endblock %}
+{% block content %}
+<h3>Chain {{chain.id}} :: {{chain.name}} :: <a href='{% url "tom_targets:detail" pk=chain.target.id %}' >{{chain.target}}</a> ({{chain.status}})</h3>
+<ul>
+    <li>ID: Facility</li>
+    {% for chained_observation in chained_observations %}
+    <li>{{chained_observation.id}}: {{chained_observation.facility}}</li>
+    {% endfor %}
+</ul>
+{% if chain.status == 'DRAFT' %}
+<a href='{% url "chains:chain_target" chain_id=chain.id pk=chain.target.id %}' class="btn btn-secondary">Add
+    Observation</a>
+{% if chained_observations|length > 1 %}
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="chain_id" value={{ chain.id }} />
+    <input type="submit" class="btn btn-primary" name="submit-chain" id="submit-chain"
+            value="Trigger chain by submitting first">
+</form>
+{% endif %}
+{% endif %}
+{% endblock content %}

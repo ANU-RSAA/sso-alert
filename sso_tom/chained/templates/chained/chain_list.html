@@ -1,0 +1,14 @@
+{% extends 'tom_common/base.html' %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% block title %}Chain List{% endblock %}
+{% block content %}
+<h3>My Observation Chains</h3>
+<ul>
+    {% for chain in object_list %}
+    <li><a href='{% url "chains:view_chain" chain.id %}'>{{chain.id}}: {{chain.name}} ({{chain.target}}) </a>
+        {{chain.status}}
+    </li>
+    {% endfor %}
+</ul>
+<a href='{% url "chains:add_chain" %}' class="btn btn-primary">Add chain</a>
+{% endblock content %}
