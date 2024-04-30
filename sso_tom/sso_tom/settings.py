@@ -10,9 +10,11 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
+
 import logging.config
 import os
 import tempfile
+import tomllib
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -30,8 +32,14 @@ SECRET_KEY = "21+fgm=fgx41*$+4o1svu*^k_dfl@^74)!zbq#fa^2_#@ct5hj"
 DEBUG = True
 
 # ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24', 'ssoalert.adacs-dev.cloud.edu.au'] # for mobile tests
-ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24', 'ssoalert.adacs-dev.cloud.edu.au']
-CSRF_TRUSTED_ORIGINS = ['https://ssoalert.adacs-dev.cloud.edu.au']
+ALLOWED_HOSTS = [
+    ".localhost",
+    "127.0.0.1",
+    "[::1]",
+    "10.0.0.24",
+    "ssoalert.adacs-dev.cloud.edu.au",
+]
+CSRF_TRUSTED_ORIGINS = ["https://ssoalert.adacs-dev.cloud.edu.au"]
 
 # Application definition
 
@@ -177,9 +185,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "data")
 MEDIA_URL = "/data/"
 
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     # 'django_plotly_dash.finders.DashAssetFinder',
     # 'django_plotly_dash.finders.DashComponentFinder',
     # 'django_plotly_dash.finders.DashAppDirectoryFinder',
@@ -210,6 +217,10 @@ CACHES = {
 # TOM Specific configuration
 TARGET_TYPE = "SIDEREAL"
 
+config_file = "ui/sso_tom/sso_tom/config.toml"
+with open(config_file, "rb") as file:
+    config = tomllib.load(file)
+
 FACILITIES = {
     "LCO": {
         "portal_url": "https://observe.lco.global",
@@ -236,6 +247,7 @@ FACILITIES = {
             },
         },
     },
+    "DREAMS": config["dreams"],
 }
 
 # Define the valid data product types for your TOM. Be careful when removing items, as previously valid types will no
@@ -253,9 +265,10 @@ DATA_PROCESSORS = {
 }
 
 TOM_FACILITY_CLASSES = [
-    'tom_observations.facilities.lco.LCOFacility',
-    'tom_observations.facilities.gemini.GEMFacility',
-    'tom_observations.facilities.soar.SOARFacility',
+    "tom_observations.facilities.lco.LCOFacility",
+    "tom_observations.facilities.gemini.GEMFacility",
+    "tom_observations.facilities.soar.SOARFacility",
+    "sso_tom.dreams.DREAMSFacility",
     "sso_tom.anu230cm.ANU230cmFacility",
 ]
 
@@ -287,9 +300,9 @@ TOM_HARVESTER_CLASSES = [
 HARVESTERS = {"TNS": {"api_key": ""}}
 
 TOM_CADENCE_STRATEGIES = [
-    'chained.models.SsoAlertCadenceStrategy',
-    'tom_observations.cadences.retry_failed_observations.RetryFailedObservationsStrategy',
-    'tom_observations.cadences.resume_cadence_after_failure.ResumeCadenceAfterFailureStrategy'
+    "chained.models.SsoAlertCadenceStrategy",
+    "tom_observations.cadences.retry_failed_observations.RetryFailedObservationsStrategy",
+    "tom_observations.cadences.resume_cadence_after_failure.ResumeCadenceAfterFailureStrategy",
 ]
 
 # Define extra target fields here. Types can be any of "number", "string", "boolean" or "datetime"

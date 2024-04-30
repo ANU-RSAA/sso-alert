@@ -1,0 +1,83 @@
+# This is a TOML document
+
+title = "DREAMS settings/configuration for SSO-Alert (TOM Toolkit)"
+
+[owner]
+name = "Jamie Soon"
+email = "jamie.soon@anu.edu.au"
+last_updated = 2024-04-26
+
+[dreams]
+  [dreams.sites]
+    [dreams.sites.sso]
+      # sitecode = "sso"
+      code = "sso"
+      name = "Siding Spring Observatory"
+      latitude = -31.27331
+      longitude = 149.064274
+      elevation = 1165
+      status = "PIE"
+      weather_url = "https://www.mso.anu.edu.au/metdata/"
+  [dreams.observing_states]
+    pending = ["Pending", "Executing"]
+    successful = ["Succeeded", "Detection", "Non-detection"]
+    failed = ["Rejected", "Failed", "Fault"]
+  [dreams.data]
+    fits_facility_header_keyword = "OBS"
+    fits_facility_header_value = "DREAMS"
+    fits_header_dateobs_keyword = "DATE-OBS"
+  [dreams.url]
+    format = ["base", "base_additional", "data_format", "endpoint","default_extension",]
+    base = "https://mortal.anu.edu.au/"
+    base_additional = "dreams/api/v1/"
+    data_format = "json/"
+    default_extension = ".php"
+    [dreams.url.endpoint]
+      cancel = "remove"
+      submit = "add"
+      status = "retrieve"
+      validation = ""
+  [dreams.observation]
+    format = ["base", "base_additional", "target",]
+    base = "https://dreams.anu.edu.au/"
+    base_additional = "monitoring/"
+    target = "object?"
+    [dreams.observation.key]
+      # Key/value pairs to send?
+      observation = "obj_name"
+  [dreams.archive]
+    base = ""
+  [dreams.instruments]
+    url = ""
+    [dreams.instruments.imager]
+      sort = "user_defined_id"
+      # Defines anything that is used to create an observation
+      [dreams.instruments.imager.key]
+        label = "DREAMS API Key"
+        format = "Char"
+        required = true
+        help_text = ""
+      [dreams.instruments.imager.proposal]
+        label = "Proposal ID"
+        format = "Integer"
+        required = true
+        help_text = "Enter ze DREAMS proposal ID"
+        [dreams.instruments.imager.proposal.form]
+          name = "proposal"
+          column = 2
+      [dreams.instruments.imager.exp_time]
+        label = "Exposure Time (seconds)"
+        format = "Float"
+        required = true
+        help_text = ""
+      [dreams.instruments.imager.filter]
+        label = "Filter"
+        format = "Choice"
+        required = true
+        initial = "no_filter"
+        [dreams.instruments.imager.filter.choice.j]
+          name = "J-band"
+        [dreams.instruments.imager.filter.choice.h-short]
+          name = "H-band (short)"
+        [dreams.instruments.imager.filter.choice.no_filter]
+          name = "No Filter"
