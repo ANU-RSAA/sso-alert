@@ -381,6 +381,7 @@ class ANU230cmForm(BaseRoboticObservationForm):
         # target_id = self.initial.get('target_id')
         return ButtonHolder(
             Submit("submit", "Submit"),
+            Submit("add_to_chain", "Add to Chain"),
             # HTML(f'''<a class="btn btn-outline-primary" href={{% url 'tom_targets:detail' {target_id} %}}>
             #          Back</a>''')
         )
@@ -847,8 +848,8 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         if test_anu230cm_emulator:
             print("new submit_observation_payload")
             # local version of emuldate_common
-            ADACS_PROPOSALDB_TEST_PASSWORD = 'asdffdsafdsadfs' # config('ADACS_PROPOSALDB_TEST_PASSWORD')
-            ADACS_PROPOSALDB_TEST_USERNAME = 'uiooiuiiooiu' #config('ADACS_PROPOSALDB_TEST_USERNAME')
+            ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+            ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
             emulate_ANU230cm="https://mortal.anu.edu.au/aocs/"
             print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
             #url_suffix = "/"
