@@ -1,5 +1,5 @@
-FROM python:3.9
-LABEL maintainer="llindstrom@lco.global"
+FROM python:3.11
+#LABEL maintainer="llindstrom@lco.global"
 
 # the exposed port must match the deployment.yaml containerPort value
 EXPOSE 8080

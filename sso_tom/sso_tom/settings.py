@@ -217,7 +217,7 @@ CACHES = {
 # TOM Specific configuration
 TARGET_TYPE = "SIDEREAL"
 
-config_file = "ui/sso_tom/sso_tom/config.toml"
+config_file = "sso_tom/config.toml"
 with open(config_file, "rb") as file:
     config = tomllib.load(file)
 
