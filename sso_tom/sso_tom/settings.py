@@ -19,8 +19,6 @@ import tomllib
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(f"BASE_DIR={BASE_DIR}")
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -265,9 +263,9 @@ DATA_PROCESSORS = {
 }
 
 TOM_FACILITY_CLASSES = [
-    "tom_observations.facilities.lco.LCOFacility",
-    "tom_observations.facilities.gemini.GEMFacility",
-    "tom_observations.facilities.soar.SOARFacility",
+    #"tom_observations.facilities.lco.LCOFacility",
+    #"tom_observations.facilities.gemini.GEMFacility",
+    #"tom_observations.facilities.soar.SOARFacility",
     "sso_tom.dreams.DREAMSFacility",
     "sso_tom.anu230cm.ANU230cmFacility",
 ]
@@ -279,7 +277,8 @@ TOM_ALERT_CLASSES = [
     "tom_alerts.brokers.lasair.LasairBroker",
     "tom_alerts.brokers.scout.ScoutBroker",
     "tom_alerts.brokers.tns.TNSBroker",
-    "tom_alerts.brokers.fink.FinkBroker",
+    #"tom_alerts.brokers.fink.FinkBroker", # TODO: Check with Julien
+    "tom_fink.fink.FinkBroker",
 ]
 
 BROKERS = {

@@ -4,9 +4,11 @@ FROM python:3.11
 # the exposed port must match the deployment.yaml containerPort value
 EXPOSE 8080
 #ENTRYPOINT [ "/usr/local/bin/gunicorn", "sso_tom.wsgi:application", "-b", "0.0.0.0:8080", "--access-logfile", "-", "--error-logfile", "-", "-k", "gevent", "--timeout", "300", "--workers", "2"]
-ENTRYPOINT [ "python", "manage.py", "runserver", "0.0.0.0:8080"]
+#ENTRYPOINT [ "python", "manage.py", "runserver", "0.0.0.0:8080"]
+ENTRYPOINT [ "./start_within_container.sh"]
 RUN apt-get update -y
 RUN apt-get install vim -y
+RUN apt-get install cron -y
 
 WORKDIR /code
 
@@ -36,6 +38,7 @@ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 COPY . /code
+RUN pip install tom_fink
 
 # write new webpack-stats.json for django-webpack-loader to use
 # and install the Vue JS/CSS etc as static files
