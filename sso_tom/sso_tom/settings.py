@@ -15,6 +15,7 @@ import logging.config
 import os
 import tempfile
 import tomllib
+from decouple import config as dotenv
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -70,6 +71,8 @@ INSTALLED_APPS = [
     "tom_registration",
     "accounts",
     "chained",
+    "tom_alertstreams",
+    "tom_fink",
 ]
 
 SITE_ID = 1
@@ -279,6 +282,24 @@ TOM_ALERT_CLASSES = [
     "tom_alerts.brokers.tns.TNSBroker",
     #"tom_alerts.brokers.fink.FinkBroker", # TODO: Check with Julien
     "tom_fink.fink.FinkBroker",
+]
+
+ALERT_STREAMS = [
+    {
+        'ACTIVE': True,
+        'NAME': 'tom_fink.alertstream.FinkAlertStream',
+        'OPTIONS': {
+            'URL': dotenv('FINK_CREDENTIAL_URL',default='set FINK_CREDENTIAL_URL value in environment'),
+            'USERNAME': dotenv('FINK_CREDENTIAL_USERNAME', default='set FINK_CREDENTIAL_USERNAME value in environment'),
+            'GROUP_ID': dotenv('FINK_CREDENTIAL_GROUP_ID', default='set FINK_CREDENTIAL_GROUP_ID value in environment'),
+            'TOPIC': dotenv('FINK_TOPIC', default='set FINK_TOPIC value in environment'),
+            'MAX_POLL_NUMBER': dotenv("FINK_MAX_POLL_NUMBER", default=1e10),
+            'TIMEOUT': dotenv('FINK_TIMEOUT', default=10, cast=int),
+            'TOPIC_HANDLERS': {
+                'fink.stream': 'tom_fink.alertstream.alert_logger',
+            },
+        },
+    },
 ]
 
 BROKERS = {
