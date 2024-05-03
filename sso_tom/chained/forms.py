@@ -1,6 +1,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit
 from django import forms
+from guardian.shortcuts import get_objects_for_user
 from tom_observations.models import ObservationTemplate
 from tom_targets.models import Target
 
@@ -16,6 +17,10 @@ class ChainForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super(ChainForm, self).__init__(*args, **kwargs)
         self.user = user
+
+        # Filter the queryset of the 'target' field based on the user's permissions
+        if user:
+            self.fields['target'].queryset = get_objects_for_user(user, 'tom_targets.view_target')
 
     def save(self, commit=True, *args, **kwargs):
         instance = super(ChainForm, self).save(commit=False)
