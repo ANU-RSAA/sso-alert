@@ -1,0 +1,13 @@
+{% extends 'tom_common/base.html' %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% block title %}Chain List{% endblock %}
+{% block content %}
+<h3>Chain Templates</h3>
+<ul>
+    {% for template in object_list %}
+    <li><a href='{% url "chains:view_chain_template" template.id %}'>{{template.id}}: {{template.name}} ({{template.created}}) </a>
+    </li>
+    {% endfor %}
+</ul>
+<a href='{% url "chains:add_chain_template" %}' class="btn btn-primary">Add Chain Template</a>
+{% endblock content %}

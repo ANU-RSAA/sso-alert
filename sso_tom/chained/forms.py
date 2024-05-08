@@ -5,7 +5,7 @@ from guardian.shortcuts import get_objects_for_user
 from tom_observations.models import ObservationTemplate
 from tom_targets.models import Target
 
-from .models import Chain, ChainedObservation
+from .models import Chain, ChainedObservation, TemplatedChain
 
 
 class ChainForm(forms.ModelForm):
@@ -54,3 +54,21 @@ class ChainedApplyObservationTemplateForm(forms.Form):
         )
         self.helper.form_method = 'GET'
         self.helper.add_input(Submit('run', 'Apply'))
+
+
+class ChainTemplateForm(forms.ModelForm):
+    class Meta:
+        model = TemplatedChain
+        fields = ['name', 'description']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ChainTemplateForm, self).__init__(*args, **kwargs)
+        self.user = user
+
+    def save(self, commit=True, *args, **kwargs):
+        instance = super(ChainTemplateForm, self).save(commit=False)
+        instance.user = self.user
+        if commit:
+            instance.save()
+        return instance

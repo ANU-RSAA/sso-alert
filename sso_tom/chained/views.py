@@ -17,17 +17,17 @@ from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from django.views.generic.edit import FormView
 from tom_common.hints import add_hint
 from tom_common.mixins import Raise403PermissionRequiredMixin
-from tom_observations.facility import get_service_class
+from tom_observations.facility import get_service_class, get_service_classes
 from tom_observations.models import ObservationTemplate, ObservationRecord
 # from tom_observations.observation_template import ApplyObservationTemplateForm
-from .forms import ChainedApplyObservationTemplateForm
+from .forms import ChainedApplyObservationTemplateForm, ChainTemplateForm
 
-from tom_observations.views import ObservationCreateView
+from tom_observations.views import ObservationCreateView, ObservationTemplateCreateView
 from tom_targets.models import Target
 from tom_targets.views import TargetDetailView
 
 from .forms import ChainedObservationForm, ChainForm
-from .models import ChainedObservation, Chain, SUBMITTED
+from .models import ChainedObservation, Chain, SUBMITTED, TemplatedChain, ChainedTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -183,10 +183,6 @@ class SingleObservationCreateView(ObservationCreateView):
         )
 
 
-class CreateChainedObservationView(TemplateView):
-    pass
-
-
 class ChainCreateView(CreateView):
     model = Chain
     form_class = ChainForm
@@ -267,3 +263,75 @@ class ChainView(TemplateView):
         return redirect(
             reverse('chains:view_chain', kwargs={'chain_id': chain_id})
         )
+
+
+class ChainTemplateCreateView(CreateView):
+    model = TemplatedChain
+    form_class = ChainTemplateForm
+    template_name = 'chained/chain_template_add.html'
+    success_url = reverse_lazy('chains:chain_template_list')
+
+    def get_form_kwargs(self):
+        kwargs = super(ChainTemplateCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+class ChainTemplateListView(ListView):
+    model = TemplatedChain
+    template_name = "chained/chain_template_list.html"
+
+    def get_queryset(self):
+        qs = super(ChainTemplateListView, self).get_queryset()
+        qs = qs.filter(user=self.request.user)
+        return qs
+
+
+class ChainTemplateView(TemplateView):
+    template_name = 'chained/chain_template_view.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        template_id = self.kwargs.get('template_id')
+        templated_chain = get_object_or_404(
+            TemplatedChain,
+            pk=template_id,
+            user=self.request.user)
+
+        chained_templates = ChainedTemplate.objects.filter(
+            templated_chain=templated_chain,
+        )
+
+        context['templated_chain'] = templated_chain
+        context['chained_templates'] = chained_templates
+        context['installed_facilities'] = get_service_classes()
+        return context
+
+
+class ChainedTemplateCreateView(ObservationTemplateCreateView):
+
+    def get_form(self, form_class=None):
+        form = super().get_form()
+        form.helper.form_action = reverse('chains:add_template',
+                                          kwargs={
+                                              'template_id': self.kwargs['template_id'],
+                                              'facility': self.get_facility_name()}
+                                          )
+        return form
+
+    def form_valid(self, form):
+        # calls the GenericTemplateForm's save method which returns the template
+        # leaving it as is so that this can be used as a single template later on.
+        template = form.save()
+
+        # now creating a chained_template instance
+        ChainedTemplate.objects.create(
+            templated_chain=TemplatedChain.objects.get(pk=self.kwargs['template_id']),
+            name=template.name,
+            facility=template.facility,
+            parameters=template.parameters,
+        )
+
+        return redirect(reverse('chains:view_chain_template',
+                                kwargs={'template_id': self.kwargs['template_id'],
+                                        }))
