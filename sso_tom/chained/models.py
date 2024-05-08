@@ -19,6 +19,7 @@ from tom_targets.models import Target
 
 logger = logging.getLogger(__name__)
 
+
 class SsoAlertCadenceForm(BaseCadenceForm):
     pass
 
@@ -46,7 +47,7 @@ class SsoAlertCadenceStrategy(CadenceStrategy):
         :type observation_payload: dict
         """
         return observation_payload
-    
+
     def run(self):
         print(f"RUN CADENCE STRATEGY FOR SSO_ALERT")
         # Obtain list of "Broker Query" entries. I think we will only support the "Fink" query broker.
@@ -57,13 +58,16 @@ class SsoAlertCadenceStrategy(CadenceStrategy):
         # Lets just assume for the moment that none of the "Broker Queries" have come up with new observations
         # We want to iterate through every currently submitted observation we are responsible for.  For now that will only involve the
         # ANU230cm facility but soon it will also include the DREAMS facility (and one day the GOTO facility)
-        observations_we_are_responsible_for = ObservationRecord.objects.filter(facility="ANU 2.3m").exclude(status="").exclude(status="Complete")
+        observations_we_are_responsible_for = ObservationRecord.objects.filter(facility="ANU 2.3m").exclude(
+            status="").exclude(status="Complete")
         for observation in observations_we_are_responsible_for:
-            print(f"  was Observation {observation} with id={observation.observation_id} status={observation.status} terminal={observation.terminal}")
+            print(
+                f"  was Observation {observation} with id={observation.observation_id} status={observation.status} terminal={observation.terminal}")
             facility = get_service_class(observation.facility)()
             facility.update_observation_status(observation.observation_id)  # Updates the DB record
             observation.refresh_from_db()
-            print(f"  is Observation {observation} with id={observation.observation_id} status={observation.status} terminal={observation.terminal}")
+            print(
+                f"  is Observation {observation} with id={observation.observation_id} status={observation.status} terminal={observation.terminal}")
 
         # Creation of corresponding ObservationRecord objects for the observations
         new_observations = []
@@ -189,4 +193,36 @@ class ChainedObservation(models.Model):
 
     def __str__(self):
         status = "NOT SUBMITTED" if not self.observation else "SUBMITTED"
-        return f'{self.facility} ({ status })'
+        return f'{self.facility} ({status})'
+
+
+DRAFT = 'DRAFT'
+FINALIZED = 'FINALIZED'
+
+TEMPLATED_CHAIN_STATUS = (
+    (DRAFT, DRAFT),
+    (FINALIZED, FINALIZED),
+)
+
+
+class TemplatedChain(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    created = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(choices=TEMPLATED_CHAIN_STATUS, max_length=20, default=DRAFT)
+
+    def __str__(self):
+        return self.name
+
+
+class ChainedTemplate(models.Model):
+    templated_chain = models.ForeignKey(TemplatedChain, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    facility = models.CharField(max_length=50)
+    parameters = models.JSONField()
+    created = models.DateTimeField(auto_now_add=True)
+    trigger_next_condition = models.CharField(choices=CONDITION_CHOICES, max_length=20, default=FAILED)
+
+    def __str__(self):
+        return f'{self.facility} ({self.templated_chain})'

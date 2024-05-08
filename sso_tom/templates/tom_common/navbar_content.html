@@ -8,7 +8,8 @@ For customization instructions, see tom_common/base.html
     <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
 </li> -->
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'targets' %}active{% endif %}" data-toggle="dropdown">Targets</a>
+    <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'targets' %}active{% endif %}"
+       data-toggle="dropdown">Targets</a>
     <div class="dropdown-menu">
         <a class="dropdown-item" href="{% url 'targets:list' %}">Targets</a>
         <a class="dropdown-item" href="{% url 'targets:targetgrouping' %}">Target Grouping</a>
@@ -24,18 +25,27 @@ For customization instructions, see tom_common/base.html
             <a class="nav-link" href="{% url 'tom_observations:list' %}" style="color:black">Observations</a>
         </li>
         <li class="nav-item {% if request.resolver_match.namespace == 'observations' %}active{% endif %}">
-            <a class="nav-link" href="{% url 'tom_observations:group-list' %}" style="color:black">Observation Groups</a>
+            <a class="nav-link" href="{% url 'tom_observations:group-list' %}" style="color:black">Observation
+                Groups</a>
         </li>
         <li class="nav-item {% if request.resolver_match.namespace == 'observations' %}active{% endif %}">
-            <a class="nav-link" href="{% url 'tom_observations:template-list' %}" style="color:black">Observation Templates</a>
-        </li>
-        <li class="nav-item {% if request.resolver_match.namespace == 'observations' %}active{% endif %}">
-            <a class="nav-link" href="{% url 'tom_observations:facility-status' %}" style="color:black">Facility Status</a>
+            <a class="nav-link" href="{% url 'tom_observations:template-list' %}" style="color:black">Observation
+                Templates</a>
         </li>
     </ul>
 </li>
-<li class="nav-item" >
-    <a class="nav-link" href="{% url 'chains:chain_list' %}">Observation Chains</a>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown">Chains</a>
+    <ul class="dropdown-menu">
+        <li class="nav-item {% if request.resolver_match.namespace == 'chains' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'chains:chain_list' %}" style="color:black">Observation Chains</a>
+        </li><li class="nav-item {% if request.resolver_match.namespace == 'chains' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'chains:chain_template_list' %}" style="color:black">Chain Templates</a>
+        </li>
+    </ul>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'sso_alerts:alert_list' %}">Stream Alerts</a>
 </li>
 <!-- <li class="nav-item {% if request.resolver_match.namespace == 'dataproducts' %}active{% endif %}">
     <a class="nav-link" href="{% url 'tom_dataproducts:list' %}">Data</a>

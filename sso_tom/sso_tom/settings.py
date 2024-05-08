@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "chained",
     "tom_alertstreams",
     "tom_fink",
+    "sso_alerts",
 ]
 
 SITE_ID = 1

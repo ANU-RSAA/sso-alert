@@ -1,0 +1,44 @@
+{% extends 'tom_common/base.html' %}
+{% load bootstrap4 %}
+{% block title %}Alert Streams{% endblock %}
+{% block content %}
+<h3>Alert Streams</h3>
+<div class="row">
+    <div class="col-md-10">
+        <p>
+            Create a new alert stream using: <a href="{% url 'sso_alerts:alert_streams_create' %}"
+                                                class="btn btn-outline-primary">Fink Streams</a>
+        </p>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Topic</th>
+                <th>Automatic Observability</th>
+                <th>Template Chain</th>
+                <th>Template Observation</th>
+                <th>Created</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for alert in object_list %}
+            <tr>
+                <td>{{ alert.name }}</td>
+                <td>{{ alert.description }}</td>
+                <td>{{ alert.topic }}</td>
+                <td>{{ alert.automatic_observability }}</td>
+                <td>{{ alert.template_chain }}</td>
+                <td>{{ alert.template_observation }}</td>
+                <td>{{ alert.created_at }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2">
+        <h4>Filter Saved Queries</h4>
+    </div>
+</div>
+{% endblock %}

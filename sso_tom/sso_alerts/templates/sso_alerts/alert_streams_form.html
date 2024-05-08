@@ -1,0 +1,94 @@
+{% extends 'tom_common/base.html' %}
+{% load static bootstrap4 crispy_forms_tags %}
+{% block additional_css %}
+<link rel="stylesheet" href="{% static 'sso_alerts/styles/styles.css' %}">
+{% endblock %}
+{% block title %}Create Fink Alert Streams{% endblock %}
+{% block content %}
+<h3>Fink Alert Streams</h3>
+<div class="row">
+    <div class="col-md-10">
+        <form method="post" id="alert-streams-form">
+            {% csrf_token %}
+            {% crispy form %}
+        </form>
+    </div>
+    <div class="col-md-2">
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var form = document.getElementById('alert-streams-form');
+        var automaticObservability = form.querySelector('#id_automatic_observability');
+        var templateTypeField = form.querySelector('#id_template_type');
+        var templateChainedField = form.querySelector('#id_template_chained');
+        var templateObservationField = form.querySelector('#id_template_observation');
+
+        function toggleFieldsVisibility() {
+            if (automaticObservability.checked) {
+                templateTypeField.parentElement.classList.remove('d-none');
+                templateTypeField.parentElement.previousElementSibling.classList.remove('sr-only');
+                templateTypeField.required = true;
+
+                if (templateTypeField.value === 'Chain') {
+                    templateChainedField.parentElement.classList.remove('d-none');
+                    templateChainedField.parentElement.previousElementSibling.classList.remove('sr-only');
+                    templateObservationField.parentElement.classList.add('d-none');
+                    templateObservationField.parentElement.previousElementSibling.classList.add('sr-only');
+                    templateChainedField.required = true;
+                    templateObservationField.required = false;
+                } else if (templateTypeField.value === 'Single') {
+                    templateChainedField.parentElement.classList.add('d-none');
+                    templateChainedField.parentElement.previousElementSibling.classList.add('sr-only');
+                    templateObservationField.parentElement.classList.remove('d-none');
+                    templateObservationField.parentElement.previousElementSibling.classList.remove('sr-only');
+                    templateChainedField.required = false;
+                    templateObservationField.required = true;
+                }
+            } else {
+                templateTypeField.parentElement.classList.add('d-none');
+                templateTypeField.parentElement.previousElementSibling.classList.add('sr-only');
+                templateChainedField.parentElement.classList.add('d-none');
+                templateChainedField.parentElement.previousElementSibling.classList.add('sr-only');
+                templateObservationField.parentElement.classList.add('d-none');
+                templateObservationField.parentElement.previousElementSibling.classList.add('sr-only');
+                templateTypeField.required = false;
+                templateChainedField.required = false;
+                templateObservationField.required = false;
+            }
+
+            var labels = form.querySelectorAll('label');
+            labels.forEach(function(label) {
+                var fieldName = label.getAttribute('for');
+                var field = form.querySelector('#' + fieldName);
+                if (field && field.required) {
+                    if (!label.querySelector('.asteriskField')) {
+                        var asterisk = document.createElement('span');
+                        asterisk.className = 'asteriskField';
+                        asterisk.textContent = '*';
+                        label.appendChild(asterisk);
+                    }
+                } else {
+                    var asterisk = label.querySelector('.asteriskField');
+                    if (asterisk) {
+                        asterisk.remove();
+                    }
+                }
+            });
+        }
+
+        toggleFieldsVisibility();
+
+        automaticObservability.addEventListener('change', function() {
+            toggleFieldsVisibility();
+        });
+
+        templateTypeField.addEventListener('change', function() {
+            toggleFieldsVisibility();
+        });
+    });
+</script>
+
+{% endblock %}

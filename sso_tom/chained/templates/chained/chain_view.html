@@ -3,7 +3,9 @@
 {% block title %}Chain List{% endblock %}
 {% block content %}
 <h3>Chain {{chain.id}} :: {{chain.name}} :: <a
-        href='{% url "tom_targets:detail" pk=chain.target.id %}'>{{chain.target}}</a> ({{chain.status}})</h3>
+        href='{% url "tom_targets:detail" pk=chain.target.id %}'>{{chain.target}}</a> ({{chain.status}})
+        <a href='{% url "chains:clone_chain" chain_id=chain.id %}' class="btn btn-secondary">Clone this Chain</a>
+</h3>
 <table class="table table-striped">
     <thead class="thead-dark">
     <tr>
