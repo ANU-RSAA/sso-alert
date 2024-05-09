@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
+from guardian.mixins import LoginRequiredMixin
 
 from .models import AlertStreams
 from .forms import AlertStreamsForm
 
 
-class AlertListView(ListView):
+class AlertListView(LoginRequiredMixin, ListView):
     template_name = 'sso_alerts/alerts_list.html'
     model = AlertStreams
 
@@ -15,7 +16,7 @@ class AlertListView(ListView):
         return queryset.filter(user=self.request.user)
 
 
-class AlertStreamsCreateView(CreateView):
+class AlertStreamsCreateView(LoginRequiredMixin, CreateView):
     model = AlertStreams
     form_class = AlertStreamsForm
     template_name = 'sso_alerts/alert_streams_form.html'

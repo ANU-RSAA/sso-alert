@@ -15,6 +15,7 @@ from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from django.views.generic.edit import FormView
+from guardian.mixins import LoginRequiredMixin
 from tom_common.hints import add_hint
 from tom_common.mixins import Raise403PermissionRequiredMixin
 from tom_observations.facility import get_service_class, get_service_classes
@@ -183,7 +184,7 @@ class SingleObservationCreateView(ObservationCreateView):
         )
 
 
-class ChainCreateView(CreateView):
+class ChainCreateView(LoginRequiredMixin, CreateView):
     model = Chain
     form_class = ChainForm
     template_name = 'chained/chain_add.html'
@@ -195,7 +196,7 @@ class ChainCreateView(CreateView):
         return kwargs
 
 
-class ChainListView(ListView):
+class ChainListView(LoginRequiredMixin, ListView):
     model = Chain
     template_name = "chained/chain_list.html"
 
@@ -205,7 +206,7 @@ class ChainListView(ListView):
         return qs
 
 
-class ChainView(TemplateView):
+class ChainView(LoginRequiredMixin, TemplateView):
     template_name = 'chained/chain_view.html'
 
     def get_context_data(self, **kwargs):
@@ -265,7 +266,7 @@ class ChainView(TemplateView):
         )
 
 
-class ChainTemplateCreateView(CreateView):
+class ChainTemplateCreateView(LoginRequiredMixin, CreateView):
     model = TemplatedChain
     form_class = ChainTemplateForm
     template_name = 'chained/chain_template_add.html'
@@ -277,7 +278,7 @@ class ChainTemplateCreateView(CreateView):
         return kwargs
 
 
-class ChainTemplateListView(ListView):
+class ChainTemplateListView(LoginRequiredMixin, ListView):
     model = TemplatedChain
     template_name = "chained/chain_template_list.html"
 
@@ -287,7 +288,7 @@ class ChainTemplateListView(ListView):
         return qs
 
 
-class ChainTemplateView(TemplateView):
+class ChainTemplateView(LoginRequiredMixin, TemplateView):
     template_name = 'chained/chain_template_view.html'
 
     def get_context_data(self, **kwargs):
@@ -308,7 +309,7 @@ class ChainTemplateView(TemplateView):
         return context
 
 
-class ChainedTemplateCreateView(ObservationTemplateCreateView):
+class ChainedTemplateCreateView(LoginRequiredMixin, ObservationTemplateCreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form()
