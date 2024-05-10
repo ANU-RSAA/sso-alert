@@ -172,18 +172,18 @@ class Chain(models.Model):
     status = models.CharField(choices=CHAIN_STATUS, max_length=20, default=DRAFT)
 
 
-FAILED = 'FAILED'
-REJECTED = 'REJECTED'
-COMPLETED = 'COMPLETED'
-
-CONDITION_CHOICES = (
-    (FAILED, FAILED),
-    (REJECTED, REJECTED),
-    (COMPLETED, COMPLETED),
-)
-
-
 class ChainedObservation(models.Model):
+
+    FAILED = 'FAILED'
+    REJECTED = 'REJECTED'
+    COMPLETED = 'COMPLETED'
+
+    CONDITION_CHOICES = (
+        (FAILED, FAILED),
+        (REJECTED, REJECTED),
+        (COMPLETED, COMPLETED),
+    )
+
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
     facility = models.CharField(max_length=50)
     parameters = models.JSONField()
@@ -196,16 +196,15 @@ class ChainedObservation(models.Model):
         return f'{self.facility} ({status})'
 
 
-DRAFT = 'DRAFT'
-FINALIZED = 'FINALIZED'
-
-TEMPLATED_CHAIN_STATUS = (
-    (DRAFT, DRAFT),
-    (FINALIZED, FINALIZED),
-)
-
-
 class TemplatedChain(models.Model):
+    DRAFT = 'DRAFT'
+    FINALIZED = 'FINALIZED'
+
+    TEMPLATED_CHAIN_STATUS = (
+        (DRAFT, DRAFT),
+        (FINALIZED, FINALIZED),
+    )
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
@@ -217,6 +216,16 @@ class TemplatedChain(models.Model):
 
 
 class ChainedTemplate(models.Model):
+    FAILED = 'FAILED'
+    REJECTED = 'REJECTED'
+    COMPLETED = 'COMPLETED'
+
+    CONDITION_CHOICES = (
+        (FAILED, FAILED),
+        (REJECTED, REJECTED),
+        (COMPLETED, COMPLETED),
+    )
+
     templated_chain = models.ForeignKey(TemplatedChain, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     facility = models.CharField(max_length=50)

@@ -308,6 +308,39 @@ class ChainTemplateView(LoginRequiredMixin, TemplateView):
         context['installed_facilities'] = get_service_classes()
         return context
 
+    def post(self, *args, **kwargs):
+        templated_chain_id = self.request.POST.get("templated_chain_id")
+
+        if "submit-template-chain" in self.request.POST:
+
+            try:
+
+                templated_chain = get_object_or_404(
+                    TemplatedChain,
+                    pk=templated_chain_id,
+                    user=self.request.user)
+
+                chained_templates = ChainedTemplate.objects.filter(
+                    templated_chain=templated_chain,
+                )
+
+                for template in chained_templates:
+                    template_id = template.id
+                    trigger_next_condition = self.request.POST.get(f"trigger_next_condition__{template_id}",
+                                                                   ChainedTemplate.FAILED)
+                    template.trigger_next_condition = trigger_next_condition
+                    template.save()
+
+                templated_chain.status = TemplatedChain.FINALIZED
+                templated_chain.save()
+
+                messages.success(self.request, "Chain finalized successfully.")
+            except Exception as e:
+                messages.error(self.request, "Cannot update chain template now.")
+        else:
+            messages.error(self.request, "Something went wrong.")
+        return redirect('chains:view_chain_template', template_id=templated_chain_id)
+
 
 class ChainedTemplateCreateView(LoginRequiredMixin, ObservationTemplateCreateView):
 
