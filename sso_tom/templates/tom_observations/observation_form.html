@@ -7,14 +7,17 @@
 {% endblock %}
 {% block content %}
 {{ form|as_crispy_errors }}
-<h3>Submit an observation to {{ form.facility.value }} for <a href="{% url 'targets:detail' pk=target.id %}">{{target.name}}</a></h3>
+<h3>Submit an observation to {{ form.facility.value }} for <a href="{% url 'targets:detail' pk=target.id %}">{{target.name}}</a>
+</h3>
 {% if missing_configurations %}
-    <div class="alert alert-danger">Some {{ form.facility.value }} Facility settings ({{ missing_configurations }}) are not configured.</div>
+<div class="alert alert-danger">Some {{ form.facility.value }} Facility settings ({{ missing_configurations }}) are not
+    configured.
+</div>
 {% endif %}
 {% if target.type == 'SIDEREAL' %}
 <div class="row">
     <div class="col">
-    {% observation_plan target form.facility.value %}
+        {% observation_plan target form.facility.value %}
     </div>
 </div>
 {% endif %}
@@ -26,25 +29,27 @@
     </div>
     <div class="col-md-6">
         <ul class="nav nav-tabs" id="tabs">
-        {% for observation_type, observation_form in observation_type_choices %}
+            {% for observation_type, observation_form in observation_type_choices %}
             <li class="nav-item">
-                <span class="nav-link {% if observation_type == active or not active and forloop.first %}active{% endif %}" data-target="#{{ observation_type }}" data-toggle="tab">
+                <span class="nav-link {% if observation_type == active or not active and forloop.first %}active{% endif %}"
+                      data-target="#{{ observation_type }}" data-toggle="tab">
                     {{ observation_type|display_obs_type }}
                 </span>
             </li>
-        {% endfor %}
+            {% endfor %}
         </ul>
         <div class="tab-content observation-form">
-        {% for observation_type, observation_form in observation_type_choices %}
-            <div class="tab-pane {% if observation_type == active or not active and forloop.first %}active{% endif %}" id="{{ observation_type }}">
+            {% for observation_type, observation_form in observation_type_choices %}
+            <div class="tab-pane {% if observation_type == active or not active and forloop.first %}active{% endif %}"
+                 id="{{ observation_type }}">
                 {% crispy observation_form %}
-<!--?<form method="post">-->
-<!--?    {% csrf_token %}-->
-<!--?    {{ observation_form|crispy }}-->
-<!--?    <button type="submit">Submit</button>-->
-<!--?</form>-->
+                <!--?<form method="post">-->
+                <!--?    {% csrf_token %}-->
+                <!--?    {{ observation_form|crispy }}-->
+                <!--?    <button type="submit">Submit</button>-->
+                <!--?</form>-->
             </div>
-        {% endfor %}
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -55,5 +60,53 @@
     } else {
         document.getElementById('submit-id-add_to_chain').style.display = 'none';
     }
+</script>
+<script>
+    // setting ra
+    document.getElementById('id_ra_0').value = document.getElementById('ra_sexigesimal').textContent;
+    // setting dec
+    document.getElementById('id_dec_0').value = document.getElementById('dec_sexigesimal').textContent;
+    if (document.getElementById('id_pmot_0').value === "") {
+        document.getElementById('id_pmot_0').value = '0 0';
+    }
+
+    // Get the elements and time
+    let userInput = document.getElementById("id_userdefid");
+    let targetName = document.getElementById("target_name").textContent.trim();
+    let currentTime = new Date();
+
+    let formattedTime =
+            currentTime.getFullYear() +
+            padZero(currentTime.getMonth() + 1) +
+            padZero(currentTime.getDate()) +
+            padZero(currentTime.getHours()) +
+            padZero(currentTime.getMinutes()) +
+            padZero(currentTime.getSeconds());
+
+    if (userInput.value.trim() !== "") {
+        userInput.value += "_" + targetName + "_" + formattedTime;
+    } else {
+        userInput.value = targetName + "_" + formattedTime;
+    }
+
+    function padZero(num) {
+        return (num < 10 ? '0' : '') + num;
+    }
+
+</script>
+<script>
+    // WIP of adding the check button
+    const parentDiv = document.getElementById("div_id_userdefid");
+
+    const button = document.createElement("button");
+    button.textContent = "Check Uniqueness";
+    button.type = "button";
+    button.id = "check_button";
+    button.classList.add("btn", "btn-primary");
+
+    // need to add code from where to check the uniqueness.
+    // right now not adding the button
+    // parentDiv.appendChild(button);
+
 </script>
 {% endblock %}
