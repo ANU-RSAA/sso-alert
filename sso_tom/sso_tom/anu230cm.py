@@ -80,19 +80,6 @@ CHOICES = {
 }
 
 
-# Validators for form fields.
-# validate_ra = RegexValidator(
-#     regex=r"(?:[01][0-9]|[2][0-3])\s[0-5][0-9]\s[0-5][0-9][.][0-5][0-9]",
-#     message="RA must be specified with the format 'HH MM SS.SS'.",
-#     code="invalid",
-# )
-
-# validate_dec = RegexValidator(
-#     regex=r"^[-+]?(?:[0-8][0-9]\s[0-5][0-9]\s[0-5][0-9][.][0-9]|90\s00\s00[.]0)$",
-#     message="Declination must be specified with the format 'sDD MM SS.S'.",
-#     code="invalid",
-# )
-
 # Class that displays a GUI form for users to create an observation.
 class ANU230cmForm(BaseRoboticObservationForm):
     proposal = forms.CharField(
@@ -365,15 +352,15 @@ class ANU230cmForm(BaseRoboticObservationForm):
                     css_class="form-row",
                 ),
             ),
-            Fieldset(
-                "Nod & Shuffle Sky",
-                Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
-                Div(
-                    Div("skya_ra_0", css_class="col"),
-                    Div("skya_dec_0", css_class="col"),
-                    css_class="form-row",
-                ),
-            ),
+            # Fieldset(
+            #     "Nod & Shuffle Sky",
+            #     Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
+            #     Div(
+            #         Div("skya_ra_0", css_class="col"),
+            #         Div("skya_dec_0", css_class="col"),
+            #         css_class="form-row",
+            #     ),
+            # ),
         )
 
     def button_layout(self):
@@ -678,40 +665,40 @@ class ANU230cmTemplateForm(GenericTemplateForm):
             ),
             Fieldset(
                 "Object, Acquisition & Guide",
-                Div(
-                    Div("ra_0", css_class="col"),
-                    Div("dec_0", css_class="col"),
-                    Div("pmot_0", css_class="col"),
-                    css_class="form-row",
-                ),
-                Div(
-                    Div("acq_ra_0", css_class="col"),
-                    Div("acq_dec_0", css_class="col"),
-                    Div("acq_pmot_0", css_class="col"),
-                    css_class="form-row",
-                ),
+                # Div(
+                #     Div("ra_0", css_class="col"),
+                #     Div("dec_0", css_class="col"),
+                #     Div("pmot_0", css_class="col"),
+                #     css_class="form-row",
+                # ),
+                # Div(
+                #     Div("acq_ra_0", css_class="col"),
+                #     Div("acq_dec_0", css_class="col"),
+                #     Div("acq_pmot_0", css_class="col"),
+                #     css_class="form-row",
+                # ),
                 Div(Div("blindacq_0", css_class="col"), css_class="form-row"),
+                # Div(
+                #     Div("rot_0", css_class="col"),
+                #     Div("rotang_0", css_class="col"),
+                #     css_class="form-row",
+                # ),
                 Div(
-                    Div("rot_0", css_class="col"),
-                    Div("rotang_0", css_class="col"),
-                    css_class="form-row",
-                ),
-                Div(
-                    Div("mag_0", css_class="col"),
+                    # Div("mag_0", css_class="col"),
                     Div("agfilter_0", css_class="col"),
                     Div("guide_0", css_class="col"),
                     css_class="form-row",
                 ),
             ),
-            Fieldset(
-                "Nod & Shuffle Sky",
-                Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
-                Div(
-                    Div("skya_ra_0", css_class="col"),
-                    Div("skya_dec_0", css_class="col"),
-                    css_class="form-row",
-                ),
-            ),
+            # Fieldset(
+            #     "Nod & Shuffle Sky",
+            #     Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
+            #     # Div(
+            #     #     Div("skya_ra_0", css_class="col"),
+            #     #     Div("skya_dec_0", css_class="col"),
+            #     #     css_class="form-row",
+            #     # ),
+            # ),
         )
 
 
@@ -837,6 +824,96 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         """
         return ["Succeeded", "Rejected"]  # Not sure if should be capitalised.
 
+    @staticmethod
+    def get_clean_data_for_posting(observation_payload):
+
+        # Keyword dictionary
+        proposal = "PROPOSAL"
+        userdefid = "USERDEFID"
+        userdefpri = "USERDEFPRI"
+        nobsblk = "NOBSBLK"
+
+        maxseeing = "MAXSEEING"
+        photometric = "PHOTOMETRIC"
+        maxlunarphase = "MAXLUNARPHASE"
+        timeconstraint = "TIMECONSTRAINT"
+        timeref = "TIMEREF"
+        timewindow = "TIMEWINDOW"
+
+        instr_pri_ = "INSTR_PRI_"
+        imgtype_ = "IMGTYPE_"
+        mode_ = "MODE_"
+        ra_ = "RA_"
+        dec_ = "DEC_"
+        pmot_ = "PMOT_"
+        rot_ = "ROT_"
+        rotang_ = "ROTANG_"
+        dichroic_ = "DICHROIC_"
+        red_grating_ = "RED_GRATING_"
+        blue_grating_ = "BLUE_GRATING_"
+        aperturewheel_ = "APERTUREWHEEL_"
+        agfilter_ = "AGFILTER_"
+        stellar_ = "STELLAR_"
+        binx_ = "BINX_"
+        biny_ = "BINY_"
+        nexp_ = "NEXP_"
+        acq_ra_ = "ACQ_RA_"
+        acq_dec_ = "ACQ_DEC_"
+        acq_pmot_ = "ACQ_PMOT_"
+        blindacq_ = "BLINDACQ_"
+        guide_ = "GUIDE_"
+        mag_ = "MAG_"
+        exptime_ = "EXPTIME_"
+        sky_exptime_ = "SKY_EXPTIME_"
+        scdescr_ = "SCDESCR_"
+        skya_ra_ = "SKYA_RA_"
+        skya_dec_ = "SKYA_DEC_"
+
+        post_data = {}
+        post_data[proposal] = observation_payload['params'].get(proposal.lower(), None)
+        post_data[userdefid] = observation_payload['params'].get(userdefid.lower(), None)
+        post_data[userdefpri] = observation_payload['params'].get(userdefpri.lower(), None)
+        post_data[nobsblk] = observation_payload['params'].get(nobsblk.lower(), None)
+        post_data[maxseeing] = observation_payload['params'].get(maxseeing.lower(), None)
+        post_data[photometric] = observation_payload['params'].get(photometric.lower(), None)
+        post_data[maxlunarphase] = observation_payload['params'].get(maxlunarphase.lower(), None)
+        post_data[timeconstraint] = observation_payload['params'].get(timeconstraint.lower(), None)
+        post_data[timeref] = observation_payload['params'].get(timeref.lower(), None)
+        post_data[timewindow] = observation_payload['params'].get(timewindow.lower(), None)
+        post_data[instr_pri_ + "0"] = observation_payload['params'].get(instr_pri_.lower() + "0", None)
+        post_data[imgtype_ + "0"] = observation_payload['params'].get(imgtype_.lower() + "0", None)
+        post_data[mode_ + "0"] = observation_payload['params'].get(mode_.lower() + "0", None)
+        post_data[dichroic_ + "0"] = observation_payload['params'].get(dichroic_.lower() + "0", None)
+        post_data[red_grating_ + "0"] = observation_payload['params'].get(red_grating_.lower() + "0", None)  # ?
+        post_data[blue_grating_ + "0"] = observation_payload['params'].get(blue_grating_.lower() + "0", None)
+        post_data[aperturewheel_ + "0"] = observation_payload['params'].get(aperturewheel_.lower() + "0", None)
+        post_data[ra_ + "0"] = observation_payload['params'].get(ra_.lower() + "0", None)
+        post_data[dec_ + "0"] = observation_payload['params'].get(dec_.lower() + "0", None)
+        post_data[pmot_ + "0"] = observation_payload['params'].get(pmot_.lower() + "0", None)
+        post_data[acq_ra_ + "0"] = observation_payload['params'].get(acq_ra_.lower() + "0", None)
+        post_data[acq_dec_ + "0"] = observation_payload['params'].get(acq_dec_.lower() + "0", None)
+        post_data[acq_pmot_ + "0"] = observation_payload['params'].get(acq_pmot_.lower() + "0", None)
+        post_data[blindacq_ + "0"] = observation_payload['params'].get(blindacq_.lower() + "0", None)
+        post_data[rot_ + "0"] = observation_payload['params'].get(rot_.lower() + "0", None)
+        post_data[rotang_ + "0"] = observation_payload['params'].get(rotang_.lower() + "0", None)
+        post_data[mag_ + "0"] = observation_payload['params'].get(mag_.lower() + "0", None)
+        post_data[agfilter_ + "0"] = observation_payload['params'].get(agfilter_.lower() + "0", None)
+        post_data[guide_ + "0"] = observation_payload['params'].get(guide_.lower() + "0", None)
+        post_data[nexp_ + "0"] = observation_payload['params'].get(nexp_.lower() + "0", None)
+        post_data[stellar_ + "0"] = observation_payload['params'].get(stellar_.lower() + "0", None)
+        post_data[binx_ + "0"] = observation_payload['params'].get(binx_.lower() + "0", None)
+        post_data[biny_ + "0"] = observation_payload['params'].get(biny_.lower() + "0", None)
+        post_data[exptime_ + "0"] = observation_payload['params'].get(exptime_.lower() + "0", None)
+        post_data[sky_exptime_ + "0"] = observation_payload['params'].get(sky_exptime_.lower() + "0", None)
+        post_data[scdescr_ + "0"] = observation_payload['params'].get(scdescr_.lower() + "0", None)
+        post_data[skya_ra_ + "0"] = observation_payload['params'].get(skya_ra_.lower() + "0", None)
+        post_data[skya_dec_ + "0"] = observation_payload['params'].get(skya_dec_.lower() + "0", None)
+
+        # Remove keys with None values
+        post_data = {k: v for k, v in post_data.items() if v not in [None, '']}
+
+        return post_data, post_data[proposal], post_data[userdefid]
+
     def submit_observation(self, observation_payload):
         """
         This method takes in the serialized data from the form and actually
@@ -847,145 +924,18 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         if test_anu230cm_emulator:
             print("new submit_observation_payload")
             # local version of emuldate_common
-            ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-            ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
-            emulate_ANU230cm = "https://mortal.anu.edu.au/aocs/"
-            print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
+            password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+            username = config('ADACS_PROPOSALDB_TEST_USERNAME')
+            facility_link = "https://mortal.anu.edu.au/aocs/"
+            print(f"TOKENS FOR ACCESS {password} {username}")
             # url_suffix = "/"
             url_suffix = ".php"
-            # Keyword dictionary
-            PROPOSAL = "PROPOSAL"
-            USERDEFID = "USERDEFID"
-            USERDEFPRI = "USERDEFPRI"
-            NOBSBLK = "NOBSBLK"
 
-            MAXSEEING = "MAXSEEING"
-            PHOTOMETRIC = "PHOTOMETRIC"
-            MAXLUNARPHASE = "MAXLUNARPHASE"
-            TIMECONSTRAINT = "TIMECONSTRAINT"
-            TIMEREF = "TIMEREF"
-            TIMEWINDOW = "TIMEWINDOW"
+            url = facility_link + '/addobsblockexec' + url_suffix
 
-            INSTR_PRI_ = "INSTR_PRI_"
-            IMGTYPE_ = "IMGTYPE_"
-            MODE_ = "MODE_"
-            RA_ = "RA_"
-            DEC_ = "DEC_"
-            PMOT_ = "PMOT_"
-            ROT_ = "ROT_"
-            ROTANG_ = "ROTANG_"
-            DICHROIC_ = "DICHROIC_"
-            RED_GRATING_ = "RED_GRATING_"
-            BLUE_GRATING_ = "BLUE_GRATING_"
-            APERTUREWHEEL_ = "APERTUREWHEEL_"
-            AGFILTER_ = "AGFILTER_"
-            STELLAR_ = "STELLAR_"
-            BINX_ = "BINX_"
-            BINY_ = "BINY_"
-            NEXP_ = "NEXP_"
-            ACQ_RA_ = "ACQ_RA_"
-            ACQ_DEC_ = "ACQ_DEC_"
-            ACQ_PMOT_ = "ACQ_PMOT_"
-            BLINDACQ_ = "BLINDACQ_"
-            GUIDE_ = "GUIDE_"
-            MAG_ = "MAG_"
-            EXPTIME_ = "EXPTIME_"
-            SKY_EXPTIME_ = "SKY_EXPTIME_"
-            SCDESCR_ = "SCDESCR_"
-            SKYA_RA_ = "SKYA_RA_"
-            SKYA_DEC_ = "SKYA_DEC_"
+            post_data, proposal, userdefid = self.get_clean_data_for_posting(observation_payload=observation_payload)
 
-            #
-            url = emulate_ANU230cm + '/addobsblockexec' + url_suffix
-
-            post_data = {}
-            post_data[PROPOSAL] = observation_payload['params']['proposal']
-
-            print(observation_payload)
-
-            # crosscheck list of whats on the observation_payload
-            # cadence_strategy: ignored
-            # facility: 'ANU 2.3m'
-            # target_id: ignored
-            # observation_type: ignored
-            # proposal: passed
-            # userdefid: passed as USERDEFID
-            # nobsblk: 1 passed as NOBSBLK
-            # maxseeing: passed as MAXSEEING
-            # photometric: passed as PHOTOMETRIC
-            # maxlunarphase: passed as MAXLUNARPHASE
-            # timeconstraint: passed as TIMECONSTRAINT
-            # timeref: passed as TIMEREF
-            # timewindow: passed as TIMEWINDOW
-            # instr_pri_0: passed as INSTR_PRI_0
-            # imgtype_0: passed as INSTR_PRI_0
-            # mode_0: passed as MODE_0
-            # dichroic_0: passed as DICHROIC_0
-            # red_grating_0: passed as RED_GRATING_0
-            # blue_grating_0: passed as BLUE_GRATING_0
-            # aperturewheel_0: passed as APERTUREWHEEL_0
-            # ra_0: passed as RA_0
-            # dec_0: passed as DEC_0
-            # pmot_0: passed as PMOT
-            # acq_ra_0: passed as ACQ_RA_0
-            # acq_dec_0: passed as ACQ_DEC_0
-            # acq_pmot_0: passed as ACQ_PMOT_0
-            # blindacq_0: passed BLINDACQ_0
-            # rot_0: passed as ROT_0
-            # rotang_0: passed as ROTANG_0
-            # mag_0: passed as MAG_0
-            # agfilter_0: passed AGFILTER_0
-            # guide_0: passed as GUIDE_0
-            # nexp_0: passed as NEXP_0
-            # stellar_0: passed as STELLAR_0
-            # binx_0: passed as BINX_0
-            # biny_0: passed as BINY_0
-            # exptime_0: passed as EXPTIME_0
-            # sky_exptime_0: passed as SKY_EXPTIME_0
-            # scdescr_0: passed as SCDESCR_0
-            # skya_ra_0: passed as SKYA_RA_0
-            # skya_dec_0: passed as SKYA_DEC_0
-
-            post_data[USERDEFID] = observation_payload['params']['userdefid']
-            post_data[USERDEFPRI] = observation_payload['params']['userdefpri']
-            post_data[NOBSBLK] = 1
-            post_data[MAXSEEING] = observation_payload['params']['maxseeing']
-            post_data[PHOTOMETRIC] = observation_payload['params']['photometric']
-            post_data[MAXLUNARPHASE] = observation_payload['params']['maxlunarphase']
-            post_data[TIMECONSTRAINT] = observation_payload['params']['timeconstraint']
-            post_data[TIMEREF] = observation_payload['params']['timeref']
-            post_data[TIMEWINDOW] = observation_payload['params']['timewindow']
-            post_data[INSTR_PRI_ + "0"] = observation_payload['params']['instr_pri_0']
-            post_data[IMGTYPE_ + "0"] = observation_payload['params']['imgtype_0']
-            post_data[MODE_ + "0"] = observation_payload['params']['mode_0']
-            post_data[DICHROIC_ + "0"] = observation_payload['params']['dichroic_0']
-            post_data[RED_GRATING_ + "0"] = observation_payload['params']['red_grating_0']  # ?
-            post_data[BLUE_GRATING_ + "0"] = observation_payload['params']['blue_grating_0']
-            post_data[APERTUREWHEEL_ + "0"] = observation_payload['params']['aperturewheel_0']
-            post_data[RA_ + "0"] = observation_payload['params']['ra_0']
-            post_data[DEC_ + "0"] = observation_payload['params']['dec_0']
-            post_data[PMOT_ + "0"] = observation_payload['params']['pmot_0']
-            post_data[ACQ_RA_ + "0"] = observation_payload['params']['acq_ra_0']
-            post_data[ACQ_DEC_ + "0"] = observation_payload['params']['acq_dec_0']
-            post_data[ACQ_PMOT_ + "0"] = observation_payload['params']['acq_pmot_0']
-            post_data[BLINDACQ_ + "0"] = observation_payload['params']['blindacq_0']
-            post_data[ROT_ + "0"] = observation_payload['params']['rot_0']
-            post_data[ROTANG_ + "0"] = observation_payload['params']['rotang_0']
-            post_data[MAG_ + "0"] = observation_payload['params']['mag_0']
-            post_data[AGFILTER_ + "0"] = observation_payload['params']['agfilter_0']
-            post_data[GUIDE_ + "0"] = observation_payload['params']['guide_0']
-            post_data[NEXP_ + "0"] = observation_payload['params']['nexp_0']
-            post_data[STELLAR_ + "0"] = observation_payload['params']['stellar_0']
-            post_data[BINX_ + "0"] = observation_payload['params']['binx_0']
-            post_data[BINY_ + "0"] = observation_payload['params']['biny_0']
-            post_data[EXPTIME_ + "0"] = observation_payload['params']['exptime_0']
-            post_data[SKY_EXPTIME_ + "0"] = observation_payload['params']['sky_exptime_0']
-            post_data[SCDESCR_ + "0"] = observation_payload['params']['scdescr_0']
-            post_data[SKYA_RA_ + "0"] = observation_payload['params']['skya_ra_0']
-            post_data[SKYA_DEC_ + "0"] = observation_payload['params']['skya_dec_0']
-            #
-            response = requests.post(url, data=post_data,
-                                     auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
+            response = requests.post(url, data=post_data, auth=(username, password))
             print(f"{response}")
 
             try:
@@ -995,8 +945,11 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 msg = f"Bad response"
                 logger.exception(msg)
 
-            return [f'{post_data[PROPOSAL]}-{post_data[USERDEFID]}']
-        return [uuid.uuid4()]  # update it to unique
+            return [f'{proposal}-{userdefid}']
+
+        else:
+            # will need to set up for real one
+            return [uuid.uuid4()]  # update it to unique
 
     def validate_observation(self, observation_payload):
         """

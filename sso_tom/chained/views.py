@@ -15,6 +15,7 @@ from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from django.views.generic.edit import FormView
+from guardian.mixins import LoginRequiredMixin
 from tom_common.hints import add_hint
 from tom_common.mixins import Raise403PermissionRequiredMixin
 from tom_observations.facility import get_service_class, get_service_classes
@@ -27,7 +28,8 @@ from tom_targets.models import Target
 from tom_targets.views import TargetDetailView
 
 from .forms import ChainedObservationForm, ChainForm
-from .models import ChainedObservation, Chain, SUBMITTED, TemplatedChain, ChainedTemplate
+from .models import ChainedObservation, Chain, TemplatedChain, ChainedTemplate
+from .utils import submit_chain
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +185,7 @@ class SingleObservationCreateView(ObservationCreateView):
         )
 
 
-class ChainCreateView(CreateView):
+class ChainCreateView(LoginRequiredMixin, CreateView):
     model = Chain
     form_class = ChainForm
     template_name = 'chained/chain_add.html'
@@ -195,7 +197,7 @@ class ChainCreateView(CreateView):
         return kwargs
 
 
-class ChainListView(ListView):
+class ChainListView(LoginRequiredMixin, ListView):
     model = Chain
     template_name = "chained/chain_list.html"
 
@@ -205,7 +207,7 @@ class ChainListView(ListView):
         return qs
 
 
-class ChainView(TemplateView):
+class ChainView(LoginRequiredMixin, TemplateView):
     template_name = 'chained/chain_view.html'
 
     def get_context_data(self, **kwargs):
@@ -233,39 +235,14 @@ class ChainView(TemplateView):
             user=request.user,
         )
 
-        chained_observations = ChainedObservation.objects.filter(chain=chain).order_by('created')
-
-        if chained_observations.exists():
-            first_chained_observation = chained_observations.first()
-
-            facility = get_service_class(first_chained_observation.facility)()
-
-            observation_ids = facility.submit_observation({
-                'target': chain.target,
-                'params': first_chained_observation.parameters,
-            })
-
-            # Create Observation record
-            record = ObservationRecord.objects.create(
-                target=chain.target,
-                user=self.request.user,
-                facility=facility.name,
-                parameters=first_chained_observation.parameters,
-                observation_id=observation_ids[0]
-            )
-
-            first_chained_observation.observation = record
-            first_chained_observation.save()
-
-            chain.status = SUBMITTED
-            chain.save()
+        submit_chain(chain)
 
         return redirect(
             reverse('chains:view_chain', kwargs={'chain_id': chain_id})
         )
 
 
-class ChainTemplateCreateView(CreateView):
+class ChainTemplateCreateView(LoginRequiredMixin, CreateView):
     model = TemplatedChain
     form_class = ChainTemplateForm
     template_name = 'chained/chain_template_add.html'
@@ -277,7 +254,7 @@ class ChainTemplateCreateView(CreateView):
         return kwargs
 
 
-class ChainTemplateListView(ListView):
+class ChainTemplateListView(LoginRequiredMixin, ListView):
     model = TemplatedChain
     template_name = "chained/chain_template_list.html"
 
@@ -287,7 +264,7 @@ class ChainTemplateListView(ListView):
         return qs
 
 
-class ChainTemplateView(TemplateView):
+class ChainTemplateView(LoginRequiredMixin, TemplateView):
     template_name = 'chained/chain_template_view.html'
 
     def get_context_data(self, **kwargs):
@@ -307,8 +284,41 @@ class ChainTemplateView(TemplateView):
         context['installed_facilities'] = get_service_classes()
         return context
 
+    def post(self, *args, **kwargs):
+        templated_chain_id = self.request.POST.get("templated_chain_id")
 
-class ChainedTemplateCreateView(ObservationTemplateCreateView):
+        if "submit-template-chain" in self.request.POST:
+
+            try:
+
+                templated_chain = get_object_or_404(
+                    TemplatedChain,
+                    pk=templated_chain_id,
+                    user=self.request.user)
+
+                chained_templates = ChainedTemplate.objects.filter(
+                    templated_chain=templated_chain,
+                )
+
+                for template in chained_templates:
+                    template_id = template.id
+                    trigger_next_condition = self.request.POST.get(f"trigger_next_condition__{template_id}",
+                                                                   ChainedTemplate.FAILED)
+                    template.trigger_next_condition = trigger_next_condition
+                    template.save()
+
+                templated_chain.status = TemplatedChain.FINALIZED
+                templated_chain.save()
+
+                messages.success(self.request, "Chain finalized successfully.")
+            except Exception as e:
+                messages.error(self.request, "Cannot update chain template now.")
+        else:
+            messages.error(self.request, "Something went wrong.")
+        return redirect('chains:view_chain_template', template_id=templated_chain_id)
+
+
+class ChainedTemplateCreateView(LoginRequiredMixin, ObservationTemplateCreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form()

@@ -2,39 +2,55 @@
 {% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
 {% block title %}Chain List{% endblock %}
 {% block content %}
-<h3>Template {{templated_chain.id}} :: {{templated_chain.name}} :: ({{templated_chain.status}})</h3>
-<table class="table table-striped">
-    <thead class="thead-dark">
-    <tr>
-        <th>Order in the chain</th>
-        <th>Facility</th>
-        <th>Proposal ID</th>
-        <th>User Defined ID</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for template in chained_templates %}
-    <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ template.facility }}</td>
-        <td>{{ template.parameters.proposal }}</td>
-        <td>{{ template.parameters.userdefid }}</td>
-    </tr>
-    {% endfor %}
-    {% if chained_templates|length < 1 %}
-    <tr>
-        <td colspan="5">No templates yet.</td>
-    </tr>
-    {% endif %}
-    </tbody>
-</table>
+<form method="post">
+    {% csrf_token %}
+    <h3>Template {{templated_chain.id}} :: {{templated_chain.name}} :: ({{templated_chain.status}})</h3>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Order in the chain</th>
+            <th>Facility</th>
+            <th>Proposal ID</th>
+            <th>User Defined ID</th>
+            <th>Condition to trigger next</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for template in chained_templates %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ template.facility }}</td>
+            <td>{{ template.parameters.proposal }}</td>
+            <td>{{ template.parameters.userdefid }}</td>
+            {% if templated_chain.status == "DRAFT" %}
+            <td>
+                {% if not forloop.last %}
+                <select class="form-control" name="trigger_next_condition__{{template.id}}" title="trigger_next_condition__{{template.id}}">
+                    {% for choice_value, choice_display in template.CONDITION_CHOICES %}
+                        <option value="{{ choice_value }}" {% if template.trigger_next_condition == choice_value %} selected {% endif %}>{{ choice_display }}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+            </td>
+            {% else %}
+            <td>{% if not forloop.last %}{{ template.trigger_next_condition }}{% endif %}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        {% if chained_templates|length < 1 %}
+        <tr>
+            <td colspan="5">No templates yet.</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
 
-<table class="table">
-    <tbody>
+    <table class="table">
+        <tbody>
         <tr>
             <td class="text-left">
                 {% if templated_chain.status == 'DRAFT' %}
-                    Add Template using:
+                Add Template using:
                 {% for facility in installed_facilities %}
                 <a href="{% url 'chains:add_template' templated_chain.id facility %}" title="{{ facility }}"
                    class="btn btn-outline-primary">{{ facility }}</a>
@@ -43,14 +59,15 @@
             </td>
             <td class="text-right">
                 {% if templated_chain.status == 'DRAFT' and chained_templates|length > 1 %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="templated_chain_id" value="{{ templated_chain.id }}"/>
-                        <input type="submit" class="btn btn-primary" name="submit-chain" id="submit-chain" value="Finalise chain">
-                    </form>
+
+                <input type="hidden" name="templated_chain_id" value="{{ templated_chain.id }}"/>
+                <input type="submit" class="btn btn-primary" name="submit-template-chain" id="submit-template-chain"
+                       value="Finalise Template Chain">
+
                 {% endif %}
             </td>
         </tr>
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</form>
 {% endblock content %}
