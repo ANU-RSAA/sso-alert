@@ -28,7 +28,8 @@ from tom_targets.models import Target
 from tom_targets.views import TargetDetailView
 
 from .forms import ChainedObservationForm, ChainForm
-from .models import ChainedObservation, Chain, SUBMITTED, TemplatedChain, ChainedTemplate
+from .models import ChainedObservation, Chain, TemplatedChain, ChainedTemplate
+from .utils import submit_chain
 
 logger = logging.getLogger(__name__)
 
@@ -234,32 +235,7 @@ class ChainView(LoginRequiredMixin, TemplateView):
             user=request.user,
         )
 
-        chained_observations = ChainedObservation.objects.filter(chain=chain).order_by('created')
-
-        if chained_observations.exists():
-            first_chained_observation = chained_observations.first()
-
-            facility = get_service_class(first_chained_observation.facility)()
-
-            observation_ids = facility.submit_observation({
-                'target': chain.target,
-                'params': first_chained_observation.parameters,
-            })
-
-            # Create Observation record
-            record = ObservationRecord.objects.create(
-                target=chain.target,
-                user=self.request.user,
-                facility=facility.name,
-                parameters=first_chained_observation.parameters,
-                observation_id=observation_ids[0]
-            )
-
-            first_chained_observation.observation = record
-            first_chained_observation.save()
-
-            chain.status = SUBMITTED
-            chain.save()
+        submit_chain(chain)
 
         return redirect(
             reverse('chains:view_chain', kwargs={'chain_id': chain_id})

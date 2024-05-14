@@ -153,18 +153,17 @@ class SsoAlertCadenceStrategy(CadenceStrategy):
         return observation_payload
 
 
-DRAFT = 'DRAFT'
-SUBMITTED = 'SUBMITTED'
-COMPLETED = 'COMPLETED'
-
-CHAIN_STATUS = (
-    (DRAFT, DRAFT),
-    (SUBMITTED, SUBMITTED),
-    (COMPLETED, COMPLETED),
-)
-
-
 class Chain(models.Model):
+    DRAFT = 'DRAFT'
+    SUBMITTED = 'SUBMITTED'
+    COMPLETED = 'COMPLETED'
+
+    CHAIN_STATUS = (
+        (DRAFT, DRAFT),
+        (SUBMITTED, SUBMITTED),
+        (COMPLETED, COMPLETED),
+    )
+
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     target = models.ForeignKey(Target, on_delete=models.CASCADE, null=False, blank=False)
     name = models.CharField(max_length=255)
@@ -226,7 +225,7 @@ class ChainedTemplate(models.Model):
         (COMPLETED, COMPLETED),
     )
 
-    templated_chain = models.ForeignKey(TemplatedChain, on_delete=models.CASCADE)
+    templated_chain = models.ForeignKey(TemplatedChain, on_delete=models.CASCADE, related_name='chained_templates')
     name = models.CharField(max_length=255)
     facility = models.CharField(max_length=50)
     parameters = models.JSONField()

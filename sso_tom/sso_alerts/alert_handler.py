@@ -15,6 +15,8 @@ from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_user_perms
 
 from .models import AlertStreams
+from sso_tom.utils import submit_observation_from_template
+from chained.utils import create_chain_and_submit_first
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +28,21 @@ def give_user_access_to_target(target, topic):
     for alert_stream in alert_streams:
         if not get_user_perms(alert_stream.user, target).filter(codename='view_target').exists():
             target.give_user_access(user=alert_stream.user)
-            # TODO: Trigger chain/observation if required
+
+        if alert_stream.automatic_observability:
+            if alert_stream.template_observation:
+                submit_observation_from_template(
+                    target=target,
+                    template=alert_stream.template_observation,
+                    user=alert_stream.user,
+                )
+            elif alert_stream.template_chained:
+                create_chain_and_submit_first(
+                    target=target,
+                    template_chained=alert_stream.template_chained,
+                    user=alert_stream.user,
+                    topic=alert_stream.topic,
+                )
 
 
 def alert_logger(alert, topic):
