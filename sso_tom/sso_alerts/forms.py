@@ -1,6 +1,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Reset, Layout, Field, HTML
 from django import forms
+from django.conf import settings
 from django.utils.safestring import mark_safe
 
 from .models import AlertStreams
@@ -20,7 +21,12 @@ class AlertStreamsForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['topic'].label = mark_safe('Topic (<small>For available topics, please refer to: <a href="https://fink-broker.readthedocs.io/en/latest/science/filters/#available-topics">Available Topics</a></small>)')
+        self.fields['topic'] = forms.ChoiceField(
+            choices=[(topic, topic) for topic in settings.TOPICS],
+            initial='fink_sso_fink_candidates_ztf',
+            label=mark_safe(
+                'Topic (<small> \'Deployed\' ones from: <a target="_blank" href="https://fink-broker.readthedocs.io/en/latest/science/filters/#available-topics">Available Topics</a></small>)')
+        )
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
             'name',

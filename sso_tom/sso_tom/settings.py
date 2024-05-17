@@ -285,39 +285,6 @@ TOM_ALERT_CLASSES = [
     "tom_fink.fink.FinkBroker",
 ]
 
-ALERT_STREAMS = [
-    {
-        'ACTIVE': True,
-        'NAME': 'tom_fink.alertstream.FinkAlertStream',
-        'OPTIONS': {
-            'URL': dotenv('FINK_CREDENTIAL_URL',default='set FINK_CREDENTIAL_URL value in environment'),
-            'USERNAME': dotenv('FINK_CREDENTIAL_USERNAME', default='set FINK_CREDENTIAL_USERNAME value in environment'),
-            'GROUP_ID': dotenv('FINK_CREDENTIAL_GROUP_ID', default='set FINK_CREDENTIAL_GROUP_ID value in environment'),
-            'TOPIC': dotenv('FINK_TOPIC', default='set FINK_TOPIC value in environment'),
-            'MAX_POLL_NUMBER': dotenv("FINK_MAX_POLL_NUMBER", default=1e10),
-            'TIMEOUT': dotenv('FINK_TIMEOUT', default=10, cast=int),
-            'TOPIC_HANDLERS': {
-                'fink.stream': 'sso_alerts.alert_handler.alert_logger',
-            },
-        },
-    },
-    # {
-    #     'ACTIVE': True,
-    #     'NAME': 'tom_fink.alertstream.FinkAlertStream',
-    #     'OPTIONS': {
-    #         'URL': dotenv('FINK_CREDENTIAL_URL', default='set FINK_CREDENTIAL_URL value in environment'),
-    #         'USERNAME': dotenv('FINK_CREDENTIAL_USERNAME', default='set FINK_CREDENTIAL_USERNAME value in environment'),
-    #         'GROUP_ID': dotenv('FINK_CREDENTIAL_GROUP_ID', default='set FINK_CREDENTIAL_GROUP_ID value in environment'),
-    #         'TOPIC': 'fink_sso_fink_candidates_ztf',
-    #         'MAX_POLL_NUMBER': dotenv("FINK_MAX_POLL_NUMBER", default=1e10),
-    #         'TIMEOUT': dotenv('FINK_TIMEOUT', default=10, cast=int),
-    #         'TOPIC_HANDLERS': {
-    #             'fink.stream': 'sso_alerts.alert_handler.alert_logger',
-    #         },
-    #     },
-    # },
-]
-
 BROKERS = {
     "TNS": {
         "api_key": "",
@@ -336,7 +303,7 @@ TOM_HARVESTER_CLASSES = [
 HARVESTERS = {"TNS": {"api_key": ""}}
 
 TOM_CADENCE_STRATEGIES = [
-    "chained.models.SsoAlertCadenceStrategy",
+    # "chained.models.SsoAlertCadenceStrategy",
     "tom_observations.cadences.retry_failed_observations.RetryFailedObservationsStrategy",
     "tom_observations.cadences.resume_cadence_after_failure.ResumeCadenceAfterFailureStrategy",
 ]
