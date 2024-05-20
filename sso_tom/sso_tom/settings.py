@@ -219,9 +219,13 @@ CACHES = {
 # TOM Specific configuration
 TARGET_TYPE = "SIDEREAL"
 
-config_file = "sso_tom/config.toml"
-with open(config_file, "rb") as file:
-    config = tomllib.load(file)
+try:
+    config_file = os.path.join(BASE_DIR, "sso_tom/config.toml")
+    with open(config_file, "rb") as file:
+        config = tomllib.load(file)
+except FileNotFoundError:
+    print("No config.toml found for DREAMS.")
+    exit(1)
 
 FACILITIES = {
     "LCO": {
@@ -362,6 +366,6 @@ REST_FRAMEWORK = {
 PLOTLY_THEME = "plotly_white"
 
 try:
-    from .local_settings import *  # noqa
+    from .settings_local import *  # noqa
 except ImportError:
     pass

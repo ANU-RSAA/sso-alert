@@ -1,6 +1,11 @@
 {% extends 'tom_common/base.html' %}
 {% load bootstrap4 %}
+
 {% block title %}Login{% endblock %}
+{% block page_header %}
+<h2>Login</h2>
+<hr/>
+{% endblock page_header %}
 {% block content %}
 <div class="row justify-content-md-center">
     <div class="col-md-12">
@@ -16,7 +21,7 @@
     <div class="row text-right">
         <div class="col-md-12">
             <label class="text-right" for="register">
-                Don't have an account yet? <a href="{% url 'registration:register' %}" id="register">Register</a>.
+                Don't have an account yet? <a href="{% url 'registration:register' %}" id="register">Register</a>.&nbsp;
             </label>
         </div>
     </div>

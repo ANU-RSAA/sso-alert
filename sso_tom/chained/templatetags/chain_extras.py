@@ -23,3 +23,8 @@ def chain_observing_buttons(target, chain_id):
     """
     facilities = get_service_classes()
     return {'target': target, 'facilities': facilities, 'chain_id': chain_id}
+
+
+@register.filter
+def get_dict_item(dictionary, key):
+    return dictionary.get(key)

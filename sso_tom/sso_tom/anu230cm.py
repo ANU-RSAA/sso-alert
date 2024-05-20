@@ -615,7 +615,7 @@ class ANU230cmTemplateForm(GenericTemplateForm):
                 "Observation",
                 Div(
                     Div("proposal", css_class="col"),
-                    Div("userdefid", css_class="col"),
+                    # Div("userdefid", css_class="col"),
                     Div("userdefpri", css_class="col"),
                     css_class="form-row",
                 ),

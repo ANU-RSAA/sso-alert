@@ -1,5 +1,5 @@
 {% extends 'tom_common/base.html' %}
-{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras chain_extras %}
 {% block title %}Chain List{% endblock %}
 {% block content %}
 <form method="post">
@@ -22,19 +22,34 @@
             <td>{{ template.facility }}</td>
             <td>{{ template.parameters.proposal }}</td>
             <td>{{ template.parameters.userdefid }}</td>
-            {% if templated_chain.status == "DRAFT" %}
             <td>
-                {% if not forloop.last %}
-                <select class="form-control" name="trigger_next_condition__{{template.id}}" title="trigger_next_condition__{{template.id}}">
-                    {% for choice_value, choice_display in template.CONDITION_CHOICES %}
-                        <option value="{{ choice_value }}" {% if template.trigger_next_condition == choice_value %} selected {% endif %}>{{ choice_display }}</option>
-                    {% endfor %}
-                </select>
+                {% if templated_chain.status == "DRAFT" %}
+                    {% if not forloop.last %}
+                        {% with terminal_states=terminal_states|get_dict_item:template.facility %}
+                            {% for terminal_state in terminal_states %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="trigger_next_condition__{{ template.id }}__{{ terminal_state }}"
+                                       id="trigger_next_condition__{{ template.id }}__{{ terminal_state }}"
+                                       value="{{ terminal_state }}" checked>
+                                <label class="form-check-label"
+                                       for="trigger_next_condition__{{ template.id }}__{{ terminal_state }}">
+                                    {{ terminal_state }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        {% endwith %}
+                    {% endif %}
+                {% else %}
+                    {% if not forloop.last %}
+                        {% for terminal_state in terminal_states|get_dict_item:template.facility %}
+                            {% if template.trigger_next_condition and terminal_state in template.trigger_next_condition %}
+                            {{ terminal_state }}<br>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 {% endif %}
             </td>
-            {% else %}
-            <td>{% if not forloop.last %}{{ template.trigger_next_condition }}{% endif %}</td>
-            {% endif %}
         </tr>
         {% endfor %}
         {% if chained_templates|length < 1 %}

@@ -172,22 +172,12 @@ class Chain(models.Model):
 
 
 class ChainedObservation(models.Model):
-
-    FAILED = 'FAILED'
-    REJECTED = 'REJECTED'
-    COMPLETED = 'COMPLETED'
-
-    CONDITION_CHOICES = (
-        (FAILED, FAILED),
-        (REJECTED, REJECTED),
-        (COMPLETED, COMPLETED),
-    )
-
-    chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE, related_name='chained_observations')
     facility = models.CharField(max_length=50)
     parameters = models.JSONField()
-    observation = models.ForeignKey(ObservationRecord, on_delete=models.CASCADE, null=True, blank=True)
-    trigger_next_condition = models.CharField(choices=CONDITION_CHOICES, max_length=20, default=FAILED)
+    observation = models.ForeignKey(ObservationRecord, on_delete=models.CASCADE, null=True, blank=True,
+                                    related_name='observation_chain')
+    trigger_next_condition = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -215,22 +205,12 @@ class TemplatedChain(models.Model):
 
 
 class ChainedTemplate(models.Model):
-    FAILED = 'FAILED'
-    REJECTED = 'REJECTED'
-    COMPLETED = 'COMPLETED'
-
-    CONDITION_CHOICES = (
-        (FAILED, FAILED),
-        (REJECTED, REJECTED),
-        (COMPLETED, COMPLETED),
-    )
-
     templated_chain = models.ForeignKey(TemplatedChain, on_delete=models.CASCADE, related_name='chained_templates')
     name = models.CharField(max_length=255)
     facility = models.CharField(max_length=50)
     parameters = models.JSONField()
     created = models.DateTimeField(auto_now_add=True)
-    trigger_next_condition = models.CharField(choices=CONDITION_CHOICES, max_length=20, default=FAILED)
+    trigger_next_condition = models.CharField(max_length=255)
 
     def __str__(self):
         return f'{self.facility} ({self.templated_chain})'
