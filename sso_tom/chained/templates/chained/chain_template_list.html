@@ -1,13 +1,43 @@
 {% extends 'tom_common/base.html' %}
 {% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+
 {% block title %}Chain List{% endblock %}
+
 {% block content %}
 <h3>Chain Templates</h3>
-<ul>
-    {% for template in object_list %}
-    <li><a href='{% url "chains:view_chain_template" template.id %}'>{{template.id}}: {{template.name}} ({{template.created}}) </a>
-    </li>
-    {% endfor %}
-</ul>
-<a href='{% url "chains:add_chain_template" %}' class="btn btn-primary">Add Chain Template</a>
-{% endblock content %}
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Chained Templates</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chain in object_list %}
+            <tr>
+                <td>{{ chain.name }}</td>
+                <td>{{ chain.get_status_display }}</td>
+                <td>{{ chain.created }}</td>
+                <td>
+                    <ol>
+                        {% for template in chain.chained_templates.all %}
+                        <li>{{ template.name }} ({{template.facility}})</li>
+                        {% empty %}
+                        <li>No templates yet</li>
+                        {% endfor %}
+                    </ol>
+                </td>
+                <td>
+                    <a href="{% url 'chains:view_chain_template' chain.id %}" class="btn btn-info btn-sm">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<a href="{% url 'chains:add_chain_template' %}" class="btn btn-primary">Add Chain Template</a>
+{% endblock %}
