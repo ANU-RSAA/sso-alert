@@ -1,11 +1,15 @@
 {% extends 'tom_common//base.html' %}
+{% load static %}
 
 {% block page_header %}
-    Registration
+<h2>Registration</h2>
+<hr/>
 {% endblock page_header %}
-
+{% block additional_css %}
+<link rel="stylesheet" href="{% static 'accounts/style/styles.css' %}">
+{% endblock %}
 {% block content %}
-    <div class="single-form-wrapper mx-auto">
+<div class="single-form-wrapper mx-auto">
     {% include 'accounts/snippets/render_form.html' %}
-    </div>
+</div>
 {% endblock content %}

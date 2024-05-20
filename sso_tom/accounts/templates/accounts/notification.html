@@ -1,19 +1,25 @@
 {% extends 'tom_common//base.html' %}
+{% load static %}
 
 {% block info-bar %}
-    Verification
+Verification
 {% endblock info-bar %}
 
 {% block page_header %}
-    SSO ALERT
-    {% if type == 'registration_submitted' %}Registration submitted {% endif %}
+<h2>SSO ALERT System Registration submission</h2>
+<hr/>
+{% if type == 'registration_submitted' %}Registration submitted {% endif %}
 {% endblock page_header %}
 
+{% block additional_css %}
+<link rel="stylesheet" href="{% static 'accounts/style/styles.css' %}">
+{% endblock %}
+
 {% block content %}
-    {% if type == 'registration_submitted' %}
-        <p>Dear {{ data.first_name }} {{ data.last_name }},</p>
-        <p>Thanks for registering with us.</p>
-        <p>The account has been activated in the system.</p>
-        <p>You should now be able to log in the system via the login page.</p>
-    {% endif %}
+{% if type == 'registration_submitted' %}
+<p>Dear {{ data.first_name }} {{ data.last_name }},</p>
+<p>Thanks for registering with us.</p>
+<p>The account has been activated in the system.</p>
+<p>You should now be able to log in the system via the login page.</p>
+{% endif %}
 {% endblock content %}

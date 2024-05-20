@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from chained.models import TemplatedChain
@@ -14,4 +16,12 @@ class AlertStreams(models.Model):
     template_observation = models.ForeignKey(ObservationTemplate, on_delete=models.PROTECT, null=True, blank=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if self.topic not in settings.TOPICS:
+            raise ValidationError(f"{self.topic} is not a valid topic.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 

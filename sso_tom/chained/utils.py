@@ -18,11 +18,9 @@ print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TES
 
 
 def submit_chain(chain):
-    chained_observations = ChainedObservation.objects.filter(chain=chain).order_by('created')
+    first_chained_observation = chain.chained_observations.filter(observation=None).order_by('created').first()
 
-    if chained_observations.exists():
-        first_chained_observation = chained_observations.first()
-
+    if first_chained_observation:
         facility = get_service_class(first_chained_observation.facility)()
 
         observation_ids, params = submit_to_facility(facility, first_chained_observation.parameters, chain.target)
@@ -40,7 +38,10 @@ def submit_chain(chain):
         first_chained_observation.save()
 
         chain.status = Chain.SUBMITTED
-        chain.save()
+    else:
+        chain.status = Chain.COMPLETED
+
+    chain.save()
 
 
 def create_chain_and_submit_first(target, template_chained, user, topic=None):

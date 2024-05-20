@@ -26,7 +26,7 @@ WIDGETS = {
 LABELS = {
     'first_name': _('First name'),
     'last_name': _('Last name'),
-    'email': _('Email'),
+    'email': _('Email (same as the telescope proposal)'),
     'username': _('Username'),
 }
 

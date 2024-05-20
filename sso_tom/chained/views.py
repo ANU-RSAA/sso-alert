@@ -282,6 +282,15 @@ class ChainTemplateView(LoginRequiredMixin, TemplateView):
         context['templated_chain'] = templated_chain
         context['chained_templates'] = chained_templates
         context['installed_facilities'] = get_service_classes()
+
+        terminal_states = {}
+        for template in chained_templates:
+            facility = get_service_class(template.facility)()
+            terminal_states.update({
+                facility.name: facility.get_terminal_observing_states(),
+            })
+        context['terminal_states'] = terminal_states
+
         return context
 
     def post(self, *args, **kwargs):
@@ -301,10 +310,13 @@ class ChainTemplateView(LoginRequiredMixin, TemplateView):
                 )
 
                 for template in chained_templates:
-                    template_id = template.id
-                    trigger_next_condition = self.request.POST.get(f"trigger_next_condition__{template_id}",
-                                                                   ChainedTemplate.FAILED)
-                    template.trigger_next_condition = trigger_next_condition
+                    terminal_states = []
+                    for key in self.request.POST.keys():
+                        if key.startswith(f'trigger_next_condition__{template.id}__'):
+                            terminal_state = key.split('__')[-1]
+                            terminal_states.append(terminal_state)
+
+                    template.trigger_next_condition = terminal_states
                     template.save()
 
                 templated_chain.status = TemplatedChain.FINALIZED
