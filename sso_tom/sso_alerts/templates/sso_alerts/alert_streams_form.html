@@ -7,14 +7,13 @@
 {% block content %}
 <h3>Fink Alert Streams</h3>
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
         <form method="post" id="alert-streams-form">
             {% csrf_token %}
             {% crispy form %}
+<!--?            {{ form|crispy }}-->
+<!--?            <button type="submit" class="btn btn-primary">Submit</button>-->
         </form>
-    </div>
-    <div class="col-md-2">
-
     </div>
 </div>
 
