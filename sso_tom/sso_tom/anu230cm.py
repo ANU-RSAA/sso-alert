@@ -748,13 +748,13 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         if test_anu230cm_emulator:
             print(f"get_observation_status {observation_id}")
             tokens = observation_id.split("-")
-            print(f"get_observation_status user email = {dir(self)}")
-            print(f"get_observation_status user email = {self.user}")
+            # print(f"get_observation_status user email = {dir(self)}")
+            # print(f"get_observation_status user email = {self.user}")
             # local version of emuldate_common
             ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
             ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
             emulate_ANU230cm = "https://mortal.anu.edu.au/aocs/"
-            print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
+            # print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
             # url_suffix = "/"
             url_suffix = ".php"
             # Keyword dictionary
@@ -769,12 +769,12 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             post_data[PROPOSAL] = tokens[0]
             post_data["OFFSET"] = 0
             post_data["PAGESIZE"] = 1000
-            print(f"get_observation_status {observation_id}")
+            # print(f"get_observation_status {observation_id}")
             response = requests.post(url, data=post_data,
                                      auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
             try:
                 content = json.loads(response.content.decode())
-                print(f"!content={content}")
+                # print(f"!content={content}")
                 found = False
                 data = content["data"]
                 print(f"Number of observations in this proposal {len(data)}")
