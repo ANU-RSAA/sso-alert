@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -33,12 +35,16 @@ class ObservationRecordSignalTestCase(TestCase):
         """
         Test that the signal is triggered when an ObservationRecord is updated.
         """
-        target = Target.objects.create(name="Test Target")
+        target = Target.objects.create(
+            name="Test Target",
+            ra=20.3389,
+            dec=31.5045,
+        )
         user = User.objects.create(username="testuser")
 
-        facility = "Test Facility"
-        other_facility = "Other Facility"
-        parameters = {"param1": "value1"}
+        facility = "DREAMS"
+        other_facility = "ANU 2.3m"
+        parameters = {"param": "param1"}
 
         chain = Chain.objects.create(
             name="Test Chain",
@@ -65,13 +71,26 @@ class ObservationRecordSignalTestCase(TestCase):
             trigger_next_condition=['Succeeded', 'Detected']
         )
 
+        anu_230cm_parameters = {"cadence_strategy": "", "facility": "ANU 2.3m", "target_id": 4,
+                                "observation_type": "OBSERVATION", "proposal": "456",
+                                "userdefid": datetime.now().isoformat(), "userdefpri": 0, "nobsblk": 1, "maxseeing": "",
+                                "photometric": False, "maxlunarphase": 100, "timeconstraint": "Flexible", "timeref": "",
+                                "timewindow": None, "instr_pri_0": "WiFeS", "imgtype_0": "Object",
+                                "mode_0": "ClassicalEqual", "dichroic_0": "RT480", "red_grating_0": "R3000",
+                                "blue_grating_0": "B3000", "aperturewheel_0": "Clear", "ra_0": "20.3389",
+                                "dec_0": "31.5045", "pmot_0": "0 0", "acq_ra_0": "", "acq_dec_0": "",
+                                "acq_pmot_0": "", "blindacq_0": False, "rot_0": "PA", "rotang_0": 0.0, "mag_0": None,
+                                "agfilter_0": "No Change", "guide_0": "BestEffort", "nexp_0": 1, "stellar_0": "false",
+                                "binx_0": "1", "biny_0": "2", "exptime_0": 150, "sky_exptime_0": None, "scdescr_0": "",
+                                "skya_ra_0": "", "skya_dec_0": ""}
+
         chained_observation2 = ChainedObservation.objects.create(
             chain=chain,
             facility=other_facility,
-            parameters=parameters,
+            parameters=anu_230cm_parameters,
         )
 
-        chained_observation2 = ChainedObservation.objects.create(
+        chained_observation3 = ChainedObservation.objects.create(
             chain=chain,
             facility="Should not be triggered",
             parameters=parameters,
@@ -79,3 +98,8 @@ class ObservationRecordSignalTestCase(TestCase):
 
         observation.status = 'Succeeded'
         observation.save()
+
+        chained_observation2.refresh_from_db()
+
+        self.assertTrue(chained_observation2.observation is not None)
+        self.assertTrue(chained_observation3.observation is None)
