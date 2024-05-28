@@ -14,7 +14,6 @@ urlpatterns = [
     path('templates/', ChainTemplateListView.as_view(), name='chain_template_list'),
     path('<int:chain_id>/', ChainView.as_view(), name='view_chain'),
     path('templates/<int:template_id>/', ChainTemplateView.as_view(), name='view_chain_template'),
-    path('<int:chain_id>/clone/', ChainCreateView.as_view(), name='clone_chain'),
     path('<int:chain_id>/target/<int:pk>/', ChainedTargetDetailView.as_view(), name='chain_target'),
     path('<int:chain_id>/<str:facility>/create/', SingleObservationCreateView.as_view(), name='create'),
     path('templates/<int:template_id>/<str:facility>/create/', ChainedTemplateCreateView.as_view(), name='add_template'),

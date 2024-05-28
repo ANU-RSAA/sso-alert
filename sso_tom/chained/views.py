@@ -174,10 +174,15 @@ class SingleObservationCreateView(ObservationCreateView):
         #     )
         #     records.append(record)
 
-        chained_observation = ChainedObservation.objects.create(
+        parameters = observation_payload
+
+        if facility.name == 'ANU 2.3m':
+            parameters = observation_payload['params']
+
+        ChainedObservation.objects.create(
             chain=Chain.objects.get(pk=self.kwargs['chain_id']),
             facility=facility.name,
-            parameters=observation_payload['params'],
+            parameters=parameters,
         )
 
         return redirect(
