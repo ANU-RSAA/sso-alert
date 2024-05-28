@@ -40,3 +40,5 @@ def observation_record_saved(sender, instance, created, **kwargs):
             # submit the chain, which will submit the unsubmitted one
             submit_chain(chained_observation.chain)
 
+            # TODO: send emails to the user
+
