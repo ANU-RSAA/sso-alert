@@ -1,7 +1,4 @@
-import uuid
-
 from django import forms
-from django.core.validators import RegexValidator
 
 import requests
 import json
@@ -12,7 +9,6 @@ from django.utils import timezone
 from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
 from crispy_forms.helper import FormHelper
 
-from tom_observations.models import ObservationTemplate
 from tom_observations.facility import (
     BaseRoboticObservationFacility,
     BaseRoboticObservationForm,
@@ -744,68 +740,63 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         be able to be used to retrieve the status from the external service.
         """
         # Add ANU2.3m POST request here.
-        test_anu230cm_emulator = True
-        if test_anu230cm_emulator:
-            print(f"get_observation_status {observation_id}")
-            tokens = observation_id.split("-")
-            # print(f"get_observation_status user email = {dir(self)}")
-            # print(f"get_observation_status user email = {self.user}")
-            # local version of emuldate_common
-            ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-            ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
-            emulate_ANU230cm = "https://mortal.anu.edu.au/aocs/"
-            # print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
-            # url_suffix = "/"
-            url_suffix = ".php"
-            # Keyword dictionary
-            PROPOSAL = "PROPOSAL"
-            USERDEFID = "USERDEFID"
-            USERDEFPRI = "USERDEFPRI"
-            NOBSBLK = "NOBSBLK"
+        print(f"get_observation_status {observation_id}")
+        # TODO: should be parted using the first hyphen
+        tokens = observation_id.split("-")
+        # print(f"get_observation_status user email = {dir(self)}")
+        # print(f"get_observation_status user email = {self.user}")
+        # local version of emuldate_common
+        ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+        ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
+        emulate_ANU230cm = "https://mortal.anu.edu.au/aocs/"
+        # print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
+        # url_suffix = "/"
+        url_suffix = ".php"
+        # Keyword dictionary
+        PROPOSAL = "PROPOSAL"
+        USERDEFID = "USERDEFID"
+        USERDEFPRI = "USERDEFPRI"
+        NOBSBLK = "NOBSBLK"
 
-            url = emulate_ANU230cm + '/propobsstat' + url_suffix
+        url = emulate_ANU230cm + '/propobsstat' + url_suffix
 
-            post_data = {}
-            post_data[PROPOSAL] = tokens[0]
-            post_data["OFFSET"] = 0
-            post_data["PAGESIZE"] = 1000
-            # print(f"get_observation_status {observation_id}")
-            response = requests.post(url, data=post_data,
-                                     auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
-            try:
-                content = json.loads(response.content.decode())
-                # print(f"!content={content}")
-                found = False
-                data = content["data"]
-                print(f"Number of observations in this proposal {len(data)}")
-                state = "PENDING"
-                for i in range(len(data)):
-                    print(f"CHECK {data[i]['userDefId']}  ==? {tokens[1]}")
-                    if data[i]["userDefId"] == tokens[1]:
-                        found = True
-                        state = data[i]['obsStatus']
-                print(f"STATE={state}")
-            except Exception:
-                msg = f"Bad response - I don't know how to show these in the tom message box."
-                logger.exception(msg)
+        post_data = {}
+        post_data[PROPOSAL] = tokens[0]
+        post_data["OFFSET"] = 0
+        post_data["PAGESIZE"] = 1000
+        # TODO: we may need to pass a filter here to narrow down the result
+        # post_data["SOME_FILTER"] = 1000
+        # print(f"get_observation_status {observation_id}")
+        response = requests.post(url, data=post_data,
+                                 auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
+        try:
+            content = json.loads(response.content.decode())
+            # print(f"!content={content}")
+            found = False
+            data = content["data"]
+            print(f"Number of observations in this proposal {len(data)}")
+            state = "PENDING"
 
-            if not found:
-                return {}
+            # may be use of Ian's regex would be a better approach to find out the found
+            for i in range(len(data)):
+                print(f"CHECK {data[i]['userDefId']}  ==? {tokens[1]}")
+                if data[i]["userDefId"] == tokens[1]:
+                    found = True
+                    state = data[i]['obsStatus']
+            print(f"STATE={state}")
+        except Exception:
+            msg = f"Bad response - I don't know how to show these in the tom message box."
+            logger.exception(msg)
 
-            # return content["data"]
-            return {
-                'state': state,
-                'scheduled_start': timezone.now() + timedelta(hours=1),
-                'scheduled_end': timezone.now() + timedelta(hours=2)
-            }
+        if not found:
+            return {}
 
-        # ${SERVER}/aocs/propobsstat.php?PROPOSAL=<number>&OFFSET=<integer>&PAGESIZE=<integer>&FILTER=<string>
-        # - OFFSET and PAGESIZE: for requesting multiple observations status updates.
-        # - FILTER: pattern-matching for userdefid (query specific requests).
-        # - Status received in “data” array. Each entry a dict w. userDefId, obsStatus, tsExec, …
-        # - tsExec is UTC timestamp of last status change: YYYY-MM-DDThh:mm:ss or ‘’
-
-        return ['PENDING']
+        # return content["data"]
+        return {
+            'state': state,
+            'scheduled_start': timezone.now() + timedelta(hours=1),
+            'scheduled_end': timezone.now() + timedelta(hours=2)
+        }
 
     def get_observing_sites(self):
         """
@@ -920,36 +911,30 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         submits the observation to the remote api
         """
         # Add ANU2.3m API query here.
-        test_anu230cm_emulator = True
-        if test_anu230cm_emulator:
-            print("new submit_observation_payload")
-            # local version of emuldate_common
-            password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-            username = config('ADACS_PROPOSALDB_TEST_USERNAME')
-            facility_link = "https://mortal.anu.edu.au/aocs/"
-            print(f"TOKENS FOR ACCESS {password} {username}")
-            # url_suffix = "/"
-            url_suffix = ".php"
+        print("new submit_observation_payload")
+        # local version of emuldate_common
+        password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+        username = config('ADACS_PROPOSALDB_TEST_USERNAME')
+        facility_link = "https://mortal.anu.edu.au/aocs/"
+        # print(f"TOKENS FOR ACCESS {password} {username}")
+        # url_suffix = "/"
+        url_suffix = ".php"
 
-            url = facility_link + '/addobsblockexec' + url_suffix
+        url = facility_link + '/addobsblockexec' + url_suffix
 
-            post_data, proposal, userdefid = self.get_clean_data_for_posting(observation_payload=observation_payload)
+        post_data, proposal, userdefid = self.get_clean_data_for_posting(observation_payload=observation_payload)
 
-            response = requests.post(url, data=post_data, auth=(username, password))
-            print(f"{response}")
+        response = requests.post(url, data=post_data, auth=(username, password))
+        print(f"{response}")
 
-            try:
-                # content = json.loads(response.content)
-                print(f"json response={response.content}")
-            except Exception:
-                msg = f"Bad response"
-                logger.exception(msg)
+        try:
+            # content = json.loads(response.content)
+            print(f"json response={response.content}")
+        except Exception:
+            msg = f"Bad response"
+            logger.exception(msg)
 
-            return [f'{proposal}-{userdefid}']
-
-        else:
-            # will need to set up for real one
-            return [uuid.uuid4()]  # update it to unique
+        return [f'{proposal}-{userdefid}']
 
     def validate_observation(self, observation_payload):
         """
