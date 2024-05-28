@@ -1,3 +1,5 @@
+from distutils.util import strtobool
+
 from decouple import config as dotenv
 
 
@@ -39,9 +41,17 @@ def generate_alert_streams():
 # Generate ALERT_STREAMS dynamically
 ALERT_STREAMS = generate_alert_streams()
 
-SITE_URL = ''
+SITE_URL = dotenv('SITE_URL', default='set SITE_URL value in environment')
+
+DEVELOPMENT_MODE = bool(strtobool(dotenv('DEVELOPMENT_MODE', default='True')))
 
 
-SERVER_EMAIL = 'noreply@supercomputing.swin.edu.au'
-EMAIL_HOST = 'mail.swin.edu.au'
-EMAIL_FROM = 'hpc-support@swin.edu.au'
+SERVER_EMAIL = dotenv('SERVER_EMAIL', default='set SERVER_EMAIL value in environment')
+EMAIL_HOST = dotenv('EMAIL_HOST', default='set EMAIL_HOST value in environment')
+EMAIL_FROM = dotenv('EMAIL_FROM', default='set EMAIL_FROM value in environment')
+EMAIL_PORT = int(dotenv('EMAIL_PORT', default='set EMAIL_PORT value in environment'))
+
+if DEVELOPMENT_MODE:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
