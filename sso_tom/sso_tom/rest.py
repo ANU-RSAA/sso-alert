@@ -289,6 +289,10 @@ class RESTObservationForm(BaseRoboticObservationForm, RESTBaseForm):
                 "submit",
                 "Submit",
             ),
+            Submit(
+                "add_to_chain",
+                "Add to Chain",
+            ),
             HTML(
                 f"""<a class="btn btn-outline-primary" href="{{% url 'tom_targets:detail' {target_id} %}}?tab=observe">
                         Back</a>"""
