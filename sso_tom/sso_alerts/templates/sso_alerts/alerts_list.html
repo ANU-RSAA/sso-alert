@@ -4,7 +4,7 @@
 {% block content %}
 <h3>Alert Streams</h3>
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
         <p>
             Create a new alert stream using: <a href="{% url 'sso_alerts:alert_streams_create' %}"
                                                 class="btn btn-outline-primary">Fink Streams</a>
@@ -13,32 +13,44 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Description</th>
                 <th>Topic</th>
                 <th>Automatic Observability</th>
                 <th>Template Chain</th>
                 <th>Template Observation</th>
-                <th>Created</th>
-
+                <!--?                <th>Active</th>-->
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
             {% for alert in object_list %}
             <tr>
                 <td>{{ alert.name }}</td>
-                <td>{{ alert.description }}</td>
                 <td>{{ alert.topic }}</td>
                 <td>{{ alert.automatic_observability }}</td>
                 <td>{{ alert.template_chained }}</td>
                 <td>{{ alert.template_observation }}</td>
-                <td>{{ alert.created_at }}</td>
+                <!--?                <td>{{ alert.active }}</td>-->
+                <td>
+                    <a href="{% url 'sso_alerts:alert_streams_update' alert.pk %}"
+                       class="btn btn-sm btn-primary">Edit</a>
+                    <form method="post" action="{% url 'sso_alerts:toggle_active' alert.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        {% if alert.active %}
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            Deactivate
+                        </button>
+                        {% else %}
+                        <button type="submit" class="btn btn-sm btn-success">
+                            Activate
+                        </button>
+                        {% endif %}
+
+                    </form>
+                </td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-<!--?    <div class="col-md-2">-->
-<!--?        <h4>Filter Saved Queries</h4>-->
-<!--?    </div>-->
 </div>
 {% endblock %}

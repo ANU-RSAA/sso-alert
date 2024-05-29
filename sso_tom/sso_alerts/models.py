@@ -16,6 +16,7 @@ class AlertStreams(models.Model):
     template_observation = models.ForeignKey(ObservationTemplate, on_delete=models.PROTECT, null=True, blank=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
 
     def clean(self):
         if self.topic not in settings.TOPICS:
