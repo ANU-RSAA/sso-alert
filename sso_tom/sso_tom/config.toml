@@ -61,7 +61,7 @@ last_updated = 2024-05-09
         label = "Proposal ID"
         format = "Integer"
         required = true
-        help_text = "Enter ze DREAMS proposal ID"
+        help_text = "Enter the DREAMS proposal ID"
         [dreams.instruments.imager.proposal.form]
           name = "proposal"
           column = 2
