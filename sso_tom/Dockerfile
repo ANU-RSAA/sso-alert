@@ -14,8 +14,8 @@ WORKDIR /code
 
 COPY requirements.txt /code
 RUN pip install --upgrade pip && pip install --no-cache-dir -r /code/requirements.txt
-COPY patch-for-forms.py /usr/local/lib/python3.9/site-packages/tom_dataproducts/forms.py
-COPY patch-for-fink.py /usr/local/lib/python3.9/site-packages/tom_alerts/brokers/fink.py
+#COPY patch-for-forms.py /usr/local/lib/python3.9/site-packages/tom_dataproducts/forms.py
+#COPY patch-for-fink.py /usr/local/lib/python3.9/site-packages/tom_alerts/brokers/fink.py
 
 # continue to setup the image with node and npm install (via nvm)
 # see https://stackoverflow.com/questions/25899912/
@@ -38,7 +38,7 @@ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 COPY . /code
-RUN pip install tom_fink
+RUN pip install --no-cache-dir tom_fink
 
 # write new webpack-stats.json for django-webpack-loader to use
 # and install the Vue JS/CSS etc as static files
