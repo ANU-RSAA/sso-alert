@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from tom_observations.models import ObservationRecord
 
 from .utils import submit_chain
+from accounts.mailer.actions import email_observation_status_update
 
 
 @receiver(pre_save, sender=ObservationRecord)
@@ -30,6 +31,19 @@ def observation_record_saved(sender, instance, created, **kwargs):
     else:
         if hasattr(instance, '_previous_status') and instance._previous_status != instance.status:
 
+            # send out email
+            try:
+                email_observation_status_update(
+                    to_addresses=[instance.user.email],
+                    first_name=instance.user.first_name,
+                    last_name=instance.user.last_name,
+                    facility=instance.facility,
+                    target=instance.target,
+                    observation_status=instance.status,
+                )
+            except Exception as e:
+                pass
+
             # finding if it is in a chain
             chained_observation = instance.observation_chain.first()
 
@@ -39,6 +53,3 @@ def observation_record_saved(sender, instance, created, **kwargs):
 
             # submit the chain, which will submit the unsubmitted one
             submit_chain(chained_observation.chain)
-
-            # TODO: send emails to the user
-

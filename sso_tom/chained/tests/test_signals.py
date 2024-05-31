@@ -16,8 +16,17 @@ class ObservationRecordSignalTestCase(TestCase):
         """
         Test that the signal is triggered when an ObservationRecord is created.
         """
-        target = Target.objects.create(name="Test Target")
-        user = User.objects.create(username="testuser")
+        target = Target.objects.create(
+            name="Test Target",
+            ra=20.3389,
+            dec=31.5045,
+        )
+        user = User.objects.create(
+            username="testuser",
+            first_name="Test",
+            last_name="User",
+            email="testuser@localhost",
+        )
         observation = ObservationRecord.objects.create(
             target=target,
             user=user,
@@ -40,7 +49,12 @@ class ObservationRecordSignalTestCase(TestCase):
             ra=20.3389,
             dec=31.5045,
         )
-        user = User.objects.create(username="testuser")
+        user = User.objects.create(
+            username="testuser",
+            first_name="Test",
+            last_name="User",
+            email="testuser@localhost",
+        )
 
         facility = "DREAMS"
         other_facility = "ANU 2.3m"

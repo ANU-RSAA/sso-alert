@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def give_user_access_to_target(target, topic):
 
-    alert_streams = AlertStreams.objects.filter(topic=topic)
+    alert_streams = AlertStreams.objects.filter(topic=topic, active=True)
 
     for alert_stream in alert_streams:
         if not get_user_perms(alert_stream.user, target).filter(codename='view_target').exists():
