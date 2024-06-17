@@ -229,6 +229,15 @@ class ChainView(LoginRequiredMixin, TemplateView):
 
         context['chain'] = chain
         context['chained_observations'] = chained_observations
+        context['installed_facilities'] = get_service_classes()
+
+        terminal_states = {}
+        for observation in chained_observations:
+            facility = get_service_class(observation.facility)()
+            terminal_states.update({
+                facility.name: facility.get_terminal_observing_states(),
+            })
+        context['terminal_states'] = terminal_states
         return context
 
     def post(self, request, *args, **kwargs):
@@ -239,6 +248,18 @@ class ChainView(LoginRequiredMixin, TemplateView):
             pk=chain_id,
             user=request.user,
         )
+
+        chained_observations = chain.chained_observations.order_by('created')
+
+        for chained_observation in chained_observations:
+            terminal_states = []
+            for key in self.request.POST.keys():
+                if key.startswith(f'trigger_next_condition__{chained_observation.id}__'):
+                    terminal_state = key.split('__')[-1]
+                    terminal_states.append(terminal_state)
+
+            chained_observation.trigger_next_condition = terminal_states
+            chained_observation.save()
 
         submit_chain(chain)
 

@@ -35,4 +35,9 @@
         {% endif %}
         {% endbuttons %}
     </form>
+<script>
+        $(document).ready(function() {
+            $('label:contains("Groups")').closest('.form-group').hide();
+        });
+    </script>
     {% endblock %}

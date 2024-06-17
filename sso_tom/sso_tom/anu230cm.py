@@ -741,62 +741,69 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         """
         # Add ANU2.3m POST request here.
         print(f"get_observation_status {observation_id}")
-        # TODO: should be parted using the first hyphen
-        tokens = observation_id.split("-")
+        # parting using the first hyphen
+        tokens = observation_id.split("-", 1)
+
+        # if less than 2 parts return to show error.
+        if len(tokens) != 2:
+            return {}
         # print(f"get_observation_status user email = {dir(self)}")
         # print(f"get_observation_status user email = {self.user}")
         # local version of emuldate_common
-        ADACS_PROPOSALDB_TEST_PASSWORD = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-        ADACS_PROPOSALDB_TEST_USERNAME = config('ADACS_PROPOSALDB_TEST_USERNAME')
-        emulate_ANU230cm = "https://mortal.anu.edu.au/aocs/"
-        # print(f"TOKENS FOR ACCESS {ADACS_PROPOSALDB_TEST_PASSWORD} {ADACS_PROPOSALDB_TEST_USERNAME}")
+        proposal_db_username = config('ADACS_PROPOSALDB_TEST_USERNAME')
+        proposal_db_password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+        emulate_anu230cm = "https://mortal.anu.edu.au/aocs/"
+        # print(f"TOKENS FOR ACCESS {proposal_db_username} {proposal_db_password}")
         # url_suffix = "/"
         url_suffix = ".php"
         # Keyword dictionary
-        PROPOSAL = "PROPOSAL"
-        USERDEFID = "USERDEFID"
-        USERDEFPRI = "USERDEFPRI"
-        NOBSBLK = "NOBSBLK"
+        proposal_key = "PROPOSAL"
+        offset_key = "OFFSET"
+        pagesize_key = "PAGESIZE"
+        filter_key = "FILTER"
 
-        url = emulate_ANU230cm + '/propobsstat' + url_suffix
+        url = emulate_anu230cm + '/propobsstat' + url_suffix
 
-        post_data = {}
-        post_data[PROPOSAL] = tokens[0]
-        post_data["OFFSET"] = 0
-        post_data["PAGESIZE"] = 1000
-        # TODO: we may need to pass a filter here to narrow down the result
-        # post_data["SOME_FILTER"] = 1000
-        # print(f"get_observation_status {observation_id}")
-        response = requests.post(url, data=post_data,
-                                 auth=(ADACS_PROPOSALDB_TEST_USERNAME, ADACS_PROPOSALDB_TEST_PASSWORD))
-        try:
-            content = json.loads(response.content.decode())
-            # print(f"!content={content}")
-            found = False
-            data = content["data"]
-            print(f"Number of observations in this proposal {len(data)}")
-            state = "PENDING"
+        pagesize = 1000
 
-            # may be use of Ian's regex would be a better approach to find out the found
-            for i in range(len(data)):
-                print(f"CHECK {data[i]['userDefId']}  ==? {tokens[1]}")
-                if data[i]["userDefId"] == tokens[1]:
-                    found = True
-                    state = data[i]['obsStatus']
-            print(f"STATE={state}")
-        except Exception:
-            msg = f"Bad response - I don't know how to show these in the tom message box."
-            logger.exception(msg)
+        post_data = dict()
+        post_data[proposal_key] = tokens[0]
+        post_data[offset_key] = 0
+        post_data[pagesize_key] = pagesize
+        # this is to filter the result set by id
+        post_data[filter_key] = tokens[1]
 
-        if not found:
-            return {}
+        while True:
+            # print(f"get_observation_status {observation_id}")
+            response = requests.post(url, data=post_data,
+                                     auth=(proposal_db_username, proposal_db_password))
 
-        # return content["data"]
-        return {
-            'state': state,
-            'scheduled_start': timezone.now() + timedelta(hours=1),
-            'scheduled_end': timezone.now() + timedelta(hours=2)
-        }
+            try:
+                content = json.loads(response.content.decode())
+                data = content["data"]
+                print(f"Number of observations found {len(data)}")
+                state = "Unknown"
+
+                # It is currently returning only one, need to check if there is a use case where it could return more
+                for item in data:
+                    print(f"CHECK {item['userDefId']}  ==? {tokens[1]}")
+                    if item["userDefId"] == tokens[1]:
+                        state = item['obsStatus']
+                        print(f"STATE={state}")
+                        return {
+                            'state': state,
+                            'scheduled_start': timezone.now() + timedelta(hours=1),
+                            'scheduled_end': timezone.now() + timedelta(hours=2)
+                        }
+
+                if content["pageSize"] == pagesize:
+                    post_data[offset_key] = post_data[offset_key] + pagesize
+                else:
+                    return {'state': state}
+            except Exception:
+                msg = f"Bad response - I don't know how to show these in the tom message box."
+                logger.exception(msg)
+                return {}
 
     def get_observing_sites(self):
         """

@@ -1,7 +1,9 @@
 {% extends 'tom_common/base.html' %}
-{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras chain_extras %}
 {% block title %}Chain List{% endblock %}
 {% block content %}
+<form method="post">
+    {% csrf_token %}
 <h3>Chain {{chain.id}} :: {{chain.name}} :: <a
         href='{% url "tom_targets:detail" pk=chain.target.id %}'>{{chain.target}}</a> ({{chain.status}})
 </h3>
@@ -13,6 +15,7 @@
         <th>Proposal ID</th>
         <th>User Defined ID</th>
         <th>Observation Created?</th>
+        <th>Condition to trigger next</th>
     </tr>
     </thead>
     <tbody>
@@ -23,6 +26,34 @@
         <td>{{ chained_observation.parameters.proposal }}</td>
         <td>{{ chained_observation.parameters.userdefid }}</td>
         <td>{{ chained_observation.observation }}</td>
+        <td>
+            {% if chain.status == "DRAFT" %}
+            {% if not forloop.last %}
+            {% with terminal_states=terminal_states|get_dict_item:chained_observation.facility %}
+            {% for terminal_state in terminal_states %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       name="trigger_next_condition__{{ chained_observation.id }}__{{ terminal_state }}"
+                       id="trigger_next_condition__{{ chained_observation.id }}__{{ terminal_state }}"
+                       value="{{ terminal_state }}" checked>
+                <label class="form-check-label"
+                       for="trigger_next_condition__{{ chain.id }}__{{ terminal_state }}">
+                    {{ terminal_state }}
+                </label>
+            </div>
+            {% endfor %}
+            {% endwith %}
+            {% endif %}
+            {% else %}
+            {% if not forloop.last %}
+            {% for terminal_state in terminal_states|get_dict_item:chained_observation.facility %}
+            {% if chained_observation.trigger_next_condition and terminal_state in chained_observation.trigger_next_condition %}
+            {{ terminal_state }}<br>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endif %}
+        </td>
     </tr>
     {% endfor %}
     {% if chained_observations|length < 1 %}
@@ -35,22 +66,24 @@
 
 <table class="table">
     <tbody>
-        <tr>
-            <td class="text-left">
-                {% if chain.status == 'DRAFT' %}
-                    <a href='{% url "chains:chain_target" chain_id=chain.id pk=chain.target.id %}' class="btn btn-secondary">Add Observation</a>
-                {% endif %}
-            </td>
-            <td class="text-right">
-                {% if chain.status == 'DRAFT' and chained_observations|length > 1 %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="chain_id" value="{{ chain.id }}"/>
-                        <input type="submit" class="btn btn-primary" name="submit-chain" id="submit-chain" value="Trigger chain by submitting first">
-                    </form>
-                {% endif %}
-            </td>
-        </tr>
+    <tr>
+        <td class="text-left">
+            {% if chain.status == 'DRAFT' %}
+            <a href='{% url "chains:chain_target" chain_id=chain.id pk=chain.target.id %}' class="btn btn-secondary">Add
+                Observation</a>
+            {% endif %}
+        </td>
+        <td class="text-right">
+            {% if chain.status == 'DRAFT' and chained_observations|length > 1 %}
+
+                <input type="hidden" name="chain_id" value="{{ chain.id }}"/>
+                <input type="submit" class="btn btn-primary" name="submit-chain" id="submit-chain"
+                       value="Trigger chain by submitting first">
+
+            {% endif %}
+        </td>
+    </tr>
     </tbody>
 </table>
+</form>
 {% endblock content %}
