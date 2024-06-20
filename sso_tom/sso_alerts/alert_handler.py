@@ -45,6 +45,13 @@ def give_user_access_to_target(target, topic):
                 )
 
 
+def set_target_list(target, topic):
+    grouping_object, is_created = TargetList.objects.get_or_create(name=topic)
+
+    if target not in grouping_object.targets.all():
+        grouping_object.targets.add(target)
+
+
 def alert_logger(alert, topic):
     """Basic alert handler for Fink
 
@@ -101,4 +108,5 @@ def alert_logger(alert, topic):
         logger.error("error when trying to save new alerts in the db", exc_info=1)
         logger.error(traceback.format_exc())
 
+    set_target_list(target=mytarget, topic=topic)
     give_user_access_to_target(target=mytarget, topic=topic)
