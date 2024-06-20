@@ -64,14 +64,14 @@ def alert_logger(alert, topic):
         If the target is already saved
 
     Raises
-    ----------
+    ------
     Exception (base)
         for any other failures than name clash when
         saving the target in the database.
 
     """
     utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
-    logger.info("fink.alert_logger topic: {}".format(topic))
+    logger.info(f"fink.alert_logger topic: {topic}")
     logger.info(
         "fink.alert_logger value: {} emitted {} JD (received {})".format(
             alert["objectId"], alert["candidate"]["jd"], utc
