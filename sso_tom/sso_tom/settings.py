@@ -16,6 +16,8 @@ import os
 import tempfile
 import tomllib
 
+import dj_database_url
+
 from decouple import config as dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -124,6 +126,13 @@ DATABASES = {
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
+
+if os.getenv('USE_POSTGRES') == 'True':
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=f"postgres://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
+        )
+    }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
