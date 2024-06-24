@@ -14,7 +14,7 @@ from sqlite3 import IntegrityError as SQL_IntegrityError
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_user_perms
 
-from .models import AlertStreams
+from .models import AlertStreams, TargetStream
 from sso_tom.utils import submit_observation_from_template
 from chained.utils import create_chain_and_submit_first
 
@@ -101,12 +101,18 @@ def alert_logger(alert, topic):
                 )
             }
         )
+
+        TargetStream.objects.create(
+            target=mytarget,
+            stream=topic,
+        )
+
+        set_target_list(target=mytarget, topic=topic)
+        give_user_access_to_target(target=mytarget, topic=topic)
+
     except (UniqueViolation, SQL_IntegrityError, DJ_IntegrityError):
         logger.warning(f"Target {mytarget} already in the database")
         pass
     except Exception:
         logger.error("error when trying to save new alerts in the db", exc_info=1)
         logger.error(traceback.format_exc())
-
-    set_target_list(target=mytarget, topic=topic)
-    give_user_access_to_target(target=mytarget, topic=topic)

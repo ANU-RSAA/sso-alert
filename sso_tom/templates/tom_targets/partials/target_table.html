@@ -16,6 +16,7 @@
       {% endif %}
       <th>Observations</th>
       <th>Created</th>
+      <th>Stream</th>
     </tr>
   </thead>
   <tbody>
@@ -39,6 +40,7 @@
       <td>{{ target.observationrecord_set.count }}</td>
 <!--?      <td>{{ target.dataproduct_set.count }}</td>-->
       <td>{{ target.created }}</td>
+      <td>{{ target.streams.stream }}</td>
     </tr>
     {% empty %}
     <tr>
