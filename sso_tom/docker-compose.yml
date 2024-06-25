@@ -1,16 +1,15 @@
-version: '3'
-
 services:
-  #nginx:
-  #  image: 'jc21/nginx-proxy-manager:latest'
-  #  container_name: nginx-proxy-manager
-  #  ports:
-  #    - '81:81'
-  #    - '80:80'
-  #    - '443:443'
-  #  volumes:
-  #    - ./data:/data
-  #    - ./letsencrypt:/etc/letsencrypt
+  nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    ports:
+      - '81:81'
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
   demo:
     build: ./
     container_name: a1
@@ -18,14 +17,24 @@ services:
       - "8080:8080"
     volumes:
       - ./:/code
-  #  depends_on:
-  #   - db
-  #db:
-  #  image: postgres:12.1
-  #  container_name: a2
-  #  ports:
-  #    - "5432:5432"
-  #  volumes:
-  #    - ./postgresql/data:/var/lib/postgresql/data
-  #  #depends_on:
-  #  #  - nginx
+    depends_on:
+      - db
+    environment:
+      - USE_POSTGRES=True
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+
+  db:
+    image: postgres:12.1
+    container_name: a2
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}

@@ -39,5 +39,7 @@
         $(document).ready(function() {
             $('label:contains("Groups")').closest('.form-group').hide();
         });
-    </script>
+        document.querySelector('label[for="id_ra"]').textContent = 'Right Ascension (we will assume ICLRS frame)';
+        document.querySelector('label[for="id_dec"]').textContent = 'Declination (we will assume ICLRS frame)';
+</script>
     {% endblock %}

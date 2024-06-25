@@ -5,6 +5,7 @@ from django.db import models
 
 from chained.models import TemplatedChain
 from tom_observations.models import ObservationTemplate
+from tom_targets.models import Target
 
 
 class AlertStreams(models.Model):
@@ -26,3 +27,15 @@ class AlertStreams(models.Model):
         self.clean()
         super().save(*args, **kwargs)
 
+
+class TargetStream(models.Model):
+    target = models.OneToOneField(Target, on_delete=models.CASCADE, related_name='stream')
+    stream = models.CharField(max_length=255)
+
+    def clean(self):
+        if self.stream not in settings.TOPICS:
+            raise ValidationError(f"{self.stream} is not a valid stream.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

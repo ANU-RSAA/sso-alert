@@ -15,6 +15,7 @@ from tom_observations.facility import (
 )
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
+from tom_observations.models import ObservationRecord
 from decouple import config
 
 logger = logging.getLogger(__name__)
@@ -773,17 +774,26 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         # this is to filter the result set by id
         post_data[filter_key] = tokens[1]
 
+        try:
+            observation = ObservationRecord.objects.get(observation_id=observation_id)
+            state = observation.status
+            scheduled_start = observation.scheduled_start
+            scheduled_end = observation.scheduled_end
+        except ObservationRecord.DoesNotExist:
+            state = "Unknown"
+            scheduled_start = None
+            scheduled_end = None
+
         while True:
             # print(f"get_observation_status {observation_id}")
             response = requests.post(url, data=post_data,
                                      auth=(proposal_db_username, proposal_db_password))
 
             try:
+
                 content = json.loads(response.content.decode())
                 data = content["data"]
                 print(f"Number of observations found {len(data)}")
-                state = "Unknown"
-
                 # It is currently returning only one, need to check if there is a use case where it could return more
                 for item in data:
                     print(f"CHECK {item['userDefId']}  ==? {tokens[1]}")
@@ -799,11 +809,11 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 if content["pageSize"] == pagesize:
                     post_data[offset_key] = post_data[offset_key] + pagesize
                 else:
-                    return {'state': state}
+                    return {'state': state, "scheduled_start": scheduled_start, "scheduled_end": scheduled_end}
             except Exception:
                 msg = f"Bad response - I don't know how to show these in the tom message box."
                 logger.exception(msg)
-                return {}
+                return {'state': state, "scheduled_start": scheduled_start, "scheduled_end": scheduled_end}
 
     def get_observing_sites(self):
         """
