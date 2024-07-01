@@ -77,6 +77,29 @@ CHOICES = {
 }
 
 
+def is_valid_proposal(proposal):
+    proposal_db_username = config('ADACS_PROPOSALDB_TEST_USERNAME')
+    proposal_db_password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
+    # Keyword dictionary
+    proposal_key = "PROPOSAL"
+
+    url = 'https://mortal.anu.edu.au/aocs/propinfo.php'
+
+    get_data = dict()
+    get_data[proposal_key] = proposal
+
+    response = requests.get(url, params=get_data, auth=(proposal_db_username, proposal_db_password))
+
+    try:
+        content = json.loads(response.content.decode())
+        if content["status"] and content["auth"] and content["found"]:
+            return True, ""
+        else:
+            return False, content["msg"].replace('alertproxy', 'The system')
+    except Exception as e:
+        return False, "Cannot check right now."
+
+
 # Class that displays a GUI form for users to create an observation.
 class ANU230cmForm(BaseRoboticObservationForm):
     proposal = forms.CharField(
@@ -268,7 +291,25 @@ class ANU230cmForm(BaseRoboticObservationForm):
             self.button_layout(),
         )
 
+    def is_valid(self):
+        # Make this call the validate_observation method in facility
+        valid = super().is_valid()
+
+        if not valid:
+            return valid
+
+        if not self.cleaned_data.get('proposal'):
+            self.add_error('proposal', 'Proposal ID is required.')
+            valid = False
+        else:
+            valid, message = is_valid_proposal(self.cleaned_data['proposal'])
+            if not valid:
+                self.add_error(None, message)
+
+        return valid
+
     def layout(self):
+        from crispy_forms.layout import Field
         return Div(
             Fieldset(
                 "Observation",
