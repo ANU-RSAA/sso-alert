@@ -4,9 +4,10 @@
 {% block additional_css %}
 <link rel="stylesheet" href="{% static 'tom_common/css/main.css' %}">
 <link rel="stylesheet" href="{% static 'tom_observations/css/main.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/style/styles.css' %}">
 {% endblock %}
 {% block content %}
-{{ form|as_crispy_errors }}
+
 <h3>Submit an observation to {{ form.facility.value }} for <a href="{% url 'targets:detail' pk=target.id %}">{{target.name}}</a>
 </h3>
 {% if missing_configurations %}
@@ -42,12 +43,8 @@
             {% for observation_type, observation_form in observation_type_choices %}
             <div class="tab-pane {% if observation_type == active or not active and forloop.first %}active{% endif %}"
                  id="{{ observation_type }}">
+                {{ form|as_crispy_errors }}
                 {% crispy observation_form %}
-                <!--?<form method="post">-->
-                <!--?    {% csrf_token %}-->
-                <!--?    {{ observation_form|crispy }}-->
-                <!--?    <button type="submit">Submit</button>-->
-                <!--?</form>-->
             </div>
             {% endfor %}
         </div>
@@ -83,11 +80,7 @@
             padZero(currentTime.getMinutes()) +
             padZero(currentTime.getSeconds());
 
-    if (userInput.value.trim() !== "") {
-        userInput.value += "_" + targetName + "_" + formattedTime;
-    } else {
-        userInput.value = targetName + "_" + formattedTime;
-    }
+    userInput.value = targetName + "_" + formattedTime;
 
     function padZero(num) {
         return (num < 10 ? '0' : '') + num;
