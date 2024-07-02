@@ -647,6 +647,23 @@ class ANU230cmTemplateForm(GenericTemplateForm):
             self.layout(),
         )
 
+    def is_valid(self):
+
+        valid = super().is_valid()
+
+        if not valid:
+            return valid
+
+        if not self.cleaned_data.get('proposal'):
+            self.add_error('proposal', 'Proposal ID is required.')
+            valid = False
+        else:
+            valid, message = is_valid_proposal(self.cleaned_data['proposal'])
+            if not valid:
+                self.add_error(None, message)
+
+        return valid
+
     def layout(self):
         return Div(
             Fieldset(
