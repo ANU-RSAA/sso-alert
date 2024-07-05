@@ -27,7 +27,7 @@ CHOICES = {
     ],
     "MODE": [
         ("ClassicalEqual", "Classical Equal"),
-        ("ObjectSkyNodAndShuffle", "Object Sky Nod And Shuffle"),
+        # ("ObjectSkyNodAndShuffle", "Object Sky Nod And Shuffle"),
     ],
     "DICHROIC": [
         ("RT480", "RT480"),
