@@ -42,6 +42,19 @@ def generate_alert_streams():
 ALERT_STREAMS = generate_alert_streams()
 
 SITE_URL = dotenv('SITE_URL', default='set SITE_URL value in environment')
+SITE_DOMAIN_NAME = dotenv('SITE_DOMAIN_NAME', default='set SITE_DOMAIN_NAME value in environment')
+print(f"WE SET SITE_URL TO {SITE_URL}. Update ALLOWED_HOSTS")
+# ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24', SITE_DOMAIN_NAME] # for mobile tests
+ALLOWED_HOSTS = [
+    ".localhost",
+    "127.0.0.1",
+    "[::1]",
+    "10.0.0.24",
+    SITE_DOMAIN_NAME,
+]
+CSRF_TRUSTED_ORIGINS = [SITE_URL]
+print(f"WE SET ALLOWED_HOSTS TO {ALLOWED_HOSTS}")
+print(f"WE SET CSRF_TRUSTED_ORIGINS TO {CSRF_TRUSTED_ORIGINS}")
 
 DEVELOPMENT_MODE = bool(strtobool(dotenv('DEVELOPMENT_MODE', default='True')))
 

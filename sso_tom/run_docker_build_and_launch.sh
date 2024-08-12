@@ -7,7 +7,7 @@
 docker system prune -f
 docker compose up --build --remove-orphans --force-recreate > staging.txt 2>&1 &
 
-IMAGE_NAME=tom-demo-demo
+IMAGE_NAME=sso_tom-demo
 CONTAINER_ID=$(docker ps --all --filter ancestor=${IMAGE_NAME} --format="{{.ID}}" | head -n 1)
 echo CONTAINER_ID=${CONTAINER_ID}
 until [ "${CONTAINER_ID}" != "" ]
