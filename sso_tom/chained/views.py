@@ -225,7 +225,7 @@ class ChainView(LoginRequiredMixin, TemplateView):
 
         chained_observations = ChainedObservation.objects.filter(
             chain=chain,
-        )
+        ).order_by('created')
 
         context['chain'] = chain
         context['chained_observations'] = chained_observations
