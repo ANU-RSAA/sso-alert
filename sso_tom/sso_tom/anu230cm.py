@@ -77,27 +77,35 @@ CHOICES = {
 }
 
 
-def is_valid_proposal(proposal):
+def is_valid_proposal(proposal, user):
     proposal_db_username = config('ADACS_PROPOSALDB_TEST_USERNAME')
     proposal_db_password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
     # Keyword dictionary
     proposal_key = "PROPOSAL"
 
-    url = 'https://mortal.anu.edu.au/aocs/propinfo.php'
-
     get_data = dict()
     get_data[proposal_key] = proposal
+
+    url = 'https://mortal.anu.edu.au/aocs/propusers.php'
+    # url = 'https://mortal.anu.edu.au/aocs/propinfo.php'
 
     response = requests.get(url, params=get_data, auth=(proposal_db_username, proposal_db_password))
 
     try:
         content = json.loads(response.content.decode())
         if content["status"] and content["auth"] and content["found"]:
-            return True, ""
+            members = content.get("member", [])
+
+            for member in members:
+                if member["user"] == user.email:
+                    feature_bits = member["featureBits"]
+                    if feature_bits & 1:
+                        return True, ""
+            return False, f'You ({user.email}) are not authorized for proposal: {proposal}'
         else:
             return False, content["msg"].replace('alertproxy', 'The system')
     except Exception as e:
-        return False, "Cannot check right now."
+        return False, f'The system cannot check the proposal id {proposal} (make sure it is valid)'
 
 
 # Class that displays a GUI form for users to create an observation.
@@ -284,7 +292,9 @@ class ANU230cmForm(BaseRoboticObservationForm):
     )
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
         self.helper.layout = Layout(
             self.common_layout,
             self.layout(),
@@ -302,7 +312,7 @@ class ANU230cmForm(BaseRoboticObservationForm):
             self.add_error('proposal', 'Proposal ID is required.')
             valid = False
         else:
-            valid, message = is_valid_proposal(self.cleaned_data['proposal'])
+            valid, message = is_valid_proposal(proposal=self.cleaned_data['proposal'], user=self.user)
             if not valid:
                 self.add_error(None, message)
 
@@ -448,7 +458,6 @@ class ANU230cmForm(BaseRoboticObservationForm):
 class ANU230cmTemplateForm(GenericTemplateForm):
     proposal = forms.CharField(
         label="Proposal ID",
-        required=False,
     )
     userdefid = forms.CharField(
         label="User Def. ID",
@@ -638,6 +647,8 @@ class ANU230cmTemplateForm(GenericTemplateForm):
     )
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+
         super().__init__(*args, **kwargs)
         self.common_layout = Layout("facility", "template_name")
         self.helper = FormHelper()
@@ -658,7 +669,7 @@ class ANU230cmTemplateForm(GenericTemplateForm):
             self.add_error('proposal', 'Proposal ID is required.')
             valid = False
         else:
-            valid, message = is_valid_proposal(self.cleaned_data['proposal'])
+            valid, message = is_valid_proposal(proposal=self.cleaned_data['proposal'], user=self.user)
             if not valid:
                 self.add_error(None, message)
 

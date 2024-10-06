@@ -14,11 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from .views import AboutView, page_not_found
+from .views import AboutView, page_not_found, CustomObservationCreateView, CustomObservationTemplateCreateView, \
+    CustomObservationTemplateUpdateView
 
 urlpatterns = [
     # disabled pages
     path("observations/status/", page_not_found, name="facility-status"),
+
+    # required for custom validation of proposal id using user information
+    path("observations/<str:facility>/create/", CustomObservationCreateView.as_view(), name="create"),
+    path('observations/template/<str:facility>/create/', CustomObservationTemplateCreateView.as_view(),
+         name='template-create'),
+    path('observations/template/<int:pk>/update/', CustomObservationTemplateUpdateView.as_view(),
+         name='template-update'),
+    path('observations/template/<int:pk>/', CustomObservationTemplateUpdateView.as_view(), name='template-detail'),
 
     path("", include("tom_registration.registration_flows.open.urls", namespace="registration"), ),
     path("", include("accounts.urls")),
