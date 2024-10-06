@@ -30,6 +30,7 @@ from tom_targets.views import TargetDetailView
 from .forms import ChainedObservationForm, ChainForm
 from .models import ChainedObservation, Chain, TemplatedChain, ChainedTemplate
 from .utils import submit_chain
+from sso_tom.views import CustomObservationTemplateCreateView
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +144,13 @@ class SingleObservationCreateView(ObservationCreateView):
                 return self.form_valid(form)
         else:
             return self.form_invalid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        facility = self.get_facility_class()()
+        if facility.name == 'ANU 2.3m':
+            kwargs['user'] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         """
@@ -356,7 +364,7 @@ class ChainTemplateView(LoginRequiredMixin, TemplateView):
         return redirect('chains:view_chain_template', template_id=templated_chain_id)
 
 
-class ChainedTemplateCreateView(LoginRequiredMixin, ObservationTemplateCreateView):
+class ChainedTemplateCreateView(LoginRequiredMixin, CustomObservationTemplateCreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form()
