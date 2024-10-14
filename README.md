@@ -1,4 +1,4 @@
-# SSO Alert System UI Prototype
+# SSO Alert System UI
 
 This is the User Interface of the Siding Spring Observatory's Alert System. This project uses Docker Compose to set up a
 reverse proxy with Nginx Proxy Manager, a web application, and a PostgreSQL database. Each service is defined within the
