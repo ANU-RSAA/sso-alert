@@ -86,12 +86,27 @@ There are some steps which could be followed by the IT people to make sure the a
 - Review logs periodically for any signs of errors, failures, or abnormal behavior. Any issues in the cron jobs should
   be investigated immediately to avoid potential disruptions in application functionality.
 
+#### 1.1 Do I need to back up cron job logs?
+
+Not necessarily. The application will be able to run smoothly after restarting even if you don't do the backup.
+
 ### 2. **Backup Strategy**
 
 - Regularly back up essential data, i.e., the PostgreSQL database to prevent data loss. Automated and secured backups
   should be scheduled if possible.
 - Use volume mounts in Docker to ensure data persistence across container restarts. For example, the PostgreSQL data is
   stored in a mounted volume, which should be backed up as part of the disaster recovery plan.
+
+#### 2.1 Where is the Data Stored
+
+The PostgreSQL service stores its data in the following volume mount - `./postgresql/data:/var/lib/postgresql/data` -
+This is where the actual PostgreSQL database files are stored. All database records, schemas, and configurations are
+stored here.
+
+#### 2.2 What to Back Up
+
+PostgreSQL Data (`./postgresql/data`): This directory contains the full database for your application. It is essential
+to back this up regularly, as it stores all the critical data required for the application's operation.
 
 ### 3. **Security Updates**
 
