@@ -25,6 +25,19 @@ reverse proxy with Nginx Proxy Manager, a web application, and a PostgreSQL data
 - Exposes port `5432` for database access.
 - Stores persistent data in a local volume.
 
+## Cron jobs
+
+In addition to the services described above, the system employs two cron jobs to read streams and update submitted 
+observation status. These jobs run management commands inside the Docker container at specified intervals and log the 
+output for monitoring.
+
+### 1. Read Streams via `run_readstreams.sh` Cron Job
+
+This cron job runs every 5 minutes and executes the `readstreams` management command.
+
+### 2. Update Status `run_updatestatus.sh` Cron Job
+
+This cron job runs every 2 hours and executes the `updatestatus` management command.
 
 ## The Web Application service is Built with
 
