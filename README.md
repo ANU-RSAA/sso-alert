@@ -1,10 +1,32 @@
 # SSO Alert System UI Prototype
 
-This is a prototype for the User Interface of the Siding Spring Observatory's Alert System.
+This is the User Interface of the Siding Spring Observatory's Alert System. This project uses Docker Compose to set up a
+reverse proxy with Nginx Proxy Manager, a web application, and a PostgreSQL database. Each service is defined within the
+`docker-compose.yml` file, ensuring a modular and scalable setup.
 
-**NOTE: This prototype is being actively developed.**
+## Services
 
-## Built with
+### 1. Nginx Proxy Manager
+- Manages reverse proxy settings and SSL certificates.
+- Exposes:
+  - Port `81` for the admin interface.
+  - Port `80` for HTTP traffic.
+  - Port `443` for HTTPS traffic.
+- Stores configuration and SSL data in mounted volumes.
+
+### 2. Web Application
+- Runs a web application built from the local directory.
+- Connects to the PostgreSQL database.
+- Exposes port `8080` for external access.
+- Environment variables configure the database connection.
+
+### 3. PostgreSQL Database
+- Provides a database backend for the web application.
+- Exposes port `5432` for database access.
+- Stores persistent data in a local volume.
+
+
+## The Web Application service is Built with
 
 ![Django]
 ![tom]
