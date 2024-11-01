@@ -5,6 +5,7 @@ import json
 import logging
 from datetime import timedelta
 from django.utils import timezone
+from django.conf import settings
 
 from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
 from crispy_forms.helper import FormHelper
@@ -16,7 +17,7 @@ from tom_observations.facility import (
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
 from tom_observations.models import ObservationRecord
-from decouple import config
+
 
 logger = logging.getLogger(__name__)
 
@@ -78,33 +79,23 @@ CHOICES = {
 
 
 def is_valid_proposal(proposal, user):
-    proposal_db_username = config('ADACS_PROPOSALDB_TEST_USERNAME')
-    proposal_db_password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-    # Keyword dictionary
-    proposal_key = "PROPOSAL"
-
-    get_data = dict()
-    get_data[proposal_key] = proposal
-
-    url = 'https://mortal.anu.edu.au/aocs/propusers.php'
-    # url = 'https://mortal.anu.edu.au/aocs/propinfo.php'
-
-    response = requests.get(url, params=get_data, auth=(proposal_db_username, proposal_db_password))
+    url = settings.ANU_SITE + 'propusers.php'
+    response = requests.get(
+        url,
+        params={"PROPOSAL": proposal},
+        auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD)
+    )
 
     try:
         content = json.loads(response.content.decode())
         if content["status"] and content["auth"] and content["found"]:
-            members = content.get("member", [])
-
-            for member in members:
-                if member["user"] == user.email:
-                    feature_bits = member["featureBits"]
-                    if feature_bits & 1:
-                        return True, ""
+            for member in content.get("member", []):
+                if member["user"] == user.email and member["featureBits"] & 1:
+                    return True, ""
             return False, f'You ({user.email}) are not authorized for proposal: {proposal}'
         else:
             return False, content["msg"].replace('alertproxy', 'The system')
-    except Exception as e:
+    except Exception:
         return False, f'The system cannot check the proposal id {proposal} (make sure it is valid)'
 
 
@@ -190,13 +181,11 @@ class ANU230cmForm(BaseRoboticObservationForm):
     )
     ra_0 = forms.CharField(
         label="RA",
-        # validators=[validate_ra],
         required=False,
         disabled=True,
     )
     dec_0 = forms.CharField(
         label="Dec",
-        # validators=[validate_dec],
         required=False,
         disabled=True,
     )
@@ -319,7 +308,6 @@ class ANU230cmForm(BaseRoboticObservationForm):
         return valid
 
     def layout(self):
-        from crispy_forms.layout import Field
         return Div(
             Fieldset(
                 "Observation",
@@ -400,15 +388,6 @@ class ANU230cmForm(BaseRoboticObservationForm):
                     css_class="form-row",
                 ),
             ),
-            # Fieldset(
-            #     "Nod & Shuffle Sky",
-            #     Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
-            #     Div(
-            #         Div("skya_ra_0", css_class="col"),
-            #         Div("skya_dec_0", css_class="col"),
-            #         css_class="form-row",
-            #     ),
-            # ),
         )
 
     def button_layout(self):
@@ -416,8 +395,6 @@ class ANU230cmForm(BaseRoboticObservationForm):
         return ButtonHolder(
             Submit("submit", "Submit"),
             Submit("add_to_chain", "Add to Chain"),
-            # HTML(f'''<a class="btn btn-outline-primary" href={{% url 'tom_targets:detail' {target_id} %}}>
-            #          Back</a>''')
         )
 
     def observation_payload(self):
@@ -538,13 +515,11 @@ class ANU230cmTemplateForm(GenericTemplateForm):
     )
     ra_0 = forms.CharField(
         label="RA",
-        # validators=[validate_ra],
         required=False,
         disabled=True,
     )
     dec_0 = forms.CharField(
         label="Dec",
-        # validators=[validate_dec],
         required=False,
         disabled=True,
     )
@@ -681,7 +656,6 @@ class ANU230cmTemplateForm(GenericTemplateForm):
                 "Observation",
                 Div(
                     Div("proposal", css_class="col"),
-                    # Div("userdefid", css_class="col"),
                     Div("userdefpri", css_class="col"),
                     css_class="form-row",
                 ),
@@ -731,40 +705,13 @@ class ANU230cmTemplateForm(GenericTemplateForm):
             ),
             Fieldset(
                 "Object, Acquisition & Guide",
-                # Div(
-                #     Div("ra_0", css_class="col"),
-                #     Div("dec_0", css_class="col"),
-                #     Div("pmot_0", css_class="col"),
-                #     css_class="form-row",
-                # ),
-                # Div(
-                #     Div("acq_ra_0", css_class="col"),
-                #     Div("acq_dec_0", css_class="col"),
-                #     Div("acq_pmot_0", css_class="col"),
-                #     css_class="form-row",
-                # ),
                 Div(Div("blindacq_0", css_class="col"), css_class="form-row"),
-                # Div(
-                #     Div("rot_0", css_class="col"),
-                #     Div("rotang_0", css_class="col"),
-                #     css_class="form-row",
-                # ),
                 Div(
-                    # Div("mag_0", css_class="col"),
                     Div("agfilter_0", css_class="col"),
                     Div("guide_0", css_class="col"),
                     css_class="form-row",
                 ),
             ),
-            # Fieldset(
-            #     "Nod & Shuffle Sky",
-            #     Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
-            #     # Div(
-            #     #     Div("skya_ra_0", css_class="col"),
-            #     #     Div("skya_dec_0", css_class="col"),
-            #     #     css_class="form-row",
-            #     # ),
-            # ),
         )
 
 
@@ -801,7 +748,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
 
         If the cancellation was successful, return True. Otherwise, return False.
         """
-        print(f"Cancelling {observation_id}")
+        logger.info(f"Cancelling {observation_id}")
         return True
 
     def get_observation_status(self, observation_id):
@@ -817,22 +764,14 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         # if less than 2 parts return to show error.
         if len(tokens) != 2:
             return {}
-        # print(f"get_observation_status user email = {dir(self)}")
-        # print(f"get_observation_status user email = {self.user}")
-        # local version of emuldate_common
-        proposal_db_username = config('ADACS_PROPOSALDB_TEST_USERNAME')
-        proposal_db_password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-        emulate_anu230cm = "https://mortal.anu.edu.au/aocs/"
-        # print(f"TOKENS FOR ACCESS {proposal_db_username} {proposal_db_password}")
-        # url_suffix = "/"
-        url_suffix = ".php"
+
         # Keyword dictionary
         proposal_key = "PROPOSAL"
         offset_key = "OFFSET"
         pagesize_key = "PAGESIZE"
         filter_key = "FILTER"
 
-        url = emulate_anu230cm + '/propobsstat' + url_suffix
+        url = settings.ANU_SITE + 'propobsstat.php'
 
         pagesize = 1000
 
@@ -854,21 +793,24 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             scheduled_end = None
 
         while True:
-            # print(f"get_observation_status {observation_id}")
-            response = requests.post(url, data=post_data,
-                                     auth=(proposal_db_username, proposal_db_password))
+
+            response = requests.post(
+                url,
+                data=post_data,
+                auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD)
+            )
 
             try:
 
                 content = json.loads(response.content.decode())
                 data = content["data"]
-                print(f"Number of observations found {len(data)}")
+                logger.info(f"Number of observations found {len(data)}")
                 # It is currently returning only one, need to check if there is a use case where it could return more
                 for item in data:
-                    print(f"CHECK {item['userDefId']}  ==? {tokens[1]}")
+                    logger.info(f"CHECK {item['userDefId']}  ==? {tokens[1]}")
                     if item["userDefId"] == tokens[1]:
                         state = item['obsStatus']
-                        print(f"STATE={state}")
+                        logger.info(f"STATE={state}")
                         return {
                             'state': state,
                             'scheduled_start': timezone.now() + timedelta(hours=1),
@@ -996,26 +938,18 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         This method takes in the serialized data from the form and actually
         submits the observation to the remote api
         """
-        # Add ANU2.3m API query here.
-        print("new submit_observation_payload")
-        # local version of emuldate_common
-        password = config('ADACS_PROPOSALDB_TEST_PASSWORD')
-        username = config('ADACS_PROPOSALDB_TEST_USERNAME')
-        facility_link = "https://mortal.anu.edu.au/aocs/"
-        # print(f"TOKENS FOR ACCESS {password} {username}")
-        # url_suffix = "/"
-        url_suffix = ".php"
-
-        url = facility_link + '/addobsblockexec' + url_suffix
+        url = settings.ANU_SITE + 'addobsblockexec.php'
 
         post_data, proposal, userdefid = self.get_clean_data_for_posting(observation_payload=observation_payload)
 
-        response = requests.post(url, data=post_data, auth=(username, password))
-        print(f"{response}")
+        response = requests.post(
+            url,
+            data=post_data,
+            auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD)
+        )
 
         try:
-            # content = json.loads(response.content)
-            print(f"json response={response.content}")
+            logger.info(f"json response={response.content}")
         except Exception:
             msg = f"Bad response"
             logger.exception(msg)
