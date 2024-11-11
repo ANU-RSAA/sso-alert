@@ -110,18 +110,20 @@ WSGI_APPLICATION = "sso_tom.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    }
-}
+USE_POSTGRES = dotenv('USE_POSTGRES', default='False', cast=bool)
 
-if os.getenv('USE_POSTGRES') == 'True':
+if USE_POSTGRES:
     DATABASES = {
         'default': dj_database_url.config(
-            default=f"postgres://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
+            default=f"postgres://{dotenv('DATABASE_USER')}:{dotenv('DATABASE_PASSWORD')}@{dotenv('DATABASE_HOST')}:{dotenv('DATABASE_PORT')}/{dotenv('DATABASE_NAME')}"
         )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
