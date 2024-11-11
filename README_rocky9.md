@@ -51,7 +51,7 @@ except ensure that the SITE_URL is updated to point to this site.
 
 | variable                       | test depolyment                                          |
 |--------------------------------|----------------------------------------------------------|
-| SECRET_KEY                     | Y0ur$ecretKeyIncludingSymbols#$%$^%                      |
+| SECRET_KEY                     | YourSecretKeyIncludingSymbolsAndNumbers                  |
 |                                |                                                          |
 | ADACS_PROPOSALDB_TEST_PASSWORD | xxxx                                                     |
 | ADACS_PROPOSALDB_TEST_USERNAME | alertproxy                                               |
