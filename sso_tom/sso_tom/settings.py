@@ -27,20 +27,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "21+fgm=fgx41*$+4o1svu*^k_dfl@^74)!zbq#fa^2_#@ct5hj"
+SECRET_KEY = dotenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-# ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '10.0.0.24', 'ssoalert.adacs-dev.cloud.edu.au'] # for mobile tests
-ALLOWED_HOSTS = [
-    ".localhost",
-    "127.0.0.1",
-    "[::1]",
-    "10.0.0.24",
-    "ssoalert.adacs-dev.cloud.edu.au",
-]
-CSRF_TRUSTED_ORIGINS = ["https://ssoalert.adacs-dev.cloud.edu.au"]
 
 # Application definition
 
@@ -120,18 +110,20 @@ WSGI_APPLICATION = "sso_tom.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    }
-}
+USE_POSTGRES = dotenv('USE_POSTGRES', default='False', cast=bool)
 
-if os.getenv('USE_POSTGRES') == 'True':
+if USE_POSTGRES:
     DATABASES = {
         'default': dj_database_url.config(
-            default=f"postgres://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
+            default=f"postgres://{dotenv('DATABASE_USER')}:{dotenv('DATABASE_PASSWORD')}@{dotenv('DATABASE_HOST')}:{dotenv('DATABASE_PORT')}/{dotenv('DATABASE_NAME')}"
         )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

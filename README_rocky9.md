@@ -49,30 +49,32 @@ $ cd ui/sso_tom
 create a file ".env" and add the appropriate values as we have done on https://ssoalert.adacs-dev.cloud.edu.au/
 except ensure that the SITE_URL is updated to point to this site.
 
-| variable | test depolyment                                          |
-| ------ |----------------------------------------------------------|
+| variable                       | test depolyment                                          |
+|--------------------------------|----------------------------------------------------------|
+| SECRET_KEY                     | YourSecretKeyIncludingSymbolsAndNumbers                  |
+|                                |                                                          |
 | ADACS_PROPOSALDB_TEST_PASSWORD | xxxx                                                     |
 | ADACS_PROPOSALDB_TEST_USERNAME | alertproxy                                               |
-| |                                                          |
-| FINK_CREDENTIAL_USERNAME | ssoas_test                                               |
-| FINK_CREDENTIAL_GROUP_ID | ssoas_1                                                  |
-| FINK_CREDENTIAL_URL | 134.158.74.95:24499                                      |
-| FINK_TOPIC | fink_sso_fink_candidates_zt                              |
-| FINK_MAX_POLL_NUMBER | 2                                                        |
-| FINK_TIMEOUT | 10                                                       |
-| |                                                          |
-| DEVELOPMENT_MODE | False                                                    |
-| SITE_URL | https://ssoalert-test.adacs-dev.cloud.edu.au (update it) |
-| SITE_DOMAIN_NAME | ssoalert-test.adacs-dev.cloud.edu.au (update it)         |
-| SERVER_EMAIL | noreply@supercomputing.swin.edu.au (update it)           |
-| |                                                          |
-| EMAIL_HOST | mail.swin.edu.au (update it)                                        |
-| EMAIL_FROM | xxxx                                                     |
-| EMAIL_PORT | 25                                                       |
-|             |                                                          |
-| DATABASE_NAME | ssoalerts                                                |
-| DATABASE_USER | sso                                                      |
-| DATABASE_PASSWORD | xxxx                                                     |
+|                                |                                                          |
+| FINK_CREDENTIAL_USERNAME       | ssoas_test                                               |
+| FINK_CREDENTIAL_GROUP_ID       | ssoas_1                                                  |
+| FINK_CREDENTIAL_URL            | 134.158.74.95:24499                                      |
+| FINK_TOPIC                     | fink_sso_fink_candidates_zt                              |
+| FINK_MAX_POLL_NUMBER           | 2                                                        |
+| FINK_TIMEOUT                   | 10                                                       |
+|                                |                                                          |
+| DEVELOPMENT_MODE               | False                                                    |
+| SITE_URL                       | https://ssoalert-test.adacs-dev.cloud.edu.au (update it) |
+| SITE_DOMAIN_NAME               | ssoalert-test.adacs-dev.cloud.edu.au (update it)         |
+| SERVER_EMAIL                   | noreply@supercomputing.swin.edu.au (update it)           |
+|                                |                                                          |
+| EMAIL_HOST                     | mail.swin.edu.au (update it)                             |
+| EMAIL_FROM                     | xxxx                                                     |
+| EMAIL_PORT                     | 25                                                       |
+|                                |                                                          |
+| DATABASE_NAME                  | ssoalerts                                                |
+| DATABASE_USER                  | sso                                                      |
+| DATABASE_PASSWORD              | xxxx                                                     |
 
 The following were used for local testing in the .env file
 
