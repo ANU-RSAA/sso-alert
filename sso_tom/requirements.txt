@@ -43,7 +43,7 @@ djangorestframework==3.15.0
 docutils==0.21.2
 dramatiq==1.15.0
 executing==2.2.0
-fastavro==1.11.1
+fastavro==1.9.4
 fink-client==9.0
 fits2image==0.4.7
 gcn-kafka==0.3.3
@@ -85,7 +85,6 @@ pure_eval==0.2.3
 pycparser==2.22
 pyerfa==2.0.1.1
 Pygments==2.19.2
-pyspark==3.4.1
 python-dateutil==2.8.2
 python-decouple==3.8
 pytz==2023.3.post1
