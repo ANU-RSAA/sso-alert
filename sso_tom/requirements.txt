@@ -44,11 +44,7 @@ docutils==0.21.2
 dramatiq==1.15.0
 executing==2.2.0
 fastavro==1.11.1
-fink-broker==4.0
 fink-client==9.0
-fink-science==7.4.0
-fink-spins==0.3.8
-fink-utils==0.41.3
 fits2image==0.4.7
 gcn-kafka==0.3.3
 gevent==23.9.1
