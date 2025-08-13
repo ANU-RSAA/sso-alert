@@ -3,16 +3,15 @@ services:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: nginx-proxy-manager
     ports:
-      - '81:81'
-      - '80:80'
-      - '443:443'
+      - '9081:81'
+      - '9080:80'
+      - '9443:443'
     volumes:
       - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
 
-  demo:
+  ssoalert:
     build: ./
-    container_name: a1
+    container_name: sso-alert
     ports:
       - "8080:8080"
     volumes:
@@ -29,7 +28,7 @@ services:
 
   db:
     image: postgres:12.1
-    container_name: a2
+    container_name: postgres
     ports:
       - "5432:5432"
     volumes:
