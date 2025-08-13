@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 
 from django.views.generic import TemplateView
-from tom_observations.models import Target
+from tom_targets.models import Target
 from tom_observations.views import ObservationCreateView, ObservationTemplateCreateView, ObservationTemplateUpdateView
 
 

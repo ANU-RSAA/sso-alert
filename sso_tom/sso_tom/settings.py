@@ -159,6 +159,7 @@ TOM_REGISTRATION = {
     "REGISTRATION_AUTHENTICATION_BACKEND": "django.contrib.auth.backends.ModelBackend",
     "REGISTRATION_REDIRECT_PATTERN": "home",
     "SEND_APPROVAL_EMAILS": False,
+    'REGISTRATION_STRATEGY': 'open',
 }
 
 # Internationalization
@@ -286,8 +287,7 @@ TOM_ALERT_CLASSES = [
     "tom_alerts.brokers.lasair.LasairBroker",
     "tom_alerts.brokers.scout.ScoutBroker",
     "tom_alerts.brokers.tns.TNSBroker",
-    # "tom_alerts.brokers.fink.FinkBroker", # TODO: Check with Julien
-    "tom_fink.fink.FinkBroker",
+    "tom_alerts.brokers.fink.FinkBroker",
 ]
 
 BROKERS = {
