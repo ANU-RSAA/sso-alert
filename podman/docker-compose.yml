@@ -7,11 +7,11 @@ services:
       - '9080:80'
       - '9443:443'
     volumes:
-      - ./data:/data
+      - ./nginx-data:/data:z
 
   ssoalert:
     build: ./
-    container_name: sso-alert
+    container_name: sso-alert-pod
     ports:
       - "8080:8080"
     volumes:
@@ -28,11 +28,11 @@ services:
 
   db:
     image: postgres:12.1
-    container_name: postgres
+    container_name: postgres-pod
     ports:
       - "5432:5432"
     volumes:
-      - ./postgresql/data:/var/lib/postgresql/data
+      - ./postgresql/data:/var/lib/postgresql/data:z
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}

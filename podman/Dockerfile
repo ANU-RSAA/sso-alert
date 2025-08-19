@@ -3,7 +3,7 @@ FROM python:3.12
 
 # the exposed port must match the deployment.yaml containerPort value
 EXPOSE 8080
-ENTRYPOINT [ "./start_within_container.sh"]
+ENTRYPOINT [ "../sso_tom/start_within_container.sh"]
 RUN apt-get update -y
 RUN apt-get install vim -y
 RUN apt-get install cron -y
@@ -25,7 +25,7 @@ ENV NODE_VERSION 14.17.0
 
 # Install nvm with node and npm
 RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.38.0/install.sh | bash \
-    && source $NVM_DIR/nvm.sh \
+    && . $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
     && nvm use default
