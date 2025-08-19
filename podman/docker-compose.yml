@@ -10,12 +10,12 @@ services:
       - ./nginx-data:/data:z
 
   ssoalert:
-    build: ./
+    build: ../sso_tom/
     container_name: sso-alert-pod
     ports:
       - "8080:8080"
     volumes:
-      - ./:/code
+      - ../sso_tom:/code
     depends_on:
       - db
     environment:
