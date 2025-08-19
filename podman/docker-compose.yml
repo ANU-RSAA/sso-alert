@@ -8,14 +8,15 @@ services:
       - '9443:443'
     volumes:
       - ./nginx-data:/data:z
+      - ./letsencrypt:/etc/letsencrypt:z
 
   ssoalert:
-    build: ../sso_tom/
+    build: ./
     container_name: sso-alert-pod
     ports:
       - "8080:8080"
     volumes:
-      - ../sso_tom:/code
+      - ../sso_tom:/code:z
     depends_on:
       - db
     environment:

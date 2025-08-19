@@ -3,7 +3,7 @@ FROM python:3.12
 
 # the exposed port must match the deployment.yaml containerPort value
 EXPOSE 8080
-ENTRYPOINT [ "../sso_tom/start_within_container.sh"]
+ENTRYPOINT [ "./start_within_container.sh"]
 RUN apt-get update -y
 RUN apt-get install vim -y
 RUN apt-get install cron -y
@@ -33,7 +33,7 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.38.0/install.sh | b
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
-COPY . /code
+# COPY . /code
 RUN pip install --no-cache-dir tom_fink
 
 RUN python manage.py collectstatic --noinput
