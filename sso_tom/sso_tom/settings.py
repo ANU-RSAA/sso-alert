@@ -17,7 +17,6 @@ import tempfile
 import tomllib
 
 import dj_database_url
-
 from decouple import config as dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -27,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = dotenv('SECRET_KEY')
+SECRET_KEY = dotenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -110,11 +109,11 @@ WSGI_APPLICATION = "sso_tom.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-USE_POSTGRES = dotenv('USE_POSTGRES', default='False', cast=bool)
+USE_POSTGRES = dotenv("USE_POSTGRES", default="False", cast=bool)
 
 if USE_POSTGRES:
     DATABASES = {
-        'default': dj_database_url.config(
+        "default": dj_database_url.config(
             default=f"postgres://{dotenv('DATABASE_USER')}:{dotenv('DATABASE_PASSWORD')}@{dotenv('DATABASE_HOST')}:{dotenv('DATABASE_PORT')}/{dotenv('DATABASE_NAME')}"
         )
     }
@@ -159,7 +158,7 @@ TOM_REGISTRATION = {
     "REGISTRATION_AUTHENTICATION_BACKEND": "django.contrib.auth.backends.ModelBackend",
     "REGISTRATION_REDIRECT_PATTERN": "home",
     "SEND_APPROVAL_EMAILS": False,
-    'REGISTRATION_STRATEGY': 'open',
+    "REGISTRATION_STRATEGY": "open",
 }
 
 # Internationalization
