@@ -27,8 +27,8 @@ last_updated = 2024-05-09
     fits_facility_header_value = "DREAMS"
     fits_header_dateobs_keyword = "DATE-OBS"
   [dreams.url]
-    format = ["base", "base_additional", "data_format", "endpoint","default_extension",]
-    base = "https://mortal.anu.edu.au/"
+    format = ["base", "base_additional", "data_format", "endpoint", "default_extension",]
+    base = "https://mudslide.anu.edu.au/"
     base_additional = "dreams/api/v1/"
     data_format = "json/"
     default_extension = ".php"
@@ -87,7 +87,7 @@ last_updated = 2024-05-09
   NAME = "tom_dreams.alertstreams.dreams.DREAMSAlertStream"
   [alerts.dreams.OPTIONS]
     [alerts.dreams.OPTIONS.config]
-      "bootstrap.servers" = "134.158.74.95:24499,"
+      "bootstrap.servers" = "150.203.91.176:24499,"
       "group.id" = "SSOAlert"
       "security.protocol" = "PLAINTEXT"
       # "sasl.mechanism" = "SCRAM-SHA-256"
