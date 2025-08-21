@@ -286,7 +286,8 @@ TOM_ALERT_CLASSES = [
     "tom_alerts.brokers.lasair.LasairBroker",
     "tom_alerts.brokers.scout.ScoutBroker",
     "tom_alerts.brokers.tns.TNSBroker",
-    "tom_alerts.brokers.fink.FinkBroker",
+    # "tom_alerts.brokers.fink.FinkBroker",
+    "tom_fink.fink.FinkBroker",
 ]
 
 BROKERS = {
