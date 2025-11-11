@@ -57,7 +57,7 @@ CSRF_TRUSTED_ORIGINS = [SITE_URL]
 print(f"WE SET ALLOWED_HOSTS TO {ALLOWED_HOSTS}")
 print(f"WE SET CSRF_TRUSTED_ORIGINS TO {CSRF_TRUSTED_ORIGINS}")
 
-DEVELOPMENT_MODE = bool(strtobool(dotenv('DEVELOPMENT_MODE', default='True')))
+DEVELOPMENT_MODE = bool(strtobool(dotenv('DEVELOPMENT_MODE', default='False')))
 
 SERVER_EMAIL = dotenv('SERVER_EMAIL', default='set SERVER_EMAIL value in environment')
 EMAIL_HOST = dotenv('EMAIL_HOST', default='set EMAIL_HOST value in environment')
