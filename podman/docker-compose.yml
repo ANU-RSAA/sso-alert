@@ -19,13 +19,7 @@ services:
       - ../sso_tom:/code:z
     depends_on:
       - db
-    environment:
-      - USE_POSTGRES=True
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=${DATABASE_NAME}
-      - DATABASE_USER=${DATABASE_USER}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+    env_file: ../sso_tom/.env
 
   db:
     image: postgres:12.1
@@ -34,7 +28,4 @@ services:
       - "5432:5432"
     volumes:
       - ./postgresql/data:/var/lib/postgresql/data:z
-    environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    env_file: ../sso_tom/.env

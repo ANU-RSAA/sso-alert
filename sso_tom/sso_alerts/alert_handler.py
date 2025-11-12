@@ -91,6 +91,7 @@ def alert_logger(alert, topic):
         ra=alert["candidate"]["ra"],
         dec=alert["candidate"]["dec"],
         epoch=alert["candidate"]["jd"],
+        permissions="PUBLIC"
     )
 
     try:
