@@ -171,7 +171,7 @@ To run the SSO Alert System locally run the following steps.
 1. Run the server.
 
    ```sh
-   python manage.py runserver
+   python manage.py runserver 8080
    ```
 
 The project will now be available at **<http://localhost:8000/>**
