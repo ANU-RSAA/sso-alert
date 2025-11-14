@@ -76,6 +76,8 @@ For a server installation, we currently recommend the use of podman. For a local
 
 Both the server and local installation required a database backend, we recommend the use of Postgres DB.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ### Installation
 
 The following instructions are for a local installation using venv, assuming that Python is installed. Fill in <> with your choices.
@@ -146,13 +148,15 @@ The SSO Alert System requires a database to be used. Depending on your preferenc
       sqlite3 <database_filename>.sqlite3
       ```
 
-These information contained in the <> should match the variables within the .env file.
+The information contained in the <> should match the variables within the .env file.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
 
 To run the SSO Alert System locally run the following steps.
 
-1. Change to the appropriate directory
+1. Change to the appropriate directory where manage.py is located.
 
    ```sh
    cd sso_tom
