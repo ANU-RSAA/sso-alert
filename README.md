@@ -1,123 +1,278 @@
-# SSO Alert System UI
+# SSO Alert System
+<!-- Completely ripped off and updated from https://github.com/othneildrew/Best-README-Template -->
+<a id="readme-top"></a>
 
-This is the User Interface of the Siding Spring Observatory's Alert System. This project uses Docker Compose to set up a
-reverse proxy with Nginx Proxy Manager, a web application, and a PostgreSQL database. Each service is defined within the
-`docker-compose.yml` file, ensuring a modular and scalable setup.
+<!-- PROJECT SHIELDS -->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![License][license-shield]][license-url]
 
-## Services
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#database">Database</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledging-usage">Acknowledging Usage</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
-### 1. Nginx Proxy Manager
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-- Manages reverse proxy settings and SSL certificates.
-- Exposes:
-    - Port `81` for the admin interface.
-    - Port `80` for HTTP traffic.
-    - Port `443` for HTTPS traffic.
-- Stores configuration and SSL data in mounted volumes.
+The Siding Spring Observatory (SSO) Alert System is designed to connect the various observing facilities at SSO to schedule observations in an automated manner.
 
-### 2. Web Application
+The system uses Docker Compose to set up a reverse proxy with Nginx Proxy Manager, a web application, and a PostgreSQL database. Each service is defined within the `docker-compose.yml` file, ensuring a modular and scalable setup. For full details on the architecture of the system see _[README_Design](README_Design.md)_.
 
-- Runs a web application built from the local directory.
-- Connects to the PostgreSQL database.
-- Exposes port `8080` for external access.
-- Environment variables configure the database connection.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### 3. PostgreSQL Database
+### Built With
 
-- Provides a database backend for the web application.
-- Exposes port `5432` for database access.
-- Stores persistent data in a local volume.
+* [![Django][django]][django-url]
+* [![Python][python]][python-url]
+* [![Tom Toolkit][tom]][tom-url]
 
-## Cron jobs
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-In addition to the services described above, the system employs two cron jobs to read streams and update submitted
-observation status. These jobs run management commands inside the Docker container at specified intervals and log the
-output for monitoring.
+<!-- GETTING STARTED -->
+## Getting Started
 
-### 1. Read Streams via `run_readstreams.sh` Cron Job
+### Prerequisites
 
-This cron job runs every 5 minutes and executes the `readstreams` management command.
+The prerequisites are dependent on whether you wish to deploy a local installation or a server installation.
+Depending on your usage requirements you can create a python environment and/or container and database using any of:
 
-### 2. Update Status `run_updatestatus.sh` Cron Job
+* Containers
+  * [![Docker][docker]][docker-url]
+  * [![Podman][podman]][podman-url]
+* Python Virtual Environments
+  * [![conda][conda]][conda-url]
+  * [![uv][uv]][uv-url]
+  * **[venv][venv-url]**
+* Databases
+  * [![Postgres][postgres]][postgres-url]
+  * [![SQLite][sqlite]][sqlite-url]
 
-This cron job runs every 2 hours and executes the `updatestatus` management command.
+For a server installation, we currently recommend the use of podman. For a local installation, the easiest method (although not recommended by us) is the use of venv, as that is part of the Python Standard Library.
 
-## The Web Application service is Built with
+Both the server and local installation required a database backend, we recommend the use of Postgres DB.
 
-![Django]
-![tom]
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Installation
+### Installation
 
-To run the prototype locally, please follow the below instructions.
+The following instructions are for a local installation using venv, assuming that Python is installed. Fill in <> with your choices.
 
-```
-cd <repo_location>
-git clone --recursive git@gitlab.com:CAS-eResearch/external/sso-alert/ui.git
-python3 -m venv <env_name>
-source <env_name>/bin/activate
-python3 -m pip install -r ui/requirements.txt 
-```
+1. Choose where to put the code
 
-## Run project
+    ```sh
+    cd <repo_location>
+    ```
 
-```
+1. Clone the repo
 
-cd ui/sso_tom
-python manage.py runserver
-```
+   ```sh
+   git clone https://github.com/ANU-RSAA/sso-alert.git
+   ```
 
-The project will now be available at http://localhost:8000/
+1. Create a Python environment
 
-<!-- Markdown links and images -->
+   ```sh
+   python -m venv <env_name>
+   ```
+
+1. Activate the Python environment
+
+   ```sh
+   source <env_name>/bin/activate
+   ```
+
+1. Install the required packages
+
+   ```sh
+   python -m pip install -r podman/requirements.txt
+   ```
+
+1. Copy the file with the environment variables and update the .env file.
+
+   ```sh
+   cp sso_tom/.env.example sso_tom/.env
+   ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+#### Database
+
+The SSO Alert System requires a database to be used. Depending on your preference for a database follow the instructions below.
+
+* Postgresql
+
+  1. Activate psql
+
+      ```sh
+      sudo -u postgres psql
+      ```
+
+  1. Create the database and database user
+
+      ```sql
+      CREATE DATABASE <database_name>;
+      CREATE USER <database_user> with encrypted password '<database_password>';
+      GRANT ALL PRIVILEGES ON DATABASE <database_name> to <database_user>;
+      ```
+
+* SQLite
+
+  1. Create the database
+
+      ```sh
+      sqlite3 <database_filename>.sqlite3
+      ```
+
+The information contained in the <> should match the variables within the .env file.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Usage
+
+To run the SSO Alert System locally run the following steps.
+
+1. Change to the appropriate directory where manage.py is located.
+
+   ```sh
+   cd sso_tom
+   ```
+
+1. Create/update database structure as needed
+
+   ```sh
+   python manage.py migrate
+   ```
+
+1. Run the server.
+
+   ```sh
+   python manage.py runserver 8080
+   ```
+
+The project will now be available at **<http://localhost:8000/>**
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+1. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+1. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+1. Push to the Branch (`git push origin feature/AmazingFeature`)
+1. Open a Pull Request
+
+### Top contributors
+
+<a href="https://github.com/ANU-RSAA/sso-alert/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ANU-RSAA/sso-alert" alt="contrib.rocks image" />
+</a>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- LICENSE -->
+## License
+
+Distributed under the GNU GPLv3 License. See _[LICENSE](LICENSE)_ for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTACT -->
+## Contact
+
+Project Link: _[https://github.com/ANU-RSAA/sso-alert](https://github.com/ANU-RSAA/sso-alert)_
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ACKNOWLEDGING USAGE -->
+## Acknowledging Usage
+
+Acknowledging the usage of the SSO Alert System is not required, however, if you do make use of the SSO Alert System this does assist in tracking usage and will contribute to determining future support of the system.
+
+If you would like to acknowledge us, an example is:
+
+* This research made use of the Siding Spring Observatory Alert System.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* The SSO Alert System was originally developed as part of an Australian Research Council (**[ARC][arc-url]**) Linkage Infrastructure, Equipment and Facilities (**[LIEF][lief-url]**) grant: **[LE230100063][grant-url]** (PI: C. Lidman) by the Swinburne node of **[ADACS][adacs-url]**.
+* This repository is currently maintained by the Research School of Astronomy and Astrophysics (**[RSAA][rsaa-url]**) at the Australian National University (**[ANU][anu-url]**).
+* An instance of the SSO Alert System is deployed using infrastructure provided by the RSAA.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/ANU-RSAA/sso-alert.svg?style=for-the-badge
+[contributors-url]: https://github.com/ANU-RSAA/sso-alert/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/ANU-RSAA/sso-alert.svg?style=for-the-badge
+[forks-url]: https://github.com/ANU-RSAA/sso-alert/network/members
+[stars-shield]: https://img.shields.io/github/stars/ANU-RSAA/sso-alert.svg?style=for-the-badge
+[stars-url]: https://github.com/ANU-RSAA/sso-alert/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ANU-RSAA/sso-alert.svg?style=for-the-badge
+[issues-url]: https://github.com/ANU-RSAA/sso-alert/issues
+[license-shield]: https://img.shields.io/github/license/ANU-RSAA/sso-alert.svg?style=for-the-badge
+[license-url]: https://github.com/ANU-RSAA/sso-alert/blob/master/LICENSE
 
 [django]: https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white
-
+[django-url]: https://www.djangoproject.com/
+[python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[python-url]: https://www.python.org/
 [tom]: https://avatars.githubusercontent.com/u/39539400?s=48&v=4
+[tom-url]: https://lco.global/tomtoolkit/
 
-## Software Maintenance Documentation
+[docker]: https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white
+[docker-url]: https://www.docker.com/
+[podman]: https://img.shields.io/badge/podman-892CA0?style=for-the-badge&logo=podman&logoColor=white
+[podman-url]: https://podman.io/
 
-There are some steps which could be followed by the IT people to make sure the application is running smoothly.
+[conda]: https://img.shields.io/badge/conda-342B029.svg?&style=for-the-badge&logo=anaconda&logoColor=white
+[conda-url]: https://docs.conda.io/en/latest/
+[uv]: https://img.shields.io/badge/uv-%23DE5FE9.svg?style=for-the-badge&logo=uv&logoColor=white
+[uv-url]: https://docs.astral.sh/uv/
+[venv-url]: https://docs.python.org/3/library/venv.html
 
-### 1. **Regular Monitoring and Logs**
+[postgres]: https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white
+[postgres-url]: https://www.postgresql.org/
+[sqlite]: https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white
+[sqlite-url]: https://sqlite.org/
 
-- Ensure that cron jobs are running as expected by checking the logs generated by the scripts (`readstreams`
-  and `updatestatus`). Logs are stored in date-based subdirectories to facilitate monitoring.
-- Review logs periodically for any signs of errors, failures, or abnormal behavior. Any issues in the cron jobs should
-  be investigated immediately to avoid potential disruptions in application functionality.
-
-#### 1.1 Do I need to back up cron job logs?
-
-Not necessarily. The application will be able to run smoothly after restarting even if you don't do the backup.
-
-### 2. **Backup Strategy**
-
-- Regularly back up essential data, i.e., the PostgreSQL database to prevent data loss. Automated and secured backups
-  should be scheduled if possible.
-- Use volume mounts in Docker to ensure data persistence across container restarts. For example, the PostgreSQL data is
-  stored in a mounted volume, which should be backed up as part of the disaster recovery plan.
-
-#### 2.1 Where is the Data Stored
-
-The PostgreSQL service stores its data in the following volume mount - `./postgresql/data:/var/lib/postgresql/data` -
-This is where the actual PostgreSQL database files are stored. All database records, schemas, and configurations are
-stored here.
-
-#### 2.2 What to Back Up
-
-PostgreSQL Data (`./postgresql/data`): This directory contains the full database for your application. It is essential
-to back this up regularly, as it stores all the critical data required for the application's operation.
-
-### 3. **Security Updates**
-
-- Stay up-to-date with security patches for both the Docker containers (e.g., Nginx, PostgreSQL) and the application
-  dependencies. Regularly update images used in the `docker-compose.yml` file to their latest stable versions to
-  incorporate security fixes.
-- If required, you can update the `tom-toolkit` that is used under the hood of the web application, however, it could
-  potentially lead to various errors in the extended UI components which need to be fixed in the UI code.
-- Ensure that SSL certificates managed by Nginx Proxy Manager are renewed automatically.
-
-### 4. **Database Maintenance**
-
-- Monitor the database size and storage utilization, especially in the mounted volumes.
-
+[arc-url]: https://www.arc.gov.au/
+[lief-url]: https://www.arc.gov.au/funding-research/funding-schemes/linkage-program/linkage-infrastructure-equipment-and-facilities
+[grant-url]: https://dataportal.arc.gov.au/NCGP/Web/Grant/Grant/LE230100063
+[adacs-url]: https://adacs.org.au/
+[rsaa-url]: https://rsaa.anu.edu.au/
+[anu-url]: https://www.anu.edu.au/

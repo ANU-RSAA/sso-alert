@@ -11,13 +11,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import logging.config
 import os
 import tempfile
 import tomllib
 
 import dj_database_url
 from decouple import config as dotenv
+from decouple import strtobool
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,7 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = dotenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(strtobool(dotenv("DEBUG", default="False")))
 
 # Application definition
 
@@ -63,9 +63,15 @@ INSTALLED_APPS = [
     "accounts",
     "chained",
     "tom_alertstreams",
-    "tom_fink",
     "sso_alerts",
 ]
+
+# This is a temporary solution until I decide if the tom_fink import via .gitmodules should be replaced with a required package.
+# Answer is probably yes
+USE_FINK = dotenv("USE_FINK", default="False", cast=bool)
+if USE_FINK:
+    INSTALLED_APPS.append("tom_fink")
+
 
 SITE_ID = 1
 
@@ -121,7 +127,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+            "NAME": {dotenv("DATABASE_PATH")},
         }
     }
 
