@@ -245,7 +245,7 @@ If you would like to acknowledge us, an example is:
 [issues-shield]: https://img.shields.io/github/issues/ANU-RSAA/sso-alert.svg?style=for-the-badge
 [issues-url]: https://github.com/ANU-RSAA/sso-alert/issues
 [license-shield]: https://img.shields.io/github/license/ANU-RSAA/sso-alert.svg?style=for-the-badge
-[license-url]: https://github.com/ANU-RSAA/sso-alert/blob/master/LICENSE
+[license-url]: https://github.com/ANU-RSAA/sso-alert/blob/main/LICENSE
 
 [django]: https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white
 [django-url]: https://www.djangoproject.com/
