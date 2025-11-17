@@ -2,8 +2,8 @@ sso_tom_env
 **/__pycache__/
 _static
 
-db.sqlite
-db.sqlite3
+*.sqlite
+*.sqlite3
 postgresql
 nginx-data
 staging.txt

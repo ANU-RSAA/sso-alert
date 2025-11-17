@@ -120,7 +120,7 @@ The following instructions are for a local installation using venv, assuming tha
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Database
+#### Database
 
 The SSO Alert System requires a database to be used. Depending on your preference for a database follow the instructions below.
 
