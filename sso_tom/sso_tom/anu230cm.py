@@ -79,11 +79,11 @@ CHOICES = {
 
 
 def is_valid_proposal(proposal, user):
-    url = settings.ANU_SITE + 'propusers.php'
+    url = settings.ANU_SITE + "propusers.php"
     response = requests.get(
         url,
         params={"PROPOSAL": proposal},
-        auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD)
+        auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD),
     )
 
     try:
@@ -92,11 +92,17 @@ def is_valid_proposal(proposal, user):
             for member in content.get("member", []):
                 if member["user"] == user.email and member["featureBits"] & 1:
                     return True, ""
-            return False, f'You ({user.email}) are not authorized for proposal: {proposal}'
+            return (
+                False,
+                f"You ({user.email}) are not authorized for proposal: {proposal}",
+            )
         else:
-            return False, content["msg"].replace('alertproxy', 'The system')
+            return False, content["msg"].replace("alertproxy", "The system")
     except Exception:
-        return False, f'The system cannot check the proposal id {proposal} (make sure it is valid)'
+        return (
+            False,
+            f"The system cannot check the proposal id {proposal} (make sure it is valid)",
+        )
 
 
 # Class that displays a GUI form for users to create an observation.
@@ -281,7 +287,7 @@ class ANU230cmForm(BaseRoboticObservationForm):
     )
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
         self.helper.layout = Layout(
@@ -297,11 +303,13 @@ class ANU230cmForm(BaseRoboticObservationForm):
         if not valid:
             return valid
 
-        if not self.cleaned_data.get('proposal'):
-            self.add_error('proposal', 'Proposal ID is required.')
+        if not self.cleaned_data.get("proposal"):
+            self.add_error("proposal", "Proposal ID is required.")
             valid = False
         else:
-            valid, message = is_valid_proposal(proposal=self.cleaned_data['proposal'], user=self.user)
+            valid, message = is_valid_proposal(
+                proposal=self.cleaned_data["proposal"], user=self.user
+            )
             if not valid:
                 self.add_error(None, message)
 
@@ -406,12 +414,16 @@ class ANU230cmForm(BaseRoboticObservationForm):
         from astropy.coordinates import Angle
         from astropy import units
 
-        target = Target.objects.get(pk=self.cleaned_data['target_id'])
+        target = Target.objects.get(pk=self.cleaned_data["target_id"])
 
         # Convert ra/dec Target fields back to strings of correct format
         # and add them to Observation data.
-        self.cleaned_data['ra_0'] = Angle(target.ra, unit=units.degree).to_string(unit=units.hourangle, sep=' ')
-        self.cleaned_data['dec_0'] = Angle(target.dec, unit=units.degree).to_string(unit=units.degree, sep=' ')
+        self.cleaned_data["ra_0"] = Angle(target.ra, unit=units.degree).to_string(
+            unit=units.hourangle, sep=" "
+        )
+        self.cleaned_data["dec_0"] = Angle(target.dec, unit=units.degree).to_string(
+            unit=units.degree, sep=" "
+        )
 
         # Convert proper motion ra/dec Target fields into one string of correct format
         # and add them to Observation data.
@@ -423,12 +435,9 @@ class ANU230cmForm(BaseRoboticObservationForm):
             pmot_ra = 0
         else:
             pmot_ra = target.pm_ra
-        self.cleaned_data['pmot_0'] = f'{pmot_ra} {pmot_dec}'
+        self.cleaned_data["pmot_0"] = f"{pmot_ra} {pmot_dec}"
 
-        return {
-            'target_id': target.id,
-            'params': self.serialize_parameters()
-        }
+        return {"target_id": target.id, "params": self.serialize_parameters()}
 
 
 # Class that displays a GUI form for users to create an observation template.
@@ -622,7 +631,7 @@ class ANU230cmTemplateForm(GenericTemplateForm):
     )
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
+        self.user = kwargs.pop("user", None)
 
         super().__init__(*args, **kwargs)
         self.common_layout = Layout("facility", "template_name")
@@ -640,11 +649,13 @@ class ANU230cmTemplateForm(GenericTemplateForm):
         if not valid:
             return valid
 
-        if not self.cleaned_data.get('proposal'):
-            self.add_error('proposal', 'Proposal ID is required.')
+        if not self.cleaned_data.get("proposal"):
+            self.add_error("proposal", "Proposal ID is required.")
             valid = False
         else:
-            valid, message = is_valid_proposal(proposal=self.cleaned_data['proposal'], user=self.user)
+            valid, message = is_valid_proposal(
+                proposal=self.cleaned_data["proposal"], user=self.user
+            )
             if not valid:
                 self.add_error(None, message)
 
@@ -771,7 +782,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         pagesize_key = "PAGESIZE"
         filter_key = "FILTER"
 
-        url = settings.ANU_SITE + 'propobsstat.php'
+        url = settings.ANU_SITE + "propobsstat.php"
 
         pagesize = 1000
 
@@ -797,7 +808,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             response = requests.post(
                 url,
                 data=post_data,
-                auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD)
+                auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD),
             )
 
             try:
@@ -809,22 +820,30 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 for item in data:
                     logger.info(f"CHECK {item['userDefId']}  ==? {tokens[1]}")
                     if item["userDefId"] == tokens[1]:
-                        state = item['obsStatus']
+                        state = item["obsStatus"]
                         logger.info(f"STATE={state}")
                         return {
-                            'state': state,
-                            'scheduled_start': timezone.now() + timedelta(hours=1),
-                            'scheduled_end': timezone.now() + timedelta(hours=2)
+                            "state": state,
+                            "scheduled_start": timezone.now() + timedelta(hours=1),
+                            "scheduled_end": timezone.now() + timedelta(hours=2),
                         }
 
                 if content["pageSize"] == pagesize:
                     post_data[offset_key] = post_data[offset_key] + pagesize
                 else:
-                    return {'state': state, "scheduled_start": scheduled_start, "scheduled_end": scheduled_end}
+                    return {
+                        "state": state,
+                        "scheduled_start": scheduled_start,
+                        "scheduled_end": scheduled_end,
+                    }
             except Exception:
                 msg = f"Bad response - I don't know how to show these in the tom message box."
                 logger.exception(msg)
-                return {'state': state, "scheduled_start": scheduled_start, "scheduled_end": scheduled_end}
+                return {
+                    "state": state,
+                    "scheduled_start": scheduled_start,
+                    "scheduled_end": scheduled_end,
+                }
 
     def get_observing_sites(self):
         """
@@ -889,47 +908,117 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         skya_dec_ = "SKYA_DEC_"
 
         post_data = {}
-        post_data[proposal] = observation_payload['params'].get(proposal.lower(), None)
-        post_data[userdefid] = observation_payload['params'].get(userdefid.lower(), None)
-        post_data[userdefpri] = observation_payload['params'].get(userdefpri.lower(), None)
-        post_data[nobsblk] = observation_payload['params'].get(nobsblk.lower(), None)
-        post_data[maxseeing] = observation_payload['params'].get(maxseeing.lower(), None)
-        post_data[photometric] = observation_payload['params'].get(photometric.lower(), None)
-        post_data[maxlunarphase] = observation_payload['params'].get(maxlunarphase.lower(), None)
-        post_data[timeconstraint] = observation_payload['params'].get(timeconstraint.lower(), None)
-        post_data[timeref] = observation_payload['params'].get(timeref.lower(), None)
-        post_data[timewindow] = observation_payload['params'].get(timewindow.lower(), None)
-        post_data[instr_pri_ + "0"] = observation_payload['params'].get(instr_pri_.lower() + "0", None)
-        post_data[imgtype_ + "0"] = observation_payload['params'].get(imgtype_.lower() + "0", None)
-        post_data[mode_ + "0"] = observation_payload['params'].get(mode_.lower() + "0", None)
-        post_data[dichroic_ + "0"] = observation_payload['params'].get(dichroic_.lower() + "0", None)
-        post_data[red_grating_ + "0"] = observation_payload['params'].get(red_grating_.lower() + "0", None)  # ?
-        post_data[blue_grating_ + "0"] = observation_payload['params'].get(blue_grating_.lower() + "0", None)
-        post_data[aperturewheel_ + "0"] = observation_payload['params'].get(aperturewheel_.lower() + "0", None)
-        post_data[ra_ + "0"] = observation_payload['params'].get(ra_.lower() + "0", None)
-        post_data[dec_ + "0"] = observation_payload['params'].get(dec_.lower() + "0", None)
-        post_data[pmot_ + "0"] = observation_payload['params'].get(pmot_.lower() + "0", None)
-        post_data[acq_ra_ + "0"] = observation_payload['params'].get(acq_ra_.lower() + "0", None)
-        post_data[acq_dec_ + "0"] = observation_payload['params'].get(acq_dec_.lower() + "0", None)
-        post_data[acq_pmot_ + "0"] = observation_payload['params'].get(acq_pmot_.lower() + "0", None)
-        post_data[blindacq_ + "0"] = observation_payload['params'].get(blindacq_.lower() + "0", None)
-        post_data[rot_ + "0"] = observation_payload['params'].get(rot_.lower() + "0", None)
-        post_data[rotang_ + "0"] = observation_payload['params'].get(rotang_.lower() + "0", None)
-        post_data[mag_ + "0"] = observation_payload['params'].get(mag_.lower() + "0", None)
-        post_data[agfilter_ + "0"] = observation_payload['params'].get(agfilter_.lower() + "0", None)
-        post_data[guide_ + "0"] = observation_payload['params'].get(guide_.lower() + "0", None)
-        post_data[nexp_ + "0"] = observation_payload['params'].get(nexp_.lower() + "0", None)
-        post_data[stellar_ + "0"] = observation_payload['params'].get(stellar_.lower() + "0", None)
-        post_data[binx_ + "0"] = observation_payload['params'].get(binx_.lower() + "0", None)
-        post_data[biny_ + "0"] = observation_payload['params'].get(biny_.lower() + "0", None)
-        post_data[exptime_ + "0"] = observation_payload['params'].get(exptime_.lower() + "0", None)
-        post_data[sky_exptime_ + "0"] = observation_payload['params'].get(sky_exptime_.lower() + "0", None)
-        post_data[scdescr_ + "0"] = observation_payload['params'].get(scdescr_.lower() + "0", None)
-        post_data[skya_ra_ + "0"] = observation_payload['params'].get(skya_ra_.lower() + "0", None)
-        post_data[skya_dec_ + "0"] = observation_payload['params'].get(skya_dec_.lower() + "0", None)
+        post_data[proposal] = observation_payload["params"].get(proposal.lower(), None)
+        post_data[userdefid] = observation_payload["params"].get(
+            userdefid.lower(), None
+        )
+        post_data[userdefpri] = observation_payload["params"].get(
+            userdefpri.lower(), None
+        )
+        post_data[nobsblk] = observation_payload["params"].get(nobsblk.lower(), None)
+        post_data[maxseeing] = observation_payload["params"].get(
+            maxseeing.lower(), None
+        )
+        post_data[photometric] = observation_payload["params"].get(
+            photometric.lower(), None
+        )
+        post_data[maxlunarphase] = observation_payload["params"].get(
+            maxlunarphase.lower(), None
+        )
+        post_data[timeconstraint] = observation_payload["params"].get(
+            timeconstraint.lower(), None
+        )
+        post_data[timeref] = observation_payload["params"].get(timeref.lower(), None)
+        post_data[timewindow] = observation_payload["params"].get(
+            timewindow.lower(), None
+        )
+        post_data[instr_pri_ + "0"] = observation_payload["params"].get(
+            instr_pri_.lower() + "0", None
+        )
+        post_data[imgtype_ + "0"] = observation_payload["params"].get(
+            imgtype_.lower() + "0", None
+        )
+        post_data[mode_ + "0"] = observation_payload["params"].get(
+            mode_.lower() + "0", None
+        )
+        post_data[dichroic_ + "0"] = observation_payload["params"].get(
+            dichroic_.lower() + "0", None
+        )
+        post_data[red_grating_ + "0"] = observation_payload["params"].get(
+            red_grating_.lower() + "0", None
+        )  # ?
+        post_data[blue_grating_ + "0"] = observation_payload["params"].get(
+            blue_grating_.lower() + "0", None
+        )
+        post_data[aperturewheel_ + "0"] = observation_payload["params"].get(
+            aperturewheel_.lower() + "0", None
+        )
+        post_data[ra_ + "0"] = observation_payload["params"].get(
+            ra_.lower() + "0", None
+        )
+        post_data[dec_ + "0"] = observation_payload["params"].get(
+            dec_.lower() + "0", None
+        )
+        post_data[pmot_ + "0"] = observation_payload["params"].get(
+            pmot_.lower() + "0", None
+        )
+        post_data[acq_ra_ + "0"] = observation_payload["params"].get(
+            acq_ra_.lower() + "0", None
+        )
+        post_data[acq_dec_ + "0"] = observation_payload["params"].get(
+            acq_dec_.lower() + "0", None
+        )
+        post_data[acq_pmot_ + "0"] = observation_payload["params"].get(
+            acq_pmot_.lower() + "0", None
+        )
+        post_data[blindacq_ + "0"] = observation_payload["params"].get(
+            blindacq_.lower() + "0", None
+        )
+        post_data[rot_ + "0"] = observation_payload["params"].get(
+            rot_.lower() + "0", None
+        )
+        post_data[rotang_ + "0"] = observation_payload["params"].get(
+            rotang_.lower() + "0", None
+        )
+        post_data[mag_ + "0"] = observation_payload["params"].get(
+            mag_.lower() + "0", None
+        )
+        post_data[agfilter_ + "0"] = observation_payload["params"].get(
+            agfilter_.lower() + "0", None
+        )
+        post_data[guide_ + "0"] = observation_payload["params"].get(
+            guide_.lower() + "0", None
+        )
+        post_data[nexp_ + "0"] = observation_payload["params"].get(
+            nexp_.lower() + "0", None
+        )
+        post_data[stellar_ + "0"] = observation_payload["params"].get(
+            stellar_.lower() + "0", None
+        )
+        post_data[binx_ + "0"] = observation_payload["params"].get(
+            binx_.lower() + "0", None
+        )
+        post_data[biny_ + "0"] = observation_payload["params"].get(
+            biny_.lower() + "0", None
+        )
+        post_data[exptime_ + "0"] = observation_payload["params"].get(
+            exptime_.lower() + "0", None
+        )
+        post_data[sky_exptime_ + "0"] = observation_payload["params"].get(
+            sky_exptime_.lower() + "0", None
+        )
+        post_data[scdescr_ + "0"] = observation_payload["params"].get(
+            scdescr_.lower() + "0", None
+        )
+        post_data[skya_ra_ + "0"] = observation_payload["params"].get(
+            skya_ra_.lower() + "0", None
+        )
+        post_data[skya_dec_ + "0"] = observation_payload["params"].get(
+            skya_dec_.lower() + "0", None
+        )
 
         # Remove keys with None values
-        post_data = {k: v for k, v in post_data.items() if v not in [None, '']}
+        post_data = {k: v for k, v in post_data.items() if v not in [None, ""]}
 
         return post_data, post_data[proposal], post_data[userdefid]
 
@@ -938,14 +1027,16 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         This method takes in the serialized data from the form and actually
         submits the observation to the remote api
         """
-        url = settings.ANU_SITE + 'addobsblockexec.php'
+        url = settings.ANU_SITE + "addobsblockexec.php"
 
-        post_data, proposal, userdefid = self.get_clean_data_for_posting(observation_payload=observation_payload)
+        post_data, proposal, userdefid = self.get_clean_data_for_posting(
+            observation_payload=observation_payload
+        )
 
         response = requests.post(
             url,
             data=post_data,
-            auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD)
+            auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD),
         )
 
         try:
@@ -954,7 +1045,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             msg = f"Bad response"
             logger.exception(msg)
 
-        return [f'{proposal}-{userdefid}']
+        return [f"{proposal}-{userdefid}"]
 
     def validate_observation(self, observation_payload):
         """

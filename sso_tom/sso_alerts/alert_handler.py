@@ -26,7 +26,11 @@ def give_user_access_to_target(target, topic):
     alert_streams = AlertStreams.objects.filter(topic=topic, active=True)
 
     for alert_stream in alert_streams:
-        if not get_user_perms(alert_stream.user, target).filter(codename='view_target').exists():
+        if (
+            not get_user_perms(alert_stream.user, target)
+            .filter(codename="view_target")
+            .exists()
+        ):
             target.give_user_access(user=alert_stream.user)
 
         if alert_stream.automatic_observability:
@@ -91,7 +95,7 @@ def alert_logger(alert, topic):
         ra=alert["candidate"]["ra"],
         dec=alert["candidate"]["dec"],
         epoch=alert["candidate"]["jd"],
-        permissions="PUBLIC"
+        permissions="PUBLIC",
     )
 
     try:

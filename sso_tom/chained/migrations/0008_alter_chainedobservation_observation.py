@@ -7,14 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tom_observations', '0012_auto_20210205_1819'),
-        ('chained', '0007_alter_chainedobservation_chain_and_more'),
+        ("tom_observations", "0012_auto_20210205_1819"),
+        ("chained", "0007_alter_chainedobservation_chain_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='chainedobservation',
-            name='observation',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='observation_chain', to='tom_observations.observationrecord'),
+            model_name="chainedobservation",
+            name="observation",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="observation_chain",
+                to="tom_observations.observationrecord",
+            ),
         ),
     ]

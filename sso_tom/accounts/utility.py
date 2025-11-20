@@ -35,19 +35,19 @@ def get_absolute_site_url(protocol=None, site_name=None):
     """
 
     # check whether forcefully using a specific url from the settings
-    if settings.SITE_URL != '':
+    if settings.SITE_URL != "":
         return settings.SITE_URL
 
     if not site_name:
         return None
 
-    if protocol != 'https':
+    if protocol != "https":
         try:
             # Look for protocol forcefully defined in the settings
             protocol = settings.HTTP_PROTOCOL
         except AttributeError:
-            protocol = 'http'
-    return protocol + '://' + site_name
+            protocol = "http"
+    return protocol + "://" + site_name
 
 
 # def get_token(information, validity=None):

@@ -20,10 +20,10 @@ def registration(request):
 
     # returning to profile if the user is authenticated
     if request.user.is_authenticated:
-        return redirect(reverse('profile'))
+        return redirect(reverse("profile"))
 
     data = {}
-    if request.method == 'POST':
+    if request.method == "POST":
 
         # creating the registration form from the data
         form = RegistrationForm(request.POST)
@@ -37,8 +37,8 @@ def registration(request):
                 request,
                 "accounts/notification.html",
                 {
-                    'type': 'registration_submitted',
-                    'data': data,
+                    "type": "registration_submitted",
+                    "data": data,
                 },
             )
     else:
@@ -50,9 +50,9 @@ def registration(request):
         request,
         "accounts/registration.html",
         {
-            'form': form,
-            'data': data,
-            'submit_text': 'Register',
+            "form": form,
+            "data": data,
+            "submit_text": "Register",
         },
     )
 
@@ -66,23 +66,27 @@ def profile(request):
     """
 
     data = {}
-    if request.method == 'POST':
+    if request.method == "POST":
         form = EditProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             data = form.cleaned_data
             form.save()
-            messages.success(request, 'Information successfully updated', 'alert alert-success')
+            messages.success(
+                request, "Information successfully updated", "alert alert-success"
+            )
             return render(
                 request,
                 "accounts/profile.html",
                 {
-                    'form': form,
-                    'type': 'update_profile_success',
-                    'data': data,
+                    "form": form,
+                    "type": "update_profile_success",
+                    "data": data,
                 },
             )
         else:
-            messages.error(request, 'Please correct the error(s) below.', 'alert alert-warning')
+            messages.error(
+                request, "Please correct the error(s) below.", "alert alert-warning"
+            )
     else:
         form = EditProfileForm(instance=request.user)
 
@@ -90,8 +94,8 @@ def profile(request):
         request,
         "accounts/profile.html",
         {
-            'form': form,
-            'data': data,
-            'submit_text': 'Update',
+            "form": form,
+            "data": data,
+            "submit_text": "Update",
         },
     )

@@ -13,8 +13,12 @@ class AlertStreams(models.Model):
     description = models.TextField(blank=True, null=True)
     topic = models.CharField(max_length=255)
     automatic_observability = models.BooleanField(default=False)
-    template_chained = models.ForeignKey(TemplatedChain, on_delete=models.PROTECT, null=True, blank=True)
-    template_observation = models.ForeignKey(ObservationTemplate, on_delete=models.PROTECT, null=True, blank=True)
+    template_chained = models.ForeignKey(
+        TemplatedChain, on_delete=models.PROTECT, null=True, blank=True
+    )
+    template_observation = models.ForeignKey(
+        ObservationTemplate, on_delete=models.PROTECT, null=True, blank=True
+    )
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
@@ -29,7 +33,9 @@ class AlertStreams(models.Model):
 
 
 class TargetStream(models.Model):
-    target = models.OneToOneField(Target, on_delete=models.CASCADE, related_name='stream')
+    target = models.OneToOneField(
+        Target, on_delete=models.CASCADE, related_name="stream"
+    )
     stream = models.CharField(max_length=255)
 
     def clean(self):

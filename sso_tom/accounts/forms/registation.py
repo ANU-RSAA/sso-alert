@@ -7,28 +7,33 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-FIELDS = ['first_name', 'last_name', 'email', 'username', ]
+FIELDS = [
+    "first_name",
+    "last_name",
+    "email",
+    "username",
+]
 
 WIDGETS = {
-    'first_name': forms.TextInput(
-        attrs={'class': "form-control", 'tabindex': '1'},
+    "first_name": forms.TextInput(
+        attrs={"class": "form-control", "tabindex": "1"},
     ),
-    'last_name': forms.TextInput(
-        attrs={'class': "form-control", 'tabindex': '2'},
+    "last_name": forms.TextInput(
+        attrs={"class": "form-control", "tabindex": "2"},
     ),
-    'email': forms.TextInput(
-        attrs={'class': "form-control", 'tabindex': '3'},
+    "email": forms.TextInput(
+        attrs={"class": "form-control", "tabindex": "3"},
     ),
-    'username': forms.TextInput(
-        attrs={'class': "form-control", 'tabindex': '5'},
+    "username": forms.TextInput(
+        attrs={"class": "form-control", "tabindex": "5"},
     ),
 }
 
 LABELS = {
-    'first_name': _('First name'),
-    'last_name': _('Last name'),
-    'email': _('Email (same as the telescope proposal)'),
-    'username': _('Username'),
+    "first_name": _("First name"),
+    "last_name": _("Last name"),
+    "email": _("Email (same as the telescope proposal)"),
+    "username": _("Username"),
 }
 
 
@@ -36,15 +41,20 @@ class RegistrationForm(UserCreationForm):
     """
     Customise the User Registration form from default Django UserCreationForm
     """
+
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
-        self.fields['username'].help_text = None
-        self.fields['username'].widget.attrs.update({'autofocus': False})
-        self.fields['password1'].widget.attrs.update({'class': 'form-control', 'tabindex': '6'})
-        self.fields['password2'].widget.attrs.update({'class': 'form-control', 'tabindex': '7'})
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
-        self.fields['email'].required = True
+        self.fields["username"].help_text = None
+        self.fields["username"].widget.attrs.update({"autofocus": False})
+        self.fields["password1"].widget.attrs.update(
+            {"class": "form-control", "tabindex": "6"}
+        )
+        self.fields["password2"].widget.attrs.update(
+            {"class": "form-control", "tabindex": "7"}
+        )
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+        self.fields["email"].required = True
 
     class Meta:
         model = get_user_model()
