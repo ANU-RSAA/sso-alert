@@ -10,33 +10,96 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('tom_targets', '0020_alter_targetname_created_alter_targetname_modified'),
+        ("tom_targets", "0020_alter_targetname_created_alter_targetname_modified"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('tom_observations', '0012_auto_20210205_1819'),
+        ("tom_observations", "0012_auto_20210205_1819"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Chain',
+            name="Chain",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField()),
-                ('status', models.CharField(choices=[('DRAFT', 'DRAFT'), ('SUBMITTED', 'SUBMITTED'), ('COMPLETED', 'COMPLETED')], default='DRAFT', max_length=20)),
-                ('target', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tom_targets.target')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("DRAFT", "DRAFT"),
+                            ("SUBMITTED", "SUBMITTED"),
+                            ("COMPLETED", "COMPLETED"),
+                        ],
+                        default="DRAFT",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "target",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="tom_targets.target",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ChainedObservation',
+            name="ChainedObservation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('facility', models.CharField(max_length=50)),
-                ('parameters', models.JSONField()),
-                ('trigger_next_condition', models.CharField(choices=[('FAILED', 'FAILED'), ('REJECTED', 'REJECTED'), ('COMPLETED', 'COMPLETED')], default='FAILED', max_length=20)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('chain', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='chained.chain')),
-                ('observation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='tom_observations.observationrecord')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("facility", models.CharField(max_length=50)),
+                ("parameters", models.JSONField()),
+                (
+                    "trigger_next_condition",
+                    models.CharField(
+                        choices=[
+                            ("FAILED", "FAILED"),
+                            ("REJECTED", "REJECTED"),
+                            ("COMPLETED", "COMPLETED"),
+                        ],
+                        default="FAILED",
+                        max_length=20,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                (
+                    "chain",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="chained.chain"
+                    ),
+                ),
+                (
+                    "observation",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="tom_observations.observationrecord",
+                    ),
+                ),
             ],
         ),
     ]

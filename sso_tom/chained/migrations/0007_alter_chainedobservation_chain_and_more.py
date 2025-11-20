@@ -7,23 +7,27 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chained', '0006_alter_chainedtemplate_templated_chain'),
+        ("chained", "0006_alter_chainedtemplate_templated_chain"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='chainedobservation',
-            name='chain',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chained_observations', to='chained.chain'),
+            model_name="chainedobservation",
+            name="chain",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="chained_observations",
+                to="chained.chain",
+            ),
         ),
         migrations.AlterField(
-            model_name='chainedobservation',
-            name='trigger_next_condition',
+            model_name="chainedobservation",
+            name="trigger_next_condition",
             field=models.CharField(max_length=255),
         ),
         migrations.AlterField(
-            model_name='chainedtemplate',
-            name='trigger_next_condition',
+            model_name="chainedtemplate",
+            name="trigger_next_condition",
             field=models.CharField(max_length=255),
         ),
     ]

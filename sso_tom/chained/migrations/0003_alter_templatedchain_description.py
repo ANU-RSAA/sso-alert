@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chained', '0002_templatedchain_chainedtemplate'),
+        ("chained", "0002_templatedchain_chainedtemplate"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='templatedchain',
-            name='description',
+            model_name="templatedchain",
+            name="description",
             field=models.TextField(blank=True, null=True),
         ),
     ]

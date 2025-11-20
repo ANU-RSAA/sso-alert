@@ -7,13 +7,13 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chained', '0004_templatedchain_status'),
+        ("chained", "0004_templatedchain_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='chainedtemplate',
-            name='name',
+            model_name="chainedtemplate",
+            name="name",
             field=models.CharField(default=django.utils.timezone.now, max_length=255),
             preserve_default=False,
         ),

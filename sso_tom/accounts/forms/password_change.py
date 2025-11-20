@@ -12,11 +12,12 @@ class PasswordChangeCustomForm(PasswordChangeForm):
     """
     Extends Django default PasswordChangeForm to apply bootstrap styles
     """
+
     new_password1 = forms.CharField(
         label=_("New password"),
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
+                "class": "form-control",
             }
         ),
         strip=False,
@@ -28,7 +29,7 @@ class PasswordChangeCustomForm(PasswordChangeForm):
         strip=False,
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
+                "class": "form-control",
             }
         ),
     )
@@ -38,8 +39,8 @@ class PasswordChangeCustomForm(PasswordChangeForm):
         strip=False,
         widget=forms.PasswordInput(
             attrs={
-                'autofocus': True,
-                'class': 'form-control',
+                "autofocus": True,
+                "class": "form-control",
             }
         ),
     )

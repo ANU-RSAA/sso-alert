@@ -9,6 +9,8 @@ from ..utility import get_absolute_site_url
 register = template.Library()
 
 
-@register.simple_tag(name='absolute_url', takes_context=True)
+@register.simple_tag(name="absolute_url", takes_context=True)
 def absolute_url(context):
-    return get_absolute_site_url(protocol=context['protocol'], site_name=context['site_name'])
+    return get_absolute_site_url(
+        protocol=context["protocol"], site_name=context["site_name"]
+    )

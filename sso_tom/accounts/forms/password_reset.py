@@ -12,11 +12,12 @@ class PasswordResetCustomForm(SetPasswordForm):
     """
     Extends Django default SetPasswordForm to apply bootstrap styles
     """
+
     new_password1 = forms.CharField(
         label=_("New password"),
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
+                "class": "form-control",
             }
         ),
         strip=False,
@@ -28,7 +29,7 @@ class PasswordResetCustomForm(SetPasswordForm):
         strip=False,
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
+                "class": "form-control",
             }
         ),
     )

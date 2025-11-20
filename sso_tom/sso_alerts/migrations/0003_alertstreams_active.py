@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sso_alerts', '0002_alter_alertstreams_description'),
+        ("sso_alerts", "0002_alter_alertstreams_description"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='alertstreams',
-            name='active',
+            model_name="alertstreams",
+            name="active",
             field=models.BooleanField(default=True),
         ),
     ]
