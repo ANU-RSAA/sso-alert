@@ -9,29 +9,68 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('chained', '0001_initial'),
+        ("chained", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TemplatedChain',
+            name="TemplatedChain",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ChainedTemplate',
+            name="ChainedTemplate",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('facility', models.CharField(max_length=50)),
-                ('parameters', models.JSONField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('trigger_next_condition', models.CharField(choices=[('FAILED', 'FAILED'), ('REJECTED', 'REJECTED'), ('COMPLETED', 'COMPLETED')], default='FAILED', max_length=20)),
-                ('templated_chain', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='chained.templatedchain')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("facility", models.CharField(max_length=50)),
+                ("parameters", models.JSONField()),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                (
+                    "trigger_next_condition",
+                    models.CharField(
+                        choices=[
+                            ("FAILED", "FAILED"),
+                            ("REJECTED", "REJECTED"),
+                            ("COMPLETED", "COMPLETED"),
+                        ],
+                        default="FAILED",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "templated_chain",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="chained.templatedchain",
+                    ),
+                ),
             ],
         ),
     ]

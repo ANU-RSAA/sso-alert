@@ -19,7 +19,16 @@ class Email:
     Class for sending emails
     """
 
-    def __init__(self, subject, to_addresses, template, context=None, from_address=None, cc=None, bcc=None):
+    def __init__(
+        self,
+        subject,
+        to_addresses,
+        template,
+        context=None,
+        from_address=None,
+        cc=None,
+        bcc=None,
+    ):
         """
         Initializes an Email object
         :param subject: Subject of the email
@@ -59,11 +68,13 @@ class Email:
             to=self.to_addresses,
             bcc=self.bcc,
             cc=self.cc,
-            reply_to=[self.from_address, ],
+            reply_to=[
+                self.from_address,
+            ],
         )
 
         # set the email as an HTML email
-        email.attach_alternative(self.html_content, 'text/html')
+        email.attach_alternative(self.html_content, "text/html")
 
         # sends the email
         email.send(fail_silently=False)

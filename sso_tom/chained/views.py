@@ -20,6 +20,7 @@ from tom_common.hints import add_hint
 from tom_common.mixins import Raise403PermissionRequiredMixin
 from tom_observations.facility import get_service_class, get_service_classes
 from tom_observations.models import ObservationTemplate, ObservationRecord
+
 # from tom_observations.observation_template import ApplyObservationTemplateForm
 from .forms import ChainedApplyObservationTemplateForm, ChainTemplateForm
 
@@ -39,9 +40,10 @@ class ChainedTargetDetailView(Raise403PermissionRequiredMixin, DetailView):
     """
     View that handles the display of the target details for chained observations. Requires authorization.
     """
-    permission_required = 'tom_targets.view_target'
+
+    permission_required = "tom_targets.view_target"
     model = Target
-    template_name = 'chained/chain_target_detail.html'
+    template_name = "chained/chain_target_detail.html"
 
     def get_context_data(self, *args, **kwargs):
         """
@@ -51,26 +53,28 @@ class ChainedTargetDetailView(Raise403PermissionRequiredMixin, DetailView):
         :rtype: dict
         """
         context = super().get_context_data(*args, **kwargs)
-        chain_id = self.kwargs.get('chain_id', None)
+        chain_id = self.kwargs.get("chain_id", None)
         chain = Chain.objects.get(pk=chain_id)
         if not chain:
-            raise BadRequest('Chain not found')
+            raise BadRequest("Chain not found")
 
-        observation_template_form = ChainedApplyObservationTemplateForm(initial={
-            'target': self.get_object(),
-            'chain': chain,
-        })
+        observation_template_form = ChainedApplyObservationTemplateForm(
+            initial={
+                "target": self.get_object(),
+                "chain": chain,
+            }
+        )
 
-        if any(self.request.GET.get(x) for x in ['observation_template']):
-            initial = {'target': self.object}
+        if any(self.request.GET.get(x) for x in ["observation_template"]):
+            initial = {"target": self.object}
             initial.update(self.request.GET)
             observation_template_form = ChainedApplyObservationTemplateForm(
                 initial=initial
             )
-        observation_template_form.fields['chain'].widget = HiddenInput()
-        observation_template_form.fields['target'].widget = HiddenInput()
-        context['observation_template_form'] = observation_template_form
-        context['chain_id'] = chain.id
+        observation_template_form.fields["chain"].widget = HiddenInput()
+        observation_template_form.fields["target"].widget = HiddenInput()
+        context["observation_template_form"] = observation_template_form
+        context["chain_id"] = chain.id
         return context
 
     def get(self, request, *args, **kwargs):
@@ -82,31 +86,45 @@ class ChainedTargetDetailView(Raise403PermissionRequiredMixin, DetailView):
         :param request: the request object passed to this view
         :type request: HTTPRequest
         """
-        update_status = request.GET.get('update_status', False)
-        chain_id = kwargs.get('chain_id', None)
+        update_status = request.GET.get("update_status", False)
+        chain_id = kwargs.get("chain_id", None)
         if update_status:
             if not request.user.is_authenticated:
-                return redirect(reverse('login'))
-            target_id = kwargs.get('pk', None)
+                return redirect(reverse("login"))
+            target_id = kwargs.get("pk", None)
             out = StringIO()
-            call_command('updatestatus', target_id=target_id, stdout=out)
+            call_command("updatestatus", target_id=target_id, stdout=out)
             messages.info(request, out.getvalue())
-            add_hint(request, mark_safe(
-                'Did you know updating observation statuses can be automated? Learn how in'
-                '<a href=https://tom-toolkit.readthedocs.io/en/stable/customization/automation.html>'
-                ' the docs.</a>'))
-            return redirect(reverse('tom_targets:detail', args=(target_id,)) + '?tab=observations')
+            add_hint(
+                request,
+                mark_safe(
+                    "Did you know updating observation statuses can be automated? Learn how in"
+                    "<a href=https://tom-toolkit.readthedocs.io/en/stable/customization/automation.html>"
+                    " the docs.</a>"
+                ),
+            )
+            return redirect(
+                reverse("tom_targets:detail", args=(target_id,)) + "?tab=observations"
+            )
 
         obs_template_form = ChainedApplyObservationTemplateForm(request.GET)
         if obs_template_form.is_valid():
-            obs_template = ObservationTemplate.objects.get(pk=obs_template_form.cleaned_data['observation_template'].id)
+            obs_template = ObservationTemplate.objects.get(
+                pk=obs_template_form.cleaned_data["observation_template"].id
+            )
             obs_template_params = obs_template.parameters
-            obs_template_params['cadence_strategy'] = request.GET.get('cadence_strategy', '')
-            obs_template_params['cadence_frequency'] = request.GET.get('cadence_frequency', '')
+            obs_template_params["cadence_strategy"] = request.GET.get(
+                "cadence_strategy", ""
+            )
+            obs_template_params["cadence_frequency"] = request.GET.get(
+                "cadence_frequency", ""
+            )
             params = urlencode(obs_template_params)
             return redirect(
-                reverse('chains:create',
-                        args=(chain_id, obs_template.facility)) + f'?target_id={self.get_object().id}&' + params)
+                reverse("chains:create", args=(chain_id, obs_template.facility))
+                + f"?target_id={self.get_object().id}&"
+                + params
+            )
 
         return super().get(request, *args, **kwargs)
 
@@ -128,17 +146,15 @@ class SingleObservationCreateView(ObservationCreateView):
         # tom_observations/facility.BaseObservationForm.__init__ to see how
         # groups is added to common_layout
         if not settings.TARGET_PERMISSIONS_ONLY:
-            form.fields['groups'].queryset = self.request.user.groups.all()
+            form.fields["groups"].queryset = self.request.user.groups.all()
 
-        form.helper.form_action = reverse(
-            'chains:create', kwargs=self.kwargs
-        )
+        form.helper.form_action = reverse("chains:create", kwargs=self.kwargs)
         return form
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
-            if 'validate' in request.POST:
+            if "validate" in request.POST:
                 return self.form_validation_valid(form)
             else:
                 return self.form_valid(form)
@@ -148,8 +164,8 @@ class SingleObservationCreateView(ObservationCreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         facility = self.get_facility_class()()
-        if facility.name == 'ANU 2.3m':
-            kwargs['user'] = self.request.user
+        if facility.name == "ANU 2.3m":
+            kwargs["user"] = self.request.user
         return kwargs
 
     def form_valid(self, form):
@@ -184,29 +200,29 @@ class SingleObservationCreateView(ObservationCreateView):
 
         parameters = observation_payload
 
-        if facility.name == 'ANU 2.3m':
-            parameters = observation_payload['params']
+        if facility.name == "ANU 2.3m":
+            parameters = observation_payload["params"]
 
         ChainedObservation.objects.create(
-            chain=Chain.objects.get(pk=self.kwargs['chain_id']),
+            chain=Chain.objects.get(pk=self.kwargs["chain_id"]),
             facility=facility.name,
             parameters=parameters,
         )
 
         return redirect(
-            reverse('chains:view_chain', kwargs={'chain_id': self.kwargs['chain_id']})
+            reverse("chains:view_chain", kwargs={"chain_id": self.kwargs["chain_id"]})
         )
 
 
 class ChainCreateView(LoginRequiredMixin, CreateView):
     model = Chain
     form_class = ChainForm
-    template_name = 'chained/chain_add.html'
-    success_url = reverse_lazy('chains:chain_list')
+    template_name = "chained/chain_add.html"
+    success_url = reverse_lazy("chains:chain_list")
 
     def get_form_kwargs(self):
         kwargs = super(ChainCreateView, self).get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs["user"] = self.request.user
         return kwargs
 
 
@@ -221,35 +237,34 @@ class ChainListView(LoginRequiredMixin, ListView):
 
 
 class ChainView(LoginRequiredMixin, TemplateView):
-    template_name = 'chained/chain_view.html'
+    template_name = "chained/chain_view.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        chain_id = self.kwargs.get('chain_id')
-        chain = get_object_or_404(
-            Chain,
-            pk=chain_id,
-            user=self.request.user)
+        chain_id = self.kwargs.get("chain_id")
+        chain = get_object_or_404(Chain, pk=chain_id, user=self.request.user)
 
         chained_observations = ChainedObservation.objects.filter(
             chain=chain,
-        ).order_by('created')
+        ).order_by("created")
 
-        context['chain'] = chain
-        context['chained_observations'] = chained_observations
-        context['installed_facilities'] = get_service_classes()
+        context["chain"] = chain
+        context["chained_observations"] = chained_observations
+        context["installed_facilities"] = get_service_classes()
 
         terminal_states = {}
         for observation in chained_observations:
             facility = get_service_class(observation.facility)()
-            terminal_states.update({
-                facility.name: facility.get_terminal_observing_states(),
-            })
-        context['terminal_states'] = terminal_states
+            terminal_states.update(
+                {
+                    facility.name: facility.get_terminal_observing_states(),
+                }
+            )
+        context["terminal_states"] = terminal_states
         return context
 
     def post(self, request, *args, **kwargs):
-        chain_id = self.kwargs.get('chain_id', None)
+        chain_id = self.kwargs.get("chain_id", None)
 
         chain = get_object_or_404(
             Chain,
@@ -257,13 +272,15 @@ class ChainView(LoginRequiredMixin, TemplateView):
             user=request.user,
         )
 
-        chained_observations = chain.chained_observations.order_by('created')
+        chained_observations = chain.chained_observations.order_by("created")
 
         for chained_observation in chained_observations:
             terminal_states = []
             for key in self.request.POST.keys():
-                if key.startswith(f'trigger_next_condition__{chained_observation.id}__'):
-                    terminal_state = key.split('__')[-1]
+                if key.startswith(
+                    f"trigger_next_condition__{chained_observation.id}__"
+                ):
+                    terminal_state = key.split("__")[-1]
                     terminal_states.append(terminal_state)
 
             chained_observation.trigger_next_condition = terminal_states
@@ -271,20 +288,18 @@ class ChainView(LoginRequiredMixin, TemplateView):
 
         submit_chain(chain)
 
-        return redirect(
-            reverse('chains:view_chain', kwargs={'chain_id': chain_id})
-        )
+        return redirect(reverse("chains:view_chain", kwargs={"chain_id": chain_id}))
 
 
 class ChainTemplateCreateView(LoginRequiredMixin, CreateView):
     model = TemplatedChain
     form_class = ChainTemplateForm
-    template_name = 'chained/chain_template_add.html'
-    success_url = reverse_lazy('chains:chain_template_list')
+    template_name = "chained/chain_template_add.html"
+    success_url = reverse_lazy("chains:chain_template_list")
 
     def get_form_kwargs(self):
         kwargs = super(ChainTemplateCreateView, self).get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs["user"] = self.request.user
         return kwargs
 
 
@@ -299,31 +314,32 @@ class ChainTemplateListView(LoginRequiredMixin, ListView):
 
 
 class ChainTemplateView(LoginRequiredMixin, TemplateView):
-    template_name = 'chained/chain_template_view.html'
+    template_name = "chained/chain_template_view.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        template_id = self.kwargs.get('template_id')
+        template_id = self.kwargs.get("template_id")
         templated_chain = get_object_or_404(
-            TemplatedChain,
-            pk=template_id,
-            user=self.request.user)
+            TemplatedChain, pk=template_id, user=self.request.user
+        )
 
         chained_templates = ChainedTemplate.objects.filter(
             templated_chain=templated_chain,
         )
 
-        context['templated_chain'] = templated_chain
-        context['chained_templates'] = chained_templates
-        context['installed_facilities'] = get_service_classes()
+        context["templated_chain"] = templated_chain
+        context["chained_templates"] = chained_templates
+        context["installed_facilities"] = get_service_classes()
 
         terminal_states = {}
         for template in chained_templates:
             facility = get_service_class(template.facility)()
-            terminal_states.update({
-                facility.name: facility.get_terminal_observing_states(),
-            })
-        context['terminal_states'] = terminal_states
+            terminal_states.update(
+                {
+                    facility.name: facility.get_terminal_observing_states(),
+                }
+            )
+        context["terminal_states"] = terminal_states
 
         return context
 
@@ -335,9 +351,8 @@ class ChainTemplateView(LoginRequiredMixin, TemplateView):
             try:
 
                 templated_chain = get_object_or_404(
-                    TemplatedChain,
-                    pk=templated_chain_id,
-                    user=self.request.user)
+                    TemplatedChain, pk=templated_chain_id, user=self.request.user
+                )
 
                 chained_templates = ChainedTemplate.objects.filter(
                     templated_chain=templated_chain,
@@ -346,8 +361,8 @@ class ChainTemplateView(LoginRequiredMixin, TemplateView):
                 for template in chained_templates:
                     terminal_states = []
                     for key in self.request.POST.keys():
-                        if key.startswith(f'trigger_next_condition__{template.id}__'):
-                            terminal_state = key.split('__')[-1]
+                        if key.startswith(f"trigger_next_condition__{template.id}__"):
+                            terminal_state = key.split("__")[-1]
                             terminal_states.append(terminal_state)
 
                     template.trigger_next_condition = terminal_states
@@ -361,18 +376,22 @@ class ChainTemplateView(LoginRequiredMixin, TemplateView):
                 messages.error(self.request, "Cannot update chain template now.")
         else:
             messages.error(self.request, "Something went wrong.")
-        return redirect('chains:view_chain_template', template_id=templated_chain_id)
+        return redirect("chains:view_chain_template", template_id=templated_chain_id)
 
 
-class ChainedTemplateCreateView(LoginRequiredMixin, CustomObservationTemplateCreateView):
+class ChainedTemplateCreateView(
+    LoginRequiredMixin, CustomObservationTemplateCreateView
+):
 
     def get_form(self, form_class=None):
         form = super().get_form()
-        form.helper.form_action = reverse('chains:add_template',
-                                          kwargs={
-                                              'template_id': self.kwargs['template_id'],
-                                              'facility': self.get_facility_name()}
-                                          )
+        form.helper.form_action = reverse(
+            "chains:add_template",
+            kwargs={
+                "template_id": self.kwargs["template_id"],
+                "facility": self.get_facility_name(),
+            },
+        )
         return form
 
     def form_valid(self, form):
@@ -382,12 +401,17 @@ class ChainedTemplateCreateView(LoginRequiredMixin, CustomObservationTemplateCre
 
         # now creating a chained_template instance
         ChainedTemplate.objects.create(
-            templated_chain=TemplatedChain.objects.get(pk=self.kwargs['template_id']),
+            templated_chain=TemplatedChain.objects.get(pk=self.kwargs["template_id"]),
             name=template.name,
             facility=template.facility,
             parameters=template.parameters,
         )
 
-        return redirect(reverse('chains:view_chain_template',
-                                kwargs={'template_id': self.kwargs['template_id'],
-                                        }))
+        return redirect(
+            reverse(
+                "chains:view_chain_template",
+                kwargs={
+                    "template_id": self.kwargs["template_id"],
+                },
+            )
+        )

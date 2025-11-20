@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class SsoAlertsConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'sso_alerts'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "sso_alerts"

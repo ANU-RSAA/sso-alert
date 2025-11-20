@@ -11,20 +11,24 @@ def submit_to_facility(facility, parameters, target):
 
     now = datetime.now().strftime("%Y%m%dT%H%M%S")
 
-    if facility.name == 'ANU 2.3m':
-        parameters['userdefid'] = f"{parameters['userdefid']}_{target.name}_{now}"
-        parameters['ra_0'] = deg_to_sexigesimal(target.ra, "hms")
-        parameters['dec_0'] = deg_to_sexigesimal(target.dec, "dms")
+    if facility.name == "ANU 2.3m":
+        parameters["userdefid"] = f"{parameters['userdefid']}_{target.name}_{now}"
+        parameters["ra_0"] = deg_to_sexigesimal(target.ra, "hms")
+        parameters["dec_0"] = deg_to_sexigesimal(target.dec, "dms")
 
-        observation_ids = facility.submit_observation({
-            'target': target,
-            'params': parameters,
-        })
+        observation_ids = facility.submit_observation(
+            {
+                "target": target,
+                "params": parameters,
+            }
+        )
 
-    elif facility.name == 'DREAMS':
-        parameters['user_defined_id'] = f"{now}_{parameters.get('proposal')}_{target.name}"
-        parameters['ra'] = target.ra
-        parameters['dec'] = target.dec
+    elif facility.name == "DREAMS":
+        parameters["user_defined_id"] = (
+            f"{now}_{parameters.get('proposal')}_{target.name}"
+        )
+        parameters["ra"] = target.ra
+        parameters["dec"] = target.dec
 
         observation_ids = facility.submit_observation(parameters)
 

@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chained', '0003_alter_templatedchain_description'),
+        ("chained", "0003_alter_templatedchain_description"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='templatedchain',
-            name='status',
-            field=models.CharField(choices=[('DRAFT', 'DRAFT'), ('FINALIZED', 'FINALIZED')], default='DRAFT', max_length=20),
+            model_name="templatedchain",
+            name="status",
+            field=models.CharField(
+                choices=[("DRAFT", "DRAFT"), ("FINALIZED", "FINALIZED")],
+                default="DRAFT",
+                max_length=20,
+            ),
         ),
     ]

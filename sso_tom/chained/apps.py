@@ -7,4 +7,3 @@ class ChainedConfig(AppConfig):
 
     def ready(self):
         import chained.signals
-

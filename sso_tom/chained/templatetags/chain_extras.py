@@ -16,13 +16,14 @@ register = template.Library()
 #     form.fields['target'].widget = forms.HiddenInput()
 #     return {'form': form}
 
-@register.inclusion_tag('chained/partials/observing_buttons.html')
+
+@register.inclusion_tag("chained/partials/observing_buttons.html")
 def chain_observing_buttons(target, chain_id):
     """
     Displays the observation buttons for all facilities available in the TOM.
     """
     facilities = get_service_classes()
-    return {'target': target, 'facilities': facilities, 'chain_id': chain_id}
+    return {"target": target, "facilities": facilities, "chain_id": chain_id}
 
 
 @register.filter

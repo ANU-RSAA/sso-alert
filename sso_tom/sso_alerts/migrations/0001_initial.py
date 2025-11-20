@@ -11,23 +11,53 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('tom_observations', '0012_auto_20210205_1819'),
-        ('chained', '0002_templatedchain_chainedtemplate'),
+        ("tom_observations", "0012_auto_20210205_1819"),
+        ("chained", "0002_templatedchain_chainedtemplate"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AlertStreams',
+            name="AlertStreams",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField()),
-                ('topic', models.CharField(max_length=255)),
-                ('automatic_observability', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('template_chained', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='chained.templatedchain')),
-                ('template_observation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='tom_observations.observationtemplate')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                ("topic", models.CharField(max_length=255)),
+                ("automatic_observability", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "template_chained",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="chained.templatedchain",
+                    ),
+                ),
+                (
+                    "template_observation",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="tom_observations.observationtemplate",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]
