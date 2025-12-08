@@ -127,7 +127,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": {dotenv("DATABASE_PATH")},
+            "NAME": dotenv("DATABASE_PATH"),
         }
     }
 
@@ -293,8 +293,10 @@ TOM_ALERT_CLASSES = [
     "tom_alerts.brokers.scout.ScoutBroker",
     "tom_alerts.brokers.tns.TNSBroker",
     # "tom_alerts.brokers.fink.FinkBroker",
-    "tom_fink.fink.FinkBroker",
 ]
+
+if USE_FINK:
+    TOM_ALERT_CLASSES.append("tom_fink.fink.FinkBroker")
 
 BROKERS = {
     "TNS": {
