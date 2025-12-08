@@ -25,6 +25,7 @@
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
         <li><a href="#database">Database</a></li>
+        <li><a href="#sso-alert">SSO Alert</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -80,6 +81,40 @@ Both the server and local installation required a database backend, we recommend
 
 ### Installation
 
+#### Database
+
+The SSO Alert System requires a database to be used. Depending on your preference for a database follow the instructions below.
+
+* SQLite
+
+  1. Create the database
+
+      ```sh
+      sqlite3 <database_filename>.sqlite3
+      ```
+
+* Postgresql
+
+  1. Activate psql
+
+      ```sh
+      sudo -u postgres psql
+      ```
+
+  1. Create the database and database user
+
+      ```sql
+      CREATE DATABASE <database_name>;
+      CREATE USER <database_user> with encrypted password '<database_password>';
+      GRANT ALL PRIVILEGES ON DATABASE <database_name> to <database_user>;
+      ```
+
+The information contained in the <> should match the variables within the .env file.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+#### SSO Alert
+
 The following instructions are for a local installation using venv, assuming that Python is installed. Fill in <> with your choices.
 
 1. Choose where to put the code
@@ -120,38 +155,6 @@ The following instructions are for a local installation using venv, assuming tha
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-#### Database
-
-The SSO Alert System requires a database to be used. Depending on your preference for a database follow the instructions below.
-
-* Postgresql
-
-  1. Activate psql
-
-      ```sh
-      sudo -u postgres psql
-      ```
-
-  1. Create the database and database user
-
-      ```sql
-      CREATE DATABASE <database_name>;
-      CREATE USER <database_user> with encrypted password '<database_password>';
-      GRANT ALL PRIVILEGES ON DATABASE <database_name> to <database_user>;
-      ```
-
-* SQLite
-
-  1. Create the database
-
-      ```sh
-      sqlite3 <database_filename>.sqlite3
-      ```
-
-The information contained in the <> should match the variables within the .env file.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## Usage
 
 To run the SSO Alert System locally run the following steps.
@@ -174,7 +177,7 @@ To run the SSO Alert System locally run the following steps.
    python manage.py runserver 8080
    ```
 
-The project will now be available at **<http://localhost:8000/>**
+The project will now be available at **<https://127.0.0.1:8000/>**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -186,11 +189,15 @@ Contributions are what make the open source community such an amazing place to l
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
-1. Fork the Project
-1. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-1. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-1. Push to the Branch (`git push origin feature/AmazingFeature`)
-1. Open a Pull Request
+Our development workflow primarily uses the "dev" branch to manage changes. All updates need to go through this branch before being applied to main.
+
+1. Fork the project
+1. Change to the dev branch (`git switch dev`)
+1. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+1. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+1. Rebase your feature branch using the latest updates from dev (`git rebase dev`)
+1. Push to the branch (`git push origin feature/AmazingFeature`)
+1. Open a pull request to the dev branch
 
 ### Top contributors
 
