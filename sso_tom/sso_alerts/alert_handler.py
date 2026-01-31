@@ -149,12 +149,12 @@ def alert_logger_lsst(alert, topic):
     """
     utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     logger.info(f"fink.alert_logger topic: {topic}")
+    logger.info(alert)
     logger.info(
         "fink.alert_logger value: {} emitted {} JD (received {})".format(
             alert["objectId"], alert["candidate"]["jd"], utc
         )
     )
-    logger.info(alert)
 
     mytarget = Target(
         name=alert["objectId"],
