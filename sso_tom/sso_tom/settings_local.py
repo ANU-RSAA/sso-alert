@@ -76,6 +76,8 @@ LSST_TOPICS = [
     "fink_in_tns_lsst",
 ]
 
+TOPICS = ZTF_TOPICS + LSST_TOPICS
+
 if USE_FINK:
     finkZTFTopics = [
         {
