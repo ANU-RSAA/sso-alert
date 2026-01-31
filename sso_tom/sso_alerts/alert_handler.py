@@ -121,3 +121,70 @@ def alert_logger(alert, topic):
     except Exception:
         logger.error("error when trying to save new alerts in the db", exc_info=1)
         logger.error(traceback.format_exc())
+
+def alert_logger_lsst(alert, topic):
+    """Basic alert handler for Fink
+
+    This alert handler simply display on screen basic information,
+    and save the alert as a new Target.
+
+    Parameters
+    ----------
+    alert: dic
+        Dictionary containing alert data. See `consumer.poll`.
+    topic: str
+        Topic name
+
+    Warnings
+    ----------
+    UniqueViolation, SQL_IntegrityError, DJ_IntegrityError
+        If the target is already saved
+
+    Raises
+    ------
+    Exception (base)
+        for any other failures than name clash when
+        saving the target in the database.
+
+    """
+    utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    logger.info(f"fink.alert_logger topic: {topic}")
+    logger.info(
+        "fink.alert_logger value: {} emitted {} JD (received {})".format(
+            alert["objectId"], alert["candidate"]["jd"], utc
+        )
+    )
+    logger.info(alert)
+
+    mytarget = Target(
+        name=alert["objectId"],
+        type="SIDEREAL",
+        ra=alert["candidate"]["ra"],
+        dec=alert["candidate"]["dec"],
+        epoch=alert["candidate"]["jd"],
+        permissions="PUBLIC",
+    )
+
+    try:
+        mytarget.save(
+            extras={
+                "fink broker link": "https://fink-portal.org/{}".format(
+                    alert["objectId"]
+                )
+            }
+        )
+
+        TargetStream.objects.create(
+            target=mytarget,
+            stream=topic,
+        )
+
+        set_target_list(target=mytarget, topic=topic)
+        give_user_access_to_target(target=mytarget, topic=topic)
+
+    except (UniqueViolation, SQL_IntegrityError, DJ_IntegrityError):
+        logger.warning(f"Target {mytarget} already in the database")
+        pass
+    except Exception:
+        logger.error("error when trying to save new alerts in the db", exc_info=1)
+        logger.error(traceback.format_exc())
