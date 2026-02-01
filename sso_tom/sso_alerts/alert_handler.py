@@ -150,11 +150,7 @@ def alert_logger_lsst(alert, topic):
     utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     logger.info(f"fink.alert_logger topic: {topic}")
     logger.info(alert)
-    logger.info(
-        "fink.alert_logger value: {} emitted {} JD (received {})".format(
-            alert["objectId"], alert["candidate"]["jd"], utc
-        )
-    )
+    logger.info(f"fink.alert_logger value: {alert["diaSource"]["diaSourceId"]} emitted { alert["diaSource"]["midpointMjdTai"]} JD (received {utc})")
 
     mytarget = Target(
         name=alert["objectId"],
@@ -168,9 +164,7 @@ def alert_logger_lsst(alert, topic):
     try:
         mytarget.save(
             extras={
-                "fink broker link": "https://fink-portal.org/{}".format(
-                    alert["objectId"]
-                )
+                "fink broker link": f"https://lsst.fink-portal.org/{alert['objectId']}"
             }
         )
 
