@@ -150,14 +150,14 @@ def alert_logger_lsst(alert, topic):
     utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     logger.info(f"fink.alert_logger topic: {topic}")
     logger.info(alert)
-    logger.info(f"fink.alert_logger value: {alert["diaSource"]["diaSourceId"]} emitted { alert["diaSource"]["midpointMjdTai"]} JD (received {utc})")
+    logger.info(f"fink.alert_logger value: {alert["diaObject"]["diaObjectId"]} emitted { alert["diaObject"]["firstDiaSourceMjdTai"]} JD (received {utc})")
 
     mytarget = Target(
-        name=alert["objectId"],
+        name=alert["diaObject"]["diaObjectId"],
         type="SIDEREAL",
-        ra=alert["candidate"]["ra"],
-        dec=alert["candidate"]["dec"],
-        epoch=alert["candidate"]["jd"],
+        ra=alert["diaObject"]["ra"],
+        dec=alert["diaObject"]["dec"],
+        epoch=alert["diaObject"]["firstDiaSourceMjdTai"],
         permissions="PUBLIC",
     )
 
