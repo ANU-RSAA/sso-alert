@@ -27,9 +27,7 @@ def give_user_access_to_target(target, topic):
 
     for alert_stream in alert_streams:
         if (
-            not get_user_perms(alert_stream.user, target)
-            .filter(codename="view_target")
-            .exists()
+            not get_user_perms(alert_stream.user, target).filter(codename="view_target").exists()
         ):
             target.give_user_access(user=alert_stream.user)
 
@@ -95,7 +93,6 @@ def alert_logger(alert, topic):
         ra=alert["candidate"]["ra"],
         dec=alert["candidate"]["dec"],
         epoch=alert["candidate"]["jd"],
-        permissions="PUBLIC",
     )
 
     try:
@@ -157,7 +154,6 @@ def alert_logger_lsst(alert, topic):
         ra=alert["diaObject"]["ra"],
         dec=alert["diaObject"]["dec"],
         epoch=alert["diaObject"]["firstDiaSourceMjdTai"],
-        permissions="PUBLIC",
     )
 
     try:
