@@ -840,6 +840,8 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 try:
                     data = content["data"]
                 except KeyError:
+                    # TODO: Decide whether observation should be deleted if not found...
+                    # observation.delete()
                     return {
                         "state": content["msg"],
                         "scheduled_start": scheduled_start,
