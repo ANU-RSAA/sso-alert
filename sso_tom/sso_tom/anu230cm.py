@@ -856,11 +856,13 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                     if item["userDefId"] == tokens[1]:
                         state = item["obsStatus"]
                         logger.info(f"STATE={state}")
-                        return {
-                            "state": state,
-                            "scheduled_start": timezone.now() + timedelta(hours=1),
-                            "scheduled_end": timezone.now() + timedelta(hours=2),
-                        }
+
+                        if state == "Succeeded":
+                            return {
+                                "state": state,
+                                "scheduled_start": item["tsExec"],
+                                "scheduled_end": item["tsExec"],
+                            }
 
                 if content["pageSize"] == pagesize:
                     post_data[offset_key] = post_data[offset_key] + pagesize
