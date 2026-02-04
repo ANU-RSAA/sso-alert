@@ -1,23 +1,20 @@
-from django import forms
-
-import requests
 import json
 import logging
 from datetime import timedelta
-from django.utils import timezone
-from django.conf import settings
 
-from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
+import requests
 from crispy_forms.helper import FormHelper
-
+from crispy_forms.layout import ButtonHolder, Div, Fieldset, Layout, Submit
+from django import forms
+from django.conf import settings
+from django.utils import timezone
 from tom_observations.facility import (
     BaseRoboticObservationFacility,
     BaseRoboticObservationForm,
 )
+from tom_observations.models import ObservationRecord
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
-from tom_observations.models import ObservationRecord
-
 
 logger = logging.getLogger(__name__)
 
@@ -411,8 +408,8 @@ class ANU230cmForm(BaseRoboticObservationForm):
         can be used by the rest of the module. In the base implementation it simply dumps
         the form into a json string.
         """
-        from astropy.coordinates import Angle
         from astropy import units
+        from astropy.coordinates import Angle
 
         target = Target.objects.get(pk=self.cleaned_data["target_id"])
 
@@ -760,7 +757,33 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         If the cancellation was successful, return True. Otherwise, return False.
         """
         logger.info(f"Cancelling {observation_id}")
-        return True
+
+        url = settings.ANU_SITE + "removeobs.php"
+
+        observation = ObservationRecord.objects.get(observation_id=observation_id)
+        payload = json.loads(observation.parameters)
+        proposal = payload.get("proposal")
+
+        get_data = {
+            "PROPOSAL": proposal,
+            "USERDEFID": observation_id,
+        }
+
+        response = requests.get(
+            url,
+            params=get_data,
+            auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD),
+        )
+
+        try:
+            logger.info(f"json response={response.content}")
+        except Exception:
+            msg = f"Bad response"
+            logger.exception(msg)
+
+        results = json.loads(response.text)
+
+        return results["status"]
 
     def get_observation_status(self, observation_id):
         """
