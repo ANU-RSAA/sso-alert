@@ -761,12 +761,14 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         url = settings.ANU_SITE + "removeobs.php"
 
         observation = ObservationRecord.objects.get(observation_id=observation_id)
-        payload = json.loads(observation.parameters)
+        payload = observation.parameters
         proposal = payload.get("proposal")
+        userdefid = payload.get("userdefid")
 
         get_data = {
             "PROPOSAL": proposal,
-            "USERDEFID": observation_id,
+            "USERDEFID": userdefid,
+            "Admin_Type": "JSON",
         }
 
         response = requests.get(
@@ -781,7 +783,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             msg = f"Bad response"
             logger.exception(msg)
 
-        results = json.loads(response.text)
+        results = json.loads(response.content.decode())
 
         return results["status"]
 
