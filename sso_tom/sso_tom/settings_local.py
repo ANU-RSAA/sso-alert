@@ -134,6 +134,7 @@ if USE_FINK:
         for topic in LSST_TOPICS
     ]
 
+
 # Function to generate ALERT_STREAMS dynamically
 def generate_alert_streams():
     if USE_FINK:

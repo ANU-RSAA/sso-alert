@@ -1,22 +1,21 @@
-import time
 import logging
+import time
 import traceback
+from sqlite3 import IntegrityError as SQL_IntegrityError
 
+from chained.utils import create_chain_and_submit_first
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.db.utils import IntegrityError as DJ_IntegrityError
 from fink_client.consumer import AlertConsumer
-
+from guardian.shortcuts import assign_perm, get_user_perms
+from psycopg2.errors import UniqueViolation
 from tom_alertstreams.alertstreams.alertstream import AlertStream
 from tom_targets.models import Target, TargetList
 
-from psycopg2.errors import UniqueViolation
-from django.db.utils import IntegrityError as DJ_IntegrityError
-from sqlite3 import IntegrityError as SQL_IntegrityError
-from django.contrib.auth.models import Group
-from guardian.shortcuts import assign_perm, get_user_perms
+from sso_tom.utils import submit_observation_from_template
 
 from .models import AlertStreams, TargetStream
-from sso_tom.utils import submit_observation_from_template
-from chained.utils import create_chain_and_submit_first
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,9 @@ def give_user_access_to_target(target, topic):
 
     for alert_stream in alert_streams:
         if (
-            not get_user_perms(alert_stream.user, target).filter(codename="view_target").exists()
+            not get_user_perms(alert_stream.user, target)
+            .filter(codename="view_target")
+            .exists()
         ):
             target.give_user_access(user=alert_stream.user)
 
@@ -119,6 +120,7 @@ def alert_logger(alert, topic):
         logger.error("error when trying to save new alerts in the db", exc_info=1)
         logger.error(traceback.format_exc())
 
+
 def alert_logger_lsst(alert, topic):
     """Basic alert handler for Fink
 
@@ -146,21 +148,25 @@ def alert_logger_lsst(alert, topic):
     """
     utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     logger.info(f"fink.alert_logger topic: {topic}")
-    logger.info(f"fink.alert_logger value: {alert["diaObject"]["diaObjectId"]} emitted { alert["diaObject"]["firstDiaSourceMjdTai"]} JD (received {utc})")
+
+    targetName = alert["diaSource"]["diaSourceId"]
+    targetEpoch = alert["diaSource"]["midpointMjdTai"]
+
+    logger.info(
+        f"fink.alert_logger value: {targetName} emitted {targetEpoch} JD (received {utc})"
+    )
 
     mytarget = Target(
-        name=alert["diaObject"]["diaObjectId"],
+        name=targetName,
         type="SIDEREAL",
-        ra=alert["diaObject"]["ra"],
-        dec=alert["diaObject"]["dec"],
-        epoch=alert["diaObject"]["firstDiaSourceMjdTai"],
+        ra=alert["diaSource"]["ra"],
+        dec=alert["diaSource"]["dec"],
+        epoch=targetEpoch,
     )
 
     try:
         mytarget.save(
-            extras={
-                "fink broker link": f'https://lsst.fink-portal.org/{alert["diaObject"]["diaObjectId"]}'
-            }
+            extras={"fink broker link": f"https://lsst.fink-portal.org/{targetName}"}
         )
 
         TargetStream.objects.create(
