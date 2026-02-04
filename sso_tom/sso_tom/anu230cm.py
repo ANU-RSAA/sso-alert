@@ -835,6 +835,8 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD),
             )
 
+            # FIXME: REPLACE WITH ACTUAL OBSERVATION TIMES.
+
             try:
                 content = json.loads(response.content.decode())
                 try:
@@ -1132,7 +1134,46 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         return facility_dict
 
     def get_observation_url(self, observation_id):
-        return ""
+        url = "https://archives.dev.datacentral.org.au/api/anu23m/query/reduced"
+
+        observation = ObservationRecord.objects.get(observation_id=observation_id)
+        payload = observation.parameters
+        proposal = payload.get("proposal")
+
+        status = observation.status
+        observationStart = observation.scheduled_start
+
+        if observationStart is None:
+            return ""
+
+        if status != "Succeeded":
+            return ""
+
+        startDate = observationStart.strftime("%Y-%m-%d")
+        endDate = observationStart + timedelta(days=1)
+        endDate = endDate.strftime("%Y-%m-%d")
+
+        get_data = {
+            "allocation_id": proposal,
+            "start_date": startDate,
+            "end_date": endDate,
+        }
+
+        response = requests.get(url, params=get_data)
+
+        try:
+            content = json.loads(response.content.decode())
+        except Exception:
+            msg = (
+                f"Bad response - I don't know how to show these in the tom message box."
+            )
+            logger.exception(msg)
+            return ""
+
+        queryUrl = "https://archives.dev.datacentral.org.au/results/reduced/"
+        uuid = content.get("uuid")
+
+        return f"{queryUrl}{uuid}"
 
     # Shouldn't need to use this. We won't host data.
     def data_products(self, observation_id, product_id=None):
