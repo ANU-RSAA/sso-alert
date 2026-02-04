@@ -829,7 +829,6 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             scheduled_end = None
 
         while True:
-
             response = requests.post(
                 url,
                 data=post_data,
@@ -837,9 +836,15 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             )
 
             try:
-
                 content = json.loads(response.content.decode())
-                data = content["data"]
+                try:
+                    data = content["data"]
+                except KeyError:
+                    return {
+                        "state": content["msg"],
+                        "scheduled_start": scheduled_start,
+                        "scheduled_end": scheduled_end,
+                    }
                 logger.info(f"Number of observations found {len(data)}")
                 # It is currently returning only one, need to check if there is a use case where it could return more
                 for item in data:
