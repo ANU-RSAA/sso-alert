@@ -1155,16 +1155,16 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         endDate = observationStart + timedelta(days=1)
         endDate = endDate.strftime("%Y-%m-%d")
 
-        get_data = {
+        postData = {
             "allocation_id": proposal,
             "start_date": startDate,
             "end_date": endDate,
         }
 
-        response = requests.get(url, params=get_data)
+        response = requests.post(url, json=postData)
 
         try:
-            content = json.loads(response.content.decode())
+            content = json.loads(response.content.decode())[0]
         except Exception:
             msg = (
                 f"Bad response - I don't know how to show these in the tom message box."
