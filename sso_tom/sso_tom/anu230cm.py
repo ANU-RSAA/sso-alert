@@ -1161,9 +1161,8 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             "end_date": endDate,
         }
 
-        response = requests.post(url, json=postData)
-
         try:
+            response = requests.post(url, json=postData)
             content = json.loads(response.content.decode())[0]
         except Exception:
             msg = (
