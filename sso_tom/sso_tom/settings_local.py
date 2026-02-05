@@ -49,6 +49,8 @@ PROPOSAL_DB_USERNAME = dotenv(
 PROPOSAL_DB_PASSWORD = dotenv(
     "2M3_PASSWORD", default="set 2M3_PASSWORD value in environment"
 )
+ARCHIVE_2M3_QUERY = dotenv("2M3_ARCHIVE_QUERY", default=None)
+ARCHIVE_2M3_RESULTS = dotenv("2M3_ARCHIVE_RESULTS", default=None)
 ### END ANU 2.3M SETTINGS ###
 
 

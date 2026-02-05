@@ -1136,7 +1136,9 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         return facility_dict
 
     def get_observation_url(self, observation_id):
-        url = "https://archives.dev.datacentral.org.au/api/anu23m/query/reduced"
+        url = settings.ARCHIVE_2M3_QUERY
+        if url is None:
+            return ""
 
         observation = ObservationRecord.objects.get(observation_id=observation_id)
         payload = observation.parameters
@@ -1171,7 +1173,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             logger.exception(msg)
             return ""
 
-        queryUrl = "https://archives.dev.datacentral.org.au/results/reduced/"
+        queryUrl = settings.ARCHIVE_2M3_RESULTS
         uuid = content.get("uuid")
 
         return f"{queryUrl}{uuid}"
