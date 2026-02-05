@@ -1,23 +1,20 @@
-from django import forms
-
-import requests
 import json
 import logging
 from datetime import timedelta
-from django.utils import timezone
-from django.conf import settings
 
-from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
+import requests
 from crispy_forms.helper import FormHelper
-
+from crispy_forms.layout import ButtonHolder, Div, Fieldset, Layout, Submit
+from django import forms
+from django.conf import settings
+from django.utils import timezone
 from tom_observations.facility import (
     BaseRoboticObservationFacility,
     BaseRoboticObservationForm,
 )
+from tom_observations.models import ObservationRecord
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
-from tom_observations.models import ObservationRecord
-
 
 logger = logging.getLogger(__name__)
 
@@ -411,8 +408,8 @@ class ANU230cmForm(BaseRoboticObservationForm):
         can be used by the rest of the module. In the base implementation it simply dumps
         the form into a json string.
         """
-        from astropy.coordinates import Angle
         from astropy import units
+        from astropy.coordinates import Angle
 
         target = Target.objects.get(pk=self.cleaned_data["target_id"])
 
@@ -760,7 +757,35 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         If the cancellation was successful, return True. Otherwise, return False.
         """
         logger.info(f"Cancelling {observation_id}")
-        return True
+
+        url = settings.ANU_SITE + "removeobs.php"
+
+        observation = ObservationRecord.objects.get(observation_id=observation_id)
+        payload = observation.parameters
+        proposal = payload.get("proposal")
+        userdefid = payload.get("userdefid")
+
+        get_data = {
+            "PROPOSAL": proposal,
+            "USERDEFID": userdefid,
+            "Admin_Type": "JSON",
+        }
+
+        response = requests.get(
+            url,
+            params=get_data,
+            auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD),
+        )
+
+        try:
+            logger.info(f"json response={response.content}")
+        except Exception:
+            msg = f"Bad response"
+            logger.exception(msg)
+
+        results = json.loads(response.content.decode())
+
+        return results["status"]
 
     def get_observation_status(self, observation_id):
         """
@@ -804,17 +829,26 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             scheduled_end = None
 
         while True:
-
             response = requests.post(
                 url,
                 data=post_data,
                 auth=(settings.PROPOSAL_DB_USERNAME, settings.PROPOSAL_DB_PASSWORD),
             )
 
-            try:
+            # FIXME: REPLACE WITH ACTUAL OBSERVATION TIMES.
 
+            try:
                 content = json.loads(response.content.decode())
-                data = content["data"]
+                try:
+                    data = content["data"]
+                except KeyError:
+                    # TODO: Decide whether observation should be deleted if not found...
+                    # observation.delete()
+                    return {
+                        "state": content["msg"],
+                        "scheduled_start": scheduled_start,
+                        "scheduled_end": scheduled_end,
+                    }
                 logger.info(f"Number of observations found {len(data)}")
                 # It is currently returning only one, need to check if there is a use case where it could return more
                 for item in data:
@@ -822,11 +856,13 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                     if item["userDefId"] == tokens[1]:
                         state = item["obsStatus"]
                         logger.info(f"STATE={state}")
-                        return {
-                            "state": state,
-                            "scheduled_start": timezone.now() + timedelta(hours=1),
-                            "scheduled_end": timezone.now() + timedelta(hours=2),
-                        }
+
+                        if state == "Succeeded":
+                            return {
+                                "state": state,
+                                "scheduled_start": item["tsExec"],
+                                "scheduled_end": item["tsExec"],
+                            }
 
                 if content["pageSize"] == pagesize:
                     post_data[offset_key] = post_data[offset_key] + pagesize
@@ -1100,7 +1136,47 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         return facility_dict
 
     def get_observation_url(self, observation_id):
-        return ""
+        url = settings.ARCHIVE_2M3_QUERY
+        if url is None:
+            return ""
+
+        observation = ObservationRecord.objects.get(observation_id=observation_id)
+        payload = observation.parameters
+        proposal = payload.get("proposal")
+
+        status = observation.status
+        observationStart = observation.scheduled_start
+
+        if observationStart is None:
+            return ""
+
+        if status != "Succeeded":
+            return ""
+
+        startDate = observationStart.strftime("%Y-%m-%d")
+        endDate = observationStart + timedelta(days=1)
+        endDate = endDate.strftime("%Y-%m-%d")
+
+        postData = {
+            "allocation_id": proposal,
+            "start_date": startDate,
+            "end_date": endDate,
+        }
+
+        try:
+            response = requests.post(url, json=postData)
+            content = json.loads(response.content.decode())[0]
+        except Exception:
+            msg = (
+                f"Bad response - I don't know how to show these in the tom message box."
+            )
+            logger.exception(msg)
+            return ""
+
+        queryUrl = settings.ARCHIVE_2M3_RESULTS
+        uuid = content.get("uuid")
+
+        return f"{queryUrl}{uuid}"
 
     # Shouldn't need to use this. We won't host data.
     def data_products(self, observation_id, product_id=None):

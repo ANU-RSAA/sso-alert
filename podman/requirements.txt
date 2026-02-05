@@ -9,6 +9,7 @@ asdf-unit-schemas==0.1.0
 asdf-wcs-schemas==0.3.0
 asgiref==3.7.2
 asn1crypto==1.5.1
+astro-datalab==2.22.1
 astroplan==0.9.1
 astropy==5.3.4
 astroquery==0.4.6
