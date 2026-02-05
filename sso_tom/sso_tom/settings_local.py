@@ -121,3 +121,9 @@ if USE_SMTP:
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ### END EMAIL SETTINGS ###
+
+### SKY SETTINGS ###
+SKY_DATA_PATH = dotenv(
+    "SKY_DATA_PATH", default="set SKY_DATA_PATH value in environment"
+)
+### END SKY SETTINGS ###

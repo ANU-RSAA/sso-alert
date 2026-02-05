@@ -1116,9 +1116,9 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 observation_payload["params"][skya_dec_.lower() + "0"]=sky["dec_sky"]
             else:
                 # If a sky cannot be found,we set it 10' north of the object
-                logger.warning(f"Cannot find sky. Setting a sky to 10' North. Good luck!")
-                observation_payload["params"][skya_ra_.lower() + "0"]=sky["ra_sky"]
-                observation_payload["params"][skya_dec_.lower() + "0"]=sky["dec_sky"]+1./60.
+                logger.info(f"Cannot find sky. Setting a sky to 5' north of target. Good luck!")
+                observation_payload["params"][skya_ra_.lower() + "0"]=obj_dict['RA']
+                observation_payload["params"][skya_dec_.lower() + "0"]=obj_dict['Dec']+5/60
 
         else:
             sky={"ra_sky":None,"dec_sky":None}

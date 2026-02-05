@@ -16,7 +16,11 @@ from astropy.table import Table
 from astropy.io import fits
 
 import os
+import logging
+from django.conf import settings
 
+
+logger = logging.getLogger(__name__)
 
 class DarkSkyPAL():
 
@@ -268,7 +272,9 @@ class DarkSkyPAL():
         # load PSF (stars) masks
         # Note that there are five separate files
         for i in range(5):
-            with np.load(f"{os.environ['SKY_DATA_PATH']}mask_data_{i}.npz", mmap_mode='r') as mask_data:
+            #with np.load(f"{os.environ['SKY_DATA_PATH']}mask_data_{i}.npz", mmap_mode='r') as mask_data:
+            with np.load(f"{settings.SKY_DATA_PATH}mask_data_{i}.npz", mmap_mode='r') as mask_data:
+
                 mask_array = mask_data['arr_0']
                 mask_array_byteswap = mask_array.byteswap().newbyteorder()
                 masked_stars = pd.DataFrame(mask_array_byteswap)
@@ -370,14 +376,13 @@ class DarkSkyPAL():
         catalog_box = catalog_box.drop(['mag'], axis=1)
         
         if len(masked_box) == 0:
-            self.verboseprint("No stars in catalog")
+            #self.verboseprint("No stars in catalog")
+            logger.info(f"No stars in catalog")
 
         if len(catalog_box) == 0:
-            self.verboseprint("No sources in catalog")
-
-        # CLi
-        #print("%d lines in masked list" % len(masked_box))
-        #print("%d lines in star list" % len(catalog_box))
+            #self.verboseprint("No sources in catalog")
+            logger.info(f"No sources in catalog")
+      
         
         # combine catalog + mask
         all_stars = pd.concat([masked_box, catalog_box]).reset_index(drop=True)
@@ -719,15 +724,17 @@ class DarkSkyPAL():
         if debug:
             tab=Table.from_pandas(all_objects)
             tab.write("all_objects+extraColumns.fits",overwrite=True)    
-        
+
+        # If there are no objects, return None
+        if len(all_stars)==0:
+            logging.info(f"No sources")
+            return None,None
+
         self.verboseprint(">>>> Creating segmentation map...")
         segmentation_map = self.seg_map(all_objects,debug=debug)
 
-               
         self.verboseprint(">>>> Finding dark regions in segmentation map...")
         dr_trans, dark_regions = self.find_dark_regions(segmentation_map, debug=debug)
-
-    
 
         # CLi - this needs to be fixed as it plots in ra/dec
         if plot_image:
@@ -735,7 +742,7 @@ class DarkSkyPAL():
             self.create_plot(segmentation_map, coords, dr_trans)
 
         self.verboseprint(">>>> Converting dark regions to coordinates...")
-        dark_catalogue = self.create_data_frame(dark_regions, debug=True)
+        dark_catalogue = self.create_data_frame(dark_regions, debug=False)
         
         overlap=None
 

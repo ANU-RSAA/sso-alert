@@ -17,26 +17,32 @@ def selectSky(args):
 
     # Find the nearest sky position
 
-    skies=pd.DataFrame(single_degree_centre, columns=["RA", "Dec"])
-    skies['offset']=np.sqrt(((skies['RA']-args.RA)*np.cos(skies['Dec']*np.pi/180.))**2+(skies['Dec']-args.Dec)**2.)  
+    if single_degree_centre is not None:
+        skies=pd.DataFrame(single_degree_centre, columns=["RA", "Dec"])
+        skies['offset']=np.sqrt(((skies['RA']-args.RA)*np.cos(skies['Dec']*np.pi/180.))**2+(skies['Dec']-args.Dec)**2.)  
     
-    # Select those that are at least a WiFES FoV away
+        # Select those that are at least a WiFES FoV away
 
-    valid_skies=skies[skies['offset'] > 40. / 3600.]
+        valid_skies=skies[skies['offset'] > 40. / 3600.]
 
-    # Sort by the offset and select the first entry
-    valid_skies.sort_values(by='offset',inplace=True)
+        # Sort by the offset and select the first entry
+        valid_skies.sort_values(by='offset',inplace=True)
 
-    if len(valid_skies) > 0:
-        ra_sky=valid_skies.iloc[0]['RA']
-        dec_sky=valid_skies.iloc[0]['Dec']
+        if len(valid_skies) > 0:
+            ra_sky=valid_skies.iloc[0]['RA']
+            dec_sky=valid_skies.iloc[0]['Dec']
+        else:
+            # A valid sky could not be found
+            ra_sky = None
+            dec_sky = None
     else:
         # A valid sky could not be found
-        ra_sky = None
-        dec_sky = None
+            ra_sky = None
+            dec_sky = None
+
 
    #print("Sky posiiton: %7.5f %7.5f" % (ra_sky,dec_sky))
-
+   
     return {'ra_sky':ra_sky,'dec_sky':dec_sky}
 
 if __name__ == "__main__":
