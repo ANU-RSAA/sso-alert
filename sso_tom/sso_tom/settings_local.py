@@ -81,67 +81,73 @@ LSST_TOPICS = [
 TOPICS = ZTF_TOPICS + LSST_TOPICS
 
 if USE_FINK:
-    finkZTFTopics = [
-        {
-            "ACTIVE": True,
-            "NAME": "tom_fink.alertstream.FinkAlertStream",
-            "OPTIONS": {
-                "URL": dotenv(
-                    "FINK_CREDENTIAL_URL",
-                    default="set FINK_CREDENTIAL_URL value in environment",
-                ),
-                "USERNAME": dotenv(
-                    "FINK_CREDENTIAL_USERNAME",
-                    default="set FINK_CREDENTIAL_USERNAME value in environment",
-                ),
-                "GROUP_ID": dotenv(
-                    "FINK_CREDENTIAL_GROUP_ID",
-                    default="set FINK_CREDENTIAL_GROUP_ID value in environment",
-                ),
-                "TOPIC": topic,
-                "MAX_POLL_NUMBER": dotenv("FINK_MAX_POLL_NUMBER", default=1e10),
-                "TIMEOUT": dotenv("FINK_TIMEOUT", default=10, cast=int),
-                "TOPIC_HANDLERS": {
-                    "fink.stream": "sso_alerts.alert_handler.alert_logger",
+    if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
+        finkZTFTopics = [
+            {
+                "ACTIVE": True,
+                "NAME": "tom_fink.alertstream.FinkAlertStream",
+                "OPTIONS": {
+                    "URL": dotenv(
+                        "FINK_CREDENTIAL_URL",
+                        default="set FINK_CREDENTIAL_URL value in environment",
+                    ),
+                    "USERNAME": dotenv(
+                        "FINK_CREDENTIAL_USERNAME",
+                        default="set FINK_CREDENTIAL_USERNAME value in environment",
+                    ),
+                    "GROUP_ID": dotenv(
+                        "FINK_CREDENTIAL_GROUP_ID",
+                        default="set FINK_CREDENTIAL_GROUP_ID value in environment",
+                    ),
+                    "TOPIC": topic,
+                    "MAX_POLL_NUMBER": dotenv("FINK_MAX_POLL_NUMBER", default=1e10),
+                    "TIMEOUT": dotenv("FINK_TIMEOUT", default=10, cast=int),
+                    "TOPIC_HANDLERS": {
+                        "fink.stream": "sso_alerts.alert_handler.alert_logger",
+                    },
                 },
-            },
-        }
-        for topic in ZTF_TOPICS
-    ]
-    finkLSSTTopics = [
-        {
-            "ACTIVE": True,
-            "NAME": "tom_fink.alertstream.FinkAlertStream",
-            "OPTIONS": {
-                "URL": dotenv(
-                    "FINK_CREDENTIAL_LSST_URL",
-                    default="set FINK_CREDENTIAL_LSST_URL value in environment",
-                ),
-                "USERNAME": dotenv(
-                    "FINK_CREDENTIAL_USERNAME",
-                    default="set FINK_CREDENTIAL_USERNAME value in environment",
-                ),
-                "GROUP_ID": dotenv(
-                    "FINK_CREDENTIAL_GROUP_ID",
-                    default="set FINK_CREDENTIAL_GROUP_ID value in environment",
-                ),
-                "TOPIC": topic,
-                "MAX_POLL_NUMBER": dotenv("FINK_MAX_POLL_NUMBER", default=1e10),
-                "TIMEOUT": dotenv("FINK_TIMEOUT", default=10, cast=int),
-                "TOPIC_HANDLERS": {
-                    "fink.stream": "sso_alerts.alert_handler.alert_logger_lsst",
+            }
+            for topic in ZTF_TOPICS
+        ]
+    if dotenv("FINK_CREDENTIAL_LSST_URL", default=None) is not None:
+        finkLSSTTopics = [
+            {
+                "ACTIVE": True,
+                "NAME": "tom_fink.alertstream.FinkAlertStream",
+                "OPTIONS": {
+                    "URL": dotenv(
+                        "FINK_CREDENTIAL_LSST_URL",
+                        default="set FINK_CREDENTIAL_LSST_URL value in environment",
+                    ),
+                    "USERNAME": dotenv(
+                        "FINK_CREDENTIAL_USERNAME",
+                        default="set FINK_CREDENTIAL_USERNAME value in environment",
+                    ),
+                    "GROUP_ID": dotenv(
+                        "FINK_CREDENTIAL_GROUP_ID",
+                        default="set FINK_CREDENTIAL_GROUP_ID value in environment",
+                    ),
+                    "TOPIC": topic,
+                    "MAX_POLL_NUMBER": dotenv("FINK_MAX_POLL_NUMBER", default=1e10),
+                    "TIMEOUT": dotenv("FINK_TIMEOUT", default=10, cast=int),
+                    "TOPIC_HANDLERS": {
+                        "fink.stream": "sso_alerts.alert_handler.alert_logger_lsst",
+                    },
                 },
-            },
-        }
-        for topic in LSST_TOPICS
-    ]
+            }
+            for topic in LSST_TOPICS
+        ]
 
 
 # Function to generate ALERT_STREAMS dynamically
 def generate_alert_streams():
+    ALL_STREAMS = []
     if USE_FINK:
-        return finkLSSTTopics + finkZTFTopics
-    return []
+        if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
+            ALL_STREAMS = ALL_STREAMS + finkZTFTopics
+        if dotenv("FINK_CREDENTIAL_LSST_URL", default=None) is not None:
+            ALL_STREAMS = ALL_STREAMS + finkLSSTTopics
+    return ALL_STREAMS
 
 
 # Generate ALERT_STREAMS dynamically
