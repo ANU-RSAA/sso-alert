@@ -78,7 +78,13 @@ LSST_TOPICS = [
     "fink_in_tns_lsst",
 ]
 
-TOPICS = ZTF_TOPICS + LSST_TOPICS
+TOPICS = []
+
+if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
+    TOPICS = TOPICS + ZTF_TOPICS
+
+if dotenv("FINK_CREDENTIAL_LSST_URL", default=None) is not None:
+    TOPICS = TOPICS + LSST_TOPICS
 
 if USE_FINK:
     if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
