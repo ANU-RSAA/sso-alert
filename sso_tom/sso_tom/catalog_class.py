@@ -10,7 +10,7 @@ import numpy as np
 
 from dl import queryClient as qc
 import pandas as pd
-from sklearn.neighbors import KDTree
+#from sklearn.neighbors import KDTree
 ## Added by CLi for test purposes
 from astropy.table import Table
 from astropy.io import fits
@@ -56,9 +56,10 @@ class DarkSkyPAL():
         self.ra=ra
         self.dec=dec
 
-        ## CLi - hardcoded to 0.25" / pixel
+        ## CLi - hardcoded to 2" / pixel
+        ## Previusly, this was 0.25" / pixel. This is not needed.
         ## This is for the mask image
-        self.pixscale = 1 / 14400
+        self.pixscale = 2 / 3600
 
         self.map_dist = map_dist
         self.dim = int(1.0/self.pixscale * self.map_dist)
@@ -87,7 +88,9 @@ class DarkSkyPAL():
         self.mask_radius = mask_radius
         
         self.map_grid_spacing = map_grid_spacing
-        self.pix_map_grid_spacing = self.map_grid_spacing // 0.25
+        self.pix_map_grid_spacing = self.map_grid_spacing / 2
+        self.verboseprint("Setting the map grid spacing to %4.1f" % self.map_grid_spacing)
+
         # print(self.pix_map_grid_spacing,self.map_grid_spacing)
          
         # load all masked stars
@@ -100,12 +103,12 @@ class DarkSkyPAL():
         self.define_grid()
         
         # create distance grid for this dimension
-        self.verboseprint("Creating KDTree for distance calculations...")
-        self.dist_array = np.indices((self.dim, self.dim), dtype=int)
-        self.dist_array = np.dstack((self.dist_array[0], self.dist_array[1]))
-        self.dist_array = np.concatenate(self.dist_array, axis=0)
-        self.distance_tree = KDTree(self.dist_array)
-        self.verboseprint("KDTree created!")
+        #self.verboseprint("Creating KDTree for distance calculations...")
+        #self.dist_array = np.indices((self.dim, self.dim), dtype=int)
+        #self.dist_array = np.dstack((self.dist_array[0], self.dist_array[1]))
+        #self.dist_array = np.concatenate(self.dist_array, axis=0)
+        #self.distance_tree = KDTree(self.dist_array)
+        #self.verboseprint("KDTree created!")
         
         self.verboseprint("Initialisation complete!")
         pass
@@ -285,7 +288,8 @@ class DarkSkyPAL():
         #print(masked_stars)
             
         # load globular clusters and planetary nebulae masks
-        with np.load(f"{os.environ['SKY_DATA_PATH']}mask_data_clusters.npz", mmap_mode='r') as mask_data:
+        #with np.load(f"{os.environ['SKY_DATA_PATH']}mask_data_clusters.npz", mmap_mode='r') as mask_data:
+        with np.load(f"{settings.SKY_DATA_PATH}mask_data_clusters.npz", mmap_mode='r') as mask_data:
             mask_array = mask_data['arr_0']
             mask_array_byteswap = mask_array.byteswap().newbyteorder()
             masked_GCs = pd.DataFrame(mask_array_byteswap)
@@ -296,7 +300,8 @@ class DarkSkyPAL():
         #print(masked_GCs)
  
         # load galaxy masks
-        with np.load(f"{os.environ['SKY_DATA_PATH']}mask_data_galaxies.npz", mmap_mode='r') as mask_data:
+        #with np.load(f"{os.environ['SKY_DATA_PATH']}mask_data_galaxies.npz", mmap_mode='r') as mask_data:
+        with np.load(f"{settings.SKY_DATA_PATH}mask_data_galaxies.npz", mmap_mode='r') as mask_data:
             mask_array = mask_data['arr_0']
             mask_array_byteswap = mask_array.byteswap().newbyteorder()
             masked_galaxies = pd.DataFrame(mask_array_byteswap)
@@ -352,21 +357,21 @@ class DarkSkyPAL():
        
         # cut masked stars to only use the same area as catalog_stars
         if coords[0] > 0 and coords[1] < 360:
-            masked_box = self.mask_df.query('(@coords[0] < ra < @coords[1]) and (@coords[2] < dec < @coords[3])')
+            #masked_box = self.mask_df.query('(@coords[0] < ra < @coords[1]) and (@coords[2] < dec < @coords[3])')
             catalog_box = catalog_stars.query('(@coords[0] < ra < @coords[1]) and (@coords[2] < dec < @coords[3])').copy()
         elif coords[0] < 0:
             coords[0]+=360
-            masked_box = self.mask_df.query('(ra < @coords[1] or ra > @coords[0]) and (@coords[2] < dec < @coords[3])')
+            #masked_box = self.mask_df.query('(ra < @coords[1] or ra > @coords[0]) and (@coords[2] < dec < @coords[3])')
             catalog_box = catalog_stars.query('(ra < @coords[1] or ra > @coords[0]) and (@coords[2] < dec < @coords[3])').copy()
         elif coords[1] > 360:
             coords[1]-=360
-            masked_box = self.mask_df.query('(ra < @coords[1] or ra > @coords[0]) and (@coords[2] < dec < @coords[3])')
+            #masked_box = self.mask_df.query('(ra < @coords[1] or ra > @coords[0]) and (@coords[2] < dec < @coords[3])')
             catalog_box = catalog_stars.query('(ra < @coords[1] or ra > @coords[0]) and (@coords[2] < dec < @coords[3])').copy()
          
 
 
         # apply buffer radius to mask and star data
-        masked_box.loc[:, 'radius'] = masked_box['radius'] + (self.mask_radius / 3600.)
+        #masked_box.loc[:, 'radius'] = masked_box['radius'] + (self.mask_radius / 3600.)
         catalog_box.loc[:, 'radius'] = self.calculate_mask_radius(catalog_box.loc[:,'mag'])
         
         # CLi
@@ -375,9 +380,9 @@ class DarkSkyPAL():
         # remove mag column
         catalog_box = catalog_box.drop(['mag'], axis=1)
         
-        if len(masked_box) == 0:
-            #self.verboseprint("No stars in catalog")
-            logger.info(f"No stars in catalog")
+        #if len(masked_box) == 0:
+        #    #self.verboseprint("No stars in catalog")
+        #    logger.info(f"No stars in catalog")
 
         if len(catalog_box) == 0:
             #self.verboseprint("No sources in catalog")
@@ -385,7 +390,8 @@ class DarkSkyPAL():
       
         
         # combine catalog + mask
-        all_stars = pd.concat([masked_box, catalog_box]).reset_index(drop=True)
+        #all_stars = pd.concat([masked_box, catalog_box]).reset_index(drop=True)
+        all_stars = catalog_box
         return all_stars
     
     def create_pixel_columns(self, all_stars:pd.DataFrame, coords):
@@ -459,6 +465,28 @@ class DarkSkyPAL():
 
         return all_stars, w
     
+    def replace_within_radius(self, arr, centers, radii, value=1): 
+        """ Replace all points within each point's individual radius. 
+        arr: 2D numpy array centers: list of (row, col) tuples 
+        radii: list/array of radii, same length as centers 
+        value: value to assign """ 
+        
+        rows, cols = arr.shape 
+        y, x = np.ogrid[:rows, :cols] 
+        
+        # Start with an empty mask 
+        mask = np.zeros_like(arr, dtype=bool) 
+        
+        # This can be slow if there are many objects
+        for (cy, cx), r in zip(centers, radii): 
+            #print('processing %d,%d' % (cy,cx))
+            dist = np.sqrt((y - cy)**2 + (x - cx)**2) 
+            mask |= (dist <= r)
+
+        arr[mask] = value 
+        
+        return arr
+    
     def seg_map(self, star_data:pd.DataFrame, debug=False):
         """Creates segementation map of shape (`dim`, `dim`) based on the mask locations and pixel data of `star_data`.
         
@@ -478,18 +506,24 @@ class DarkSkyPAL():
         # the index of a particular ra / dec in this array is:
         # array[ dec*dim + ra ]
         # "rows" of dec with "columns" of ra
-        array = np.zeros(self.dim**2, dtype=int)
+        array = np.zeros(self.dim**2, dtype=int).reshape(self.dim,self.dim)
         
         if len(star_data) > 0:
-            radec = np.asarray([star_data['dec_pix'],star_data['ra_pix']]).T
-            circle_points = self.distance_tree.query_radius(radec, star_data['rad_pix'])
+            # The original code used KD tree; however, there were issues in getting this to work on smoe platforms
+           
+            centres = np.asarray([star_data['dec_pix'],star_data['ra_pix']]).T
+            radii=np.asarray(star_data['rad_pix'])
 
-            for circle_array in circle_points:
-                np.put(array, circle_array, 1)
+            array = self.replace_within_radius(array, centres, radii)
+
+            #circle_points = self.distance_tree.query_radius(radec, star_data['rad_pix'])
+
+            #for circle_array in circle_points:
+            #    np.put(array, circle_array, 1)
         else:
             self.verboseprint("No sources to create segmentation map")
         
-        array = array.reshape((self.dim, self.dim))
+        #array = array.reshape((self.dim, self.dim))
 
         # CLi 
         hdu = fits.PrimaryHDU(data=array)

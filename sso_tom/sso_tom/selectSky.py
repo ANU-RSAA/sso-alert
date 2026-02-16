@@ -8,12 +8,13 @@ import argparse
 import pandas as pd
 
 def selectSky(args):
-    # Loads catalogue of bright stars, galaxies and globular clusters, and creates a KDTree
+    # Loads catalogue of bright stars, galaxies and globular clusters
+    # Set the grid spacing that searches for skies to 20 arc seconds
 
     catalog = DarkSkyPAL(mag_limit=args.magLimit, map_dist=0.5, map_grid_spacing=40, mask_radius=args.maskRadius, ra=args.RA, dec=args.Dec, verbose=args.Verbose, debug=args.Debug)
 
     # A catalogue of dark sky positions
-    single_degree_centre, overlap = catalog.create_degree_square(args.RA, args.Dec, plot_image=False, add_query=True, mode='centre', debug=args.Debug)
+    single_degree_centre, overlap = catalog.create_degree_square(args.RA, args.Dec, plot_image=args.plotImage, add_query=True, mode='centre', debug=args.Debug)
 
     # Find the nearest sky position
 
@@ -71,6 +72,10 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--verbose", dest="Verbose", default=False, action="store_true", help="Verbose option"
+    )
+
+    parser.add_argument(
+        "--plotImage", dest="plotImage", default=False, action="store_true", help="Verbose option"
     )
 
     args = parser.parse_args()

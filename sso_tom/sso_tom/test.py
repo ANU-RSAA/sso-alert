@@ -1,6 +1,7 @@
 from selectSky import selectSky
 import argparse
 
+
 parser = argparse.ArgumentParser(description="Extract all data")
 
 parser.add_argument(
@@ -26,6 +27,11 @@ parser.add_argument(
 parser.add_argument(
         "--verbose", dest="Verbose", default=False, action="store_true", help="Verbose option"
     )
+
+parser.add_argument(
+        "--plotImage", dest="plotImage", default=False, action="store_true", help="Verbose option"
+    )
+
 args = parser.parse_args()
 
 sky=selectSky(args)

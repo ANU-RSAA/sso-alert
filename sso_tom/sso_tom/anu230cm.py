@@ -1144,7 +1144,12 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             obj_ra=observation_payload["params"].get(ra_.lower() + "0", None)
             obj_dec=observation_payload["params"].get(dec_.lower() + "0", None)
 
-            obj_dict={'RA':Angle(obj_ra, unit=u.hourangle).degree,"Dec":Angle(obj_dec, unit=u.degree).degree,"maskRadius":20,"magLimit":20,"Debug":False,"Verbose":False}
+            obj_dict={'RA':Angle(obj_ra, unit=u.hourangle).degree,"Dec":Angle(obj_dec, unit=u.degree).degree,\
+                      "maskRadius":20,\
+                      "magLimit":20,\
+                      "Debug":True,
+                      "Verbose":True,
+                      "plotImage":False}
             
             obj=SimpleNamespace(**obj_dict)
 
