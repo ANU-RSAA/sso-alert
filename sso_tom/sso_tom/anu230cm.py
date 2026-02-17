@@ -1147,8 +1147,8 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
             obj_dict={'RA':Angle(obj_ra, unit=u.hourangle).degree,"Dec":Angle(obj_dec, unit=u.degree).degree,\
                       "maskRadius":20,\
                       "magLimit":20,\
-                      "Debug":True,
-                      "Verbose":True,
+                      "Debug":False,
+                      "Verbose":False,
                       "plotImage":False}
             
             obj=SimpleNamespace(**obj_dict)
