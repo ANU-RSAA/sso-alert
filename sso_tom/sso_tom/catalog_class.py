@@ -776,18 +776,24 @@ class DarkSkyPAL():
             self.create_plot(segmentation_map, coords, dr_trans)
 
         self.verboseprint(">>>> Converting dark regions to coordinates...")
+        # Return a list of dark sky positions
         dark_catalogue = self.create_data_frame(dark_regions, debug=False)
         
-        overlap=None
 
         # CLi
-        # Unsure what this does
+        # Set to None for now
         
         #self.verboseprint(">>>> Finding maximum extent of stars beyond the degree-square bounds...")
         #overlap = self.find_overlapping_extent(all_stars)
-        
+        overlap=None
+
         self.verboseprint(">>>> Done!")
-        return dark_catalogue, overlap
+
+        # This should be refactored
+        if dark_catalogue[0].shape[0] == 0:
+            return None,None
+        else:
+            return dark_catalogue, overlap
 
     def remove_overlap_positions(self, ra_coords, dec_coords, overlap_store, dark_catalogue, bounds=1, mode='corner'):
         """Deletes dark sky positions on the edges of regions that fall into the masks of objects in neighbouring regions.

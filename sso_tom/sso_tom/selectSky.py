@@ -15,7 +15,6 @@ def selectSky(args):
 
     # A catalogue of dark sky positions
     single_degree_centre, overlap = catalog.create_degree_square(args.RA, args.Dec, plot_image=args.plotImage, add_query=True, mode='centre', debug=args.Debug)
-
     # Find the nearest sky position
 
     if single_degree_centre is not None:
