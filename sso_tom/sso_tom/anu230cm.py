@@ -15,6 +15,12 @@ from tom_observations.facility import (
 from tom_observations.models import ObservationRecord
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
+from tom_observations.models import ObservationRecord
+
+# Code to select a blank sky - CLi
+from sso_tom.selectSky import selectSky
+from types import SimpleNamespace
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +31,12 @@ CHOICES = {
     ],
     "MODE": [
         ("ClassicalEqual", "Classical Equal"),
-        # ("ObjectSkyNodAndShuffle", "Object Sky Nod And Shuffle"),
+        ("ObjectSkyNodAndShuffle", "Object Sky Nod And Shuffle"),
     ],
     "DICHROIC": [
-        ("RT480", "RT480"),
+        # Put RT50 first
         ("RT560", "RT560"),
+        ("RT480", "RT480"),
         ("RT615", "RT615"),
     ],
     "RED_GRATING": [
@@ -123,14 +130,28 @@ class ANU230cmForm(BaseRoboticObservationForm):
         label='Max Seeing (")',
         required=False,
     )
-    photometric = forms.BooleanField(
-        label="Photometric",
-        required=False,
-    )
+    
     maxlunarphase = forms.IntegerField(
         label="Max. Lunar Phase (%)",
         required=False,
         initial=100,
+    )
+    
+    maxlunarphase = forms.IntegerField(
+        label="Max. Lunar Phase (%)",
+        required=False,
+        initial=100,
+    )
+    # Renamed to sky transpareny
+    skytransparency = forms.BooleanField(
+        label="Clear conditions",
+        required=False,
+    )
+    # CLi Added lunar distance
+    minlunardist = forms.IntegerField(
+        label="Min. Lunar distance (degrees)",
+        required=False,
+        initial=30,
     )
     timeconstraint = forms.ChoiceField(
         label="Time Constraint",
@@ -274,6 +295,12 @@ class ANU230cmForm(BaseRoboticObservationForm):
         label="Sub-cycle Description",
         required=False,
     )
+    autoselsky_0 = forms.BooleanField(
+        label="Automatic Selection",
+        required=False,
+        initial=False,
+    )
+
     skya_ra_0 = forms.CharField(
         label="Sky A RA",
         required=False,
@@ -330,7 +357,12 @@ class ANU230cmForm(BaseRoboticObservationForm):
                 ),
                 Div(
                     Div("maxseeing", css_class="col"),
+                    Div("skytransparency", css_class="col"),
+                    css_class="form-row",
+                ),
+                Div(
                     Div("maxlunarphase", css_class="col"),
+                    Div("minlunardist", css_class="col"),
                     css_class="form-row",
                 ),
                 Div(
@@ -366,6 +398,21 @@ class ANU230cmForm(BaseRoboticObservationForm):
                     css_class="form-row",
                 ),
             ),
+            # Sky and nodding sequence
+            Fieldset(
+                "Sky Position",
+                Div(Div("autoselsky_0", css_class="col"), css_class="form-row"),
+                Div(
+                    Div("skya_ra_0", css_class="col"),
+                    Div("skya_dec_0", css_class="col"),
+                    css_class="form-row",
+                ),
+            ),
+            Fieldset(
+                "Nod sequence",
+                Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
+            ),
+
             Fieldset(
                 "Object, Acquisition & Guide",
                 Div(
@@ -461,14 +508,21 @@ class ANU230cmTemplateForm(GenericTemplateForm):
         label='Max Seeing (")',
         required=False,
     )
-    photometric = forms.BooleanField(
-        label="Photometric",
+    # Renamed to sky transpareny
+    skytransparency = forms.BooleanField(
+        label="Clear conditions",
         required=False,
     )
     maxlunarphase = forms.IntegerField(
         label="Max. Lunar Phase (%)",
         required=False,
         initial=100,
+    )
+    # CLi Added lunar distance
+    minlunardist = forms.IntegerField(
+        label="Min. Lunar distance (degrees)",
+        required=False,
+        initial=30,
     )
     timeconstraint = forms.ChoiceField(
         label="Time Constraint",
@@ -554,6 +608,17 @@ class ANU230cmTemplateForm(GenericTemplateForm):
         label="Blind Acquisition",
         required=False,
         initial=False,
+    )
+    # Added an automatic options
+    autoselacqstar_0 = forms.BooleanField(
+        label="Automatic Selection",
+        required=False,
+        initial=True,
+    )
+    autoselsky_0 = forms.BooleanField(
+        label="Automatic Selection",
+        required=False,
+        initial=True,
     )
     rot_0 = forms.ChoiceField(
         label="Rotator Mode",
@@ -673,9 +738,12 @@ class ANU230cmTemplateForm(GenericTemplateForm):
                     Div("imgtype_0", css_class="col"),
                     css_class="form-row",
                 ),
+                # Added a button to choose sky transparency
                 Div(
                     Div("maxseeing", css_class="col"),
                     Div("maxlunarphase", css_class="col"),
+                    Div("minlunardist", css_class="col"),
+                    Div("skytransparency", css_class="col"),
                     css_class="form-row",
                 ),
                 Div(
@@ -704,6 +772,11 @@ class ANU230cmTemplateForm(GenericTemplateForm):
                     Div("nexp_0", css_class="col"),
                     css_class="form-row",
                 ),
+                Div(
+                    Div("scdescr_0", css_class="col"),
+                    css_class="form-row",
+                ),
+                
                 Div(Div("stellar_0", css_class="col"), css_class="form-row"),
                 Div(
                     Div("binx_0", css_class="col"),
@@ -711,9 +784,19 @@ class ANU230cmTemplateForm(GenericTemplateForm):
                     css_class="form-row",
                 ),
             ),
+            # Sky and nodding sequence
             Fieldset(
-                "Object, Acquisition & Guide",
-                Div(Div("blindacq_0", css_class="col"), css_class="form-row"),
+                "Sky Position",
+                Div(Div("autoselsky_0", css_class="col"), css_class="form-row"),
+                Div(
+                    Div("skya_ra_0", css_class="col"),
+                    Div("skya_dec_0", css_class="col"),
+                    css_class="form-row",
+                ),
+            ),
+            Fieldset(
+                "Object Acquisition and guiding",
+                Div(Div("autoselacqstar_0", css_class="col"), css_class="form-row"),
                 Div(
                     Div("agfilter_0", css_class="col"),
                     Div("guide_0", css_class="col"),
@@ -901,6 +984,9 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
     @staticmethod
     def get_clean_data_for_posting(observation_payload):
 
+        from astropy.coordinates import Angle 
+        import astropy.units as u
+
         # Keyword dictionary
         proposal = "PROPOSAL"
         userdefid = "USERDEFID"
@@ -910,6 +996,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         maxseeing = "MAXSEEING"
         photometric = "PHOTOMETRIC"
         maxlunarphase = "MAXLUNARPHASE"
+        minlunardist = "MINLUNARDIST"
         timeconstraint = "TIMECONSTRAINT"
         timeref = "TIMEREF"
         timewindow = "TIMEWINDOW"
@@ -940,6 +1027,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         exptime_ = "EXPTIME_"
         sky_exptime_ = "SKY_EXPTIME_"
         scdescr_ = "SCDESCR_"
+        autoselsky_ = "AUTOSELSKY_"
         skya_ra_ = "SKYA_RA_"
         skya_dec_ = "SKYA_DEC_"
 
@@ -960,6 +1048,9 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         )
         post_data[maxlunarphase] = observation_payload["params"].get(
             maxlunarphase.lower(), None
+        )
+        post_data[minlunardist] = observation_payload["params"].get(
+            minlunardist.lower(), None
         )
         post_data[timeconstraint] = observation_payload["params"].get(
             timeconstraint.lower(), None
@@ -998,6 +1089,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         post_data[pmot_ + "0"] = observation_payload["params"].get(
             pmot_.lower() + "0", None
         )
+        # Add code to select acquisition star if requested
         post_data[acq_ra_ + "0"] = observation_payload["params"].get(
             acq_ra_.lower() + "0", None
         )
@@ -1046,11 +1138,41 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         post_data[scdescr_ + "0"] = observation_payload["params"].get(
             scdescr_.lower() + "0", None
         )
+
+        # Code to select sky region if requested
+        if observation_payload["params"].get(autoselsky_.lower() + "0"):
+            obj_ra=observation_payload["params"].get(ra_.lower() + "0", None)
+            obj_dec=observation_payload["params"].get(dec_.lower() + "0", None)
+
+            obj_dict={'RA':Angle(obj_ra, unit=u.hourangle).degree,"Dec":Angle(obj_dec, unit=u.degree).degree,\
+                      "maskRadius":20,\
+                      "magLimit":20,\
+                      "Debug":False,
+                      "Verbose":False,
+                      "plotImage":False}
+            
+            obj=SimpleNamespace(**obj_dict)
+
+            sky=selectSky(obj)  
+            if sky['ra_sky'] is not None:
+                observation_payload["params"][skya_ra_.lower() + "0"]=sky["ra_sky"]
+                observation_payload["params"][skya_dec_.lower() + "0"]=sky["dec_sky"]
+            else:
+                # If a sky cannot be found,we set it 10' north of the object
+                logger.info(f"Cannot find sky. Setting a sky to 5' north of target. Good luck!")
+                observation_payload["params"][skya_ra_.lower() + "0"]=obj_dict['RA']
+                observation_payload["params"][skya_dec_.lower() + "0"]=obj_dict['Dec']+5/60
+
+        else:
+            sky={"ra_sky":None,"dec_sky":None}
+        
+
+
         post_data[skya_ra_ + "0"] = observation_payload["params"].get(
-            skya_ra_.lower() + "0", None
+            skya_ra_.lower() + "0", sky["ra_sky"]
         )
         post_data[skya_dec_ + "0"] = observation_payload["params"].get(
-            skya_dec_.lower() + "0", None
+            skya_dec_.lower() + "0", sky["dec_sky"] 
         )
 
         # Remove keys with None values
