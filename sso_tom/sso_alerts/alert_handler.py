@@ -152,14 +152,10 @@ def alert_logger_lsst(alert, topic):
     logger.info(f"fink.alert_logger topic: {topic}")
 
     sourceId = alert["diaSource"]["diaSourceId"]
-    logger.info(sourceId)
-
     diaObjectId = alert["diaObject"]["diaObjectId"]
-    logger.info(diaObjectId)
     diaObjectId_str = pyarrow.compute.cast(diaObjectId, pyarrow.string())
-    logger.info(diaObjectId_str)
 
-    targetName = alert["diaObject"]["diaObjectId"]
+    targetName = diaObjectId_str
     targetEpoch = alert["diaSource"]["midpointMjdTai"]
 
     logger.info(
