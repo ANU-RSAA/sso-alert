@@ -3,6 +3,8 @@ import time
 import traceback
 from sqlite3 import IntegrityError as SQL_IntegrityError
 
+import pyarrow
+import pyarrow.compute
 from chained.utils import create_chain_and_submit_first
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -149,7 +151,15 @@ def alert_logger_lsst(alert, topic):
     utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     logger.info(f"fink.alert_logger topic: {topic}")
 
-    targetName = alert["diaSource"]["diaSourceId"]
+    sourceId = alert["diaSource"]["diaSourceId"]
+    logger.info(sourceId)
+
+    diaObjectId = alert["diaObject"]["diaObjectId"]
+    logger.info(diaObjectId)
+    diaObjectId_str = pyarrow.compute.cast(diaObjectId, pyarrow.string())
+    logger.info(diaObjectId_str)
+
+    targetName = alert["diaObject"]["diaObjectId"]
     targetEpoch = alert["diaSource"]["midpointMjdTai"]
 
     logger.info(
@@ -159,8 +169,8 @@ def alert_logger_lsst(alert, topic):
     mytarget = Target(
         name=targetName,
         type="SIDEREAL",
-        ra=alert["diaSource"]["ra"],
-        dec=alert["diaSource"]["dec"],
+        ra=alert["diaObject"]["ra"],
+        dec=alert["diaObject"]["dec"],
         epoch=targetEpoch,
     )
 
