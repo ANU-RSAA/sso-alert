@@ -25,15 +25,19 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-4">
+    <div class="column">
         {% observationtemplate_from_record object %}
-        <p></p>
+        <a href="{% url 'observations:detail' observationrecord.id %}cancel" class="btn btn-outline-primary">Cancel Observation</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
         <h4>Request Parameters</h4><br>
         <dl class="row">
             {% for k,v in object.parameters.items %}
             <dt class="col-sm-6">{{ k }}</dt>
             <dd class="col-sm-6">{{ v }}</dt>
-            {% endfor %}
+                {% endfor %}
         </dl>
     </div>
 </div>

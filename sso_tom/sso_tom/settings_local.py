@@ -73,9 +73,13 @@ ZTF_TOPICS = [
 ]
 
 LSST_TOPICS = [
-    "fink_extragalactic_candidate_lsst",
-    "fink_cataloged_lsst",
+    "fink_early_snia_candidate_lsst",
+    "fink_extragalactic_lt20mag_candidate_lsst",
+    "fink_extragalactic_new_candidate_lsst",
+    "fink_good_quality_lsst",
+    "fink_hostless_candidate_lsst",
     "fink_in_tns_lsst",
+    "fink_sn_near_galaxy_candidate_lsst",
 ]
 
 TOPICS = []
