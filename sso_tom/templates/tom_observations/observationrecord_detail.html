@@ -13,7 +13,8 @@
             <p>{% update_observation_id_form object %}</p>
             {% endif %}
             <p class="my-auto"><strong>Observation ID:</strong> {{ object.observation_id }}</p>
-            <p class="my-auto"><strong>Created:</strong> {{ object.created }} <strong>Modified:</strong> {{ object.modified }}</p>
+            <p class="my-auto"><strong>Created:</strong> {{ object.created }} <strong>Modified:</strong> {{
+                object.modified }}</p>
             <p class="my-auto"><strong>Status:</strong> {{ object.status }}</p>
         </div>
         <p></p>
@@ -27,13 +28,14 @@
 <div class="row">
     <div class="col-md-4">
         {% observationtemplate_from_record object %}
+        {% observation_cancel object %}
         <p></p>
         <h4>Request Parameters</h4><br>
         <dl class="row">
             {% for k,v in object.parameters.items %}
             <dt class="col-sm-6">{{ k }}</dt>
             <dd class="col-sm-6">{{ v }}</dt>
-            {% endfor %}
+                {% endfor %}
         </dl>
     </div>
 </div>
