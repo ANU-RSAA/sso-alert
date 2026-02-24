@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import timedelta
+from types import SimpleNamespace
 
 import requests
 from crispy_forms.helper import FormHelper
@@ -15,12 +16,9 @@ from tom_observations.facility import (
 from tom_observations.models import ObservationRecord
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
-from tom_observations.models import ObservationRecord
 
 # Code to select a blank sky - CLi
 from sso_tom.selectSky import selectSky
-from types import SimpleNamespace
-
 
 logger = logging.getLogger(__name__)
 
@@ -130,13 +128,13 @@ class ANU230cmForm(BaseRoboticObservationForm):
         label='Max Seeing (")',
         required=False,
     )
-    
+
     maxlunarphase = forms.IntegerField(
         label="Max. Lunar Phase (%)",
         required=False,
         initial=100,
     )
-    
+
     maxlunarphase = forms.IntegerField(
         label="Max. Lunar Phase (%)",
         required=False,
@@ -412,7 +410,6 @@ class ANU230cmForm(BaseRoboticObservationForm):
                 "Nod sequence",
                 Div(Div("scdescr_0", css_class="col"), css_class="form-row"),
             ),
-
             Fieldset(
                 "Object, Acquisition & Guide",
                 Div(
@@ -776,7 +773,6 @@ class ANU230cmTemplateForm(GenericTemplateForm):
                     Div("scdescr_0", css_class="col"),
                     css_class="form-row",
                 ),
-                
                 Div(Div("stellar_0", css_class="col"), css_class="form-row"),
                 Div(
                     Div("binx_0", css_class="col"),
@@ -979,13 +975,17 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         Returns the states for which an observation is not expected
         to change.
         """
-        return ["Succeeded", "Rejected"]  # Not sure if should be capitalised.
+        return [
+            "Succeeded",
+            "Rejected",
+            "No observations",
+        ]  # Not sure if should be capitalised.
 
     @staticmethod
     def get_clean_data_for_posting(observation_payload):
 
-        from astropy.coordinates import Angle 
         import astropy.units as u
+        from astropy.coordinates import Angle
 
         # Keyword dictionary
         proposal = "PROPOSAL"
@@ -1141,38 +1141,43 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
 
         # Code to select sky region if requested
         if observation_payload["params"].get(autoselsky_.lower() + "0"):
-            obj_ra=observation_payload["params"].get(ra_.lower() + "0", None)
-            obj_dec=observation_payload["params"].get(dec_.lower() + "0", None)
+            obj_ra = observation_payload["params"].get(ra_.lower() + "0", None)
+            obj_dec = observation_payload["params"].get(dec_.lower() + "0", None)
 
-            obj_dict={'RA':Angle(obj_ra, unit=u.hourangle).degree,"Dec":Angle(obj_dec, unit=u.degree).degree,\
-                      "maskRadius":20,\
-                      "magLimit":20,\
-                      "Debug":False,
-                      "Verbose":False,
-                      "plotImage":False}
-            
-            obj=SimpleNamespace(**obj_dict)
+            obj_dict = {
+                "RA": Angle(obj_ra, unit=u.hourangle).degree,
+                "Dec": Angle(obj_dec, unit=u.degree).degree,
+                "maskRadius": 20,
+                "magLimit": 20,
+                "Debug": False,
+                "Verbose": False,
+                "plotImage": False,
+            }
 
-            sky=selectSky(obj)  
-            if sky['ra_sky'] is not None:
-                observation_payload["params"][skya_ra_.lower() + "0"]=sky["ra_sky"]
-                observation_payload["params"][skya_dec_.lower() + "0"]=sky["dec_sky"]
+            obj = SimpleNamespace(**obj_dict)
+
+            sky = selectSky(obj)
+            if sky["ra_sky"] is not None:
+                observation_payload["params"][skya_ra_.lower() + "0"] = sky["ra_sky"]
+                observation_payload["params"][skya_dec_.lower() + "0"] = sky["dec_sky"]
             else:
                 # If a sky cannot be found,we set it 10' north of the object
-                logger.info(f"Cannot find sky. Setting a sky to 5' north of target. Good luck!")
-                observation_payload["params"][skya_ra_.lower() + "0"]=obj_dict['RA']
-                observation_payload["params"][skya_dec_.lower() + "0"]=obj_dict['Dec']+5/60
+                logger.info(
+                    f"Cannot find sky. Setting a sky to 5' north of target. Good luck!"
+                )
+                observation_payload["params"][skya_ra_.lower() + "0"] = obj_dict["RA"]
+                observation_payload["params"][skya_dec_.lower() + "0"] = (
+                    obj_dict["Dec"] + 5 / 60
+                )
 
         else:
-            sky={"ra_sky":None,"dec_sky":None}
-        
-
+            sky = {"ra_sky": None, "dec_sky": None}
 
         post_data[skya_ra_ + "0"] = observation_payload["params"].get(
             skya_ra_.lower() + "0", sky["ra_sky"]
         )
         post_data[skya_dec_ + "0"] = observation_payload["params"].get(
-            skya_dec_.lower() + "0", sky["dec_sky"] 
+            skya_dec_.lower() + "0", sky["dec_sky"]
         )
 
         # Remove keys with None values
