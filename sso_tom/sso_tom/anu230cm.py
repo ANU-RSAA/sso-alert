@@ -17,8 +17,12 @@ from tom_observations.models import ObservationRecord
 from tom_observations.observation_template import GenericTemplateForm
 from tom_targets.models import Target
 
-# Code to select a blank sky - CLi
+# Code to select a blank sky and an acquistion star - CLi
 from sso_tom.selectSky import selectSky
+from sso_tom.selectAcqStar import selectAcqStar
+
+from types import SimpleNamespace
+
 
 logger = logging.getLogger(__name__)
 
@@ -214,15 +218,16 @@ class ANU230cmForm(BaseRoboticObservationForm):
     pmot_0 = forms.CharField(
         label="Prop. Motion",
         required=False,
-        # initial="0 0",
+        initial="0 0",
         disabled=True,
     )
+
     acq_ra_0 = forms.CharField(
-        label="Acquired RA",
+        label="Acquistion RA",
         required=False,
     )
     acq_dec_0 = forms.CharField(
-        label="Acquired Dec",
+        label="Acquisition Dec",
         required=False,
     )
     acq_pmot_0 = forms.CharField(
@@ -419,15 +424,15 @@ class ANU230cmForm(BaseRoboticObservationForm):
                     css_class="form-row",
                 ),
                 Div(
-                    Div("acq_ra_0", css_class="col"),
-                    Div("acq_dec_0", css_class="col"),
-                    Div("acq_pmot_0", css_class="col"),
+                    Div("rot_0", css_class="col"),
+                    Div("rotang_0", css_class="col"),
                     css_class="form-row",
                 ),
                 Div(Div("blindacq_0", css_class="col"), css_class="form-row"),
                 Div(
-                    Div("rot_0", css_class="col"),
-                    Div("rotang_0", css_class="col"),
+                    Div("acq_ra_0", css_class="col"),
+                    Div("acq_dec_0", css_class="col"),
+                    Div("acq_pmot_0", css_class="col"),
                     css_class="form-row",
                 ),
                 Div(
@@ -504,6 +509,7 @@ class ANU230cmTemplateForm(GenericTemplateForm):
     maxseeing = forms.CharField(
         label='Max Seeing (")',
         required=False,
+        initial=3,
     )
     # Renamed to sky transpareny
     skytransparency = forms.BooleanField(
@@ -584,34 +590,29 @@ class ANU230cmTemplateForm(GenericTemplateForm):
         label="Prop. Motion",
         required=False,
         initial="0 0",
-        disabled=True,
+        disabled=False,
     )
     acq_ra_0 = forms.CharField(
         label="Acquired RA",
         required=False,
-        disabled=True,
+        disabled=False,
     )
     acq_dec_0 = forms.CharField(
         label="Acquired Dec",
         required=False,
-        disabled=True,
+        disabled=False,
     )
     acq_pmot_0 = forms.CharField(
         label="Acq. Prop. Motion",
         required=False,
-        disabled=True,
+        disabled=False,
     )
     blindacq_0 = forms.BooleanField(
         label="Blind Acquisition",
         required=False,
         initial=False,
     )
-    # Added an automatic options
-    autoselacqstar_0 = forms.BooleanField(
-        label="Automatic Selection",
-        required=False,
-        initial=True,
-    )
+    
     autoselsky_0 = forms.BooleanField(
         label="Automatic Selection",
         required=False,
@@ -674,6 +675,7 @@ class ANU230cmTemplateForm(GenericTemplateForm):
     )
     sky_exptime_0 = forms.IntegerField(
         label="Sky Exp. time (s)",
+        initial=150,
         required=False,
     )
     scdescr_0 = forms.CharField(
@@ -791,8 +793,14 @@ class ANU230cmTemplateForm(GenericTemplateForm):
                 ),
             ),
             Fieldset(
-                "Object Acquisition and guiding",
-                Div(Div("autoselacqstar_0", css_class="col"), css_class="form-row"),
+                "Acquisition and guiding",
+                Div(Div("blindacq_0", css_class="col"), css_class="form-row"),
+                Div(
+                    Div("acq_ra_0", css_class="col"),
+                    Div("acq_dec_0", css_class="col"),
+                    Div("acq_pmot_0", css_class="col"),
+                    css_class="form-row",
+                ),
                 Div(
                     Div("agfilter_0", css_class="col"),
                     Div("guide_0", css_class="col"),
@@ -1171,13 +1179,49 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
                 )
 
         else:
-            sky = {"ra_sky": None, "dec_sky": None}
+            sky={"ra_sky":None,"dec_sky":None}
+            observation_payload["params"][skya_ra_.lower() + "0"]=sky["ra_sky"]
+            observation_payload["params"][skya_dec_.lower() + "0"]=sky["dec_sky"]
+        
 
         post_data[skya_ra_ + "0"] = observation_payload["params"].get(
             skya_ra_.lower() + "0", sky["ra_sky"]
         )
         post_data[skya_dec_ + "0"] = observation_payload["params"].get(
             skya_dec_.lower() + "0", sky["dec_sky"]
+        )
+
+        # Code to select guide star if requested
+        if not observation_payload["params"].get(blindacq_.lower() + "0"):
+            obj_ra=observation_payload["params"].get(ra_.lower() + "0", None)
+            obj_dec=observation_payload["params"].get(dec_.lower() + "0", None)
+
+            obj_dict={'RA':Angle(obj_ra, unit=u.hourangle).degree,"Dec":Angle(obj_dec, unit=u.degree).degree,\
+                      "searchRadius":5,\
+                      "Debug":False,
+                      "Verbose":True}
+            
+            obj=SimpleNamespace(**obj_dict)
+
+            acq=selectAcqStar(obj)
+
+            print(observation_payload)           
+        else:
+            acq={"acq_ra":None,"acq_dec":None,'acq_pmot':None,'acq_pmdec':None}
+            
+
+        observation_payload["params"][acq_ra_.lower() + "0"]=acq["acq_ra"]
+        observation_payload["params"][acq_dec_.lower() + "0"]=acq["acq_dec"] 
+        observation_payload["params"][acq_pmot_.lower() + "0"]='%4.2f %4.2f' % (acq["acq_pmra"],acq["acq_pmdec"])
+
+        post_data[acq_ra_ + "0"] = observation_payload["params"].get(
+            acq_ra_.lower() + "0", acq["acq_ra"]
+        )
+        post_data[acq_dec_ + "0"] = observation_payload["params"].get(
+            acq_dec_.lower() + "0", acq["acq_dec"] 
+        )
+        post_data[acq_pmot_ + "0"] = observation_payload["params"].get(
+            acq_pmot_.lower() + "0", '%4.2f %4.2f' % (acq["acq_pmra"],acq["acq_pmdec"])
         )
 
         # Remove keys with None values
