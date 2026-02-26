@@ -1,13 +1,16 @@
 from django.http import Http404
 from django.shortcuts import render
-
 from django.views.generic import TemplateView
-from tom_targets.models import Target
 from tom_observations.views import (
     ObservationCreateView,
     ObservationTemplateCreateView,
     ObservationTemplateUpdateView,
 )
+from tom_targets.models import Target
+
+
+class HowToView(TemplateView):
+    template_name = "howto.html"
 
 
 class AboutView(TemplateView):
