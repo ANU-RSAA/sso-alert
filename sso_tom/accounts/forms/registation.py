@@ -3,8 +3,8 @@ Distributed under the MIT License. See LICENSE.txt for more info.
 """
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
 
 FIELDS = [
@@ -32,7 +32,7 @@ WIDGETS = {
 LABELS = {
     "first_name": _("First name"),
     "last_name": _("Last name"),
-    "email": _("Email (same as the telescope proposal)"),
+    "email": _("Email (same email as used for LENS)"),
     "username": _("Username"),
 }
 
