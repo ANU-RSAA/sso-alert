@@ -1,9 +1,94 @@
 {% extends 'tom_common/base.html' %}
 {% block content %}
-<p>
-    Here is a list of targets. <br /><br />
-    <strong>Targets</strong>
-</p>
-<ul>
-</ul>
+<section id="top"></section>
+<div class="row">
+    <div class="col-md-12">
+        <h2> How to use the SSO Alert System</h2>
+    </div>
+</div>
+<div class="row">
+    <section id="introduction">
+        <div class="col-md-6">
+            This page provides basic instructions
+        </div>
+    </section>
+    <section id="toc">
+        <div class="col-md-6">
+            <h3>Table of Contents</h3>
+            <ul><a href="{% url 'howto' %}#introduction">Introduction</a></ul>
+            <ul><a href="{% url 'howto' %}#registration">Registration</a></ul>
+            <ul><a href="{% url 'howto' %}#lens">Connecting to LENS</a></ul>
+            <ul><a href="{% url 'howto' %}#createtemplate">Creating an observation template</a></ul>
+            <ul><a href="{% url 'howto' %}#streamalert">Streaming alerts from an alert stream</a></ul>
+            <ul><a href="{% url 'howto' %}#submitobservation">Submitting an observation</a></ul>
+            <ul><a href="{% url 'howto' %}#updateobservation">Updating an observation status</a></ul>
+            <ul><a href="{% url 'howto' %}#cancelobservation">Cancelling an observations</a></ul>
+            <ul><a href="{% url 'howto' %}#chainobservation">Observation Chaining</a></ul>
+            <ul><a href="{% url 'howto' %}#help">More help</a></ul>
+        </div>
+    </section>
+</div>
+<section id="registration">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Registration</h4>
+        </div>
+    </div>
+</section>
+<section id="lens">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Connecting to LENS</h4>
+        </div>
+    </div>
+</section>
+<section id="createtemplate">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Creating an observation template</h4>
+        </div>
+    </div>
+</section>
+<section id="streamalert">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Streaming Alerts</h4>
+        </div>
+    </div>
+</section>
+<section id="submitobservation">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Submitting an observation</h4>
+        </div>
+    </div>
+</section>
+<section id="updateobservation">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Updating an observation status</h4>
+        </div>
+    </div>
+</section>
+<section id="cancelobservatiton">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Cancelling an observation</h4>
+        </div>
+    </div>
+</section>
+<section id="chainobservation">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Chaining observations</h4>
+        </div>
+    </div>
+</section>
+<section id="help">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>More help</h4>
+        </div>
+    </div>
+</section>
 {% endblock %}
