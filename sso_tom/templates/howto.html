@@ -9,7 +9,16 @@
 <div class="row">
     <div class="col-md-6">
         <section id="introduction">
-            This page provides basic instructions
+            <h4>Introduction</h4>
+            <p>This page provides basic instructions on how to use the SSO Alert System.</p>
+            <p>This system provides the ability to automatically submit observations to the ANU 2.3m as well as other facilities.</p>
+            <p>By the end of this guide, you should be able to submit an observation to the ANU 2.3m</p>
+            <p>In order to use this service you should be familiar with the <a href="https://rsaa.anu.edu.au/observers/applying-23m-time">"Applying for time on
+                    the ANU 2.3-metre telescope"</a> page.</p>
+            <p>This instance of the SSO Alert System is deployed by the <a href="www.rsaa.anu.edu.au">Research School of Astronomy and Astrophysics</a> at the
+                <a href="www.anu.edu.au">Australian National University</a>
+            </p>
+            <p>For additional assistance or enquires please contact: <a href="mailto:sso-alert-system@mso.anu.edu.au">sso-alert-system@mso.anu.edu.au</a></p>
         </section>
     </div>
     <div class="col-md-6">
@@ -32,6 +41,7 @@
     <div class="row">
         <div class="col-md-12">
             <h4>Registration</h4>
+            <a href="{% url 'observations:detail' observationrecord.id %}cancel">Cancel Observation</a>
         </div>
     </div>
 </section>
