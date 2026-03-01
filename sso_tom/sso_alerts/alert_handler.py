@@ -90,6 +90,11 @@ def alert_logger(alert, topic):
         )
     )
 
+    alert_streams = AlertStreams.objects.filter(topic=topic, active=True)
+    if len(alert_streams) == 0:
+        logger.info(f"No active user streams for {topic}. Not saving target")
+        return
+
     mytarget = Target(
         name=alert["objectId"],
         type="SIDEREAL",
@@ -150,6 +155,11 @@ def alert_logger_lsst(alert, topic):
     """
     utc = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     logger.info(f"fink.alert_logger topic: {topic}")
+
+    alert_streams = AlertStreams.objects.filter(topic=topic, active=True)
+    if len(alert_streams) == 0:
+        logger.info(f"No active user streams for {topic}. Not saving target")
+        return
 
     sourceId = alert["diaSource"]["diaSourceId"]
     diaObjectId = alert["diaObject"]["diaObjectId"]
