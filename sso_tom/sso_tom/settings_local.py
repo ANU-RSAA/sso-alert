@@ -55,42 +55,43 @@ ARCHIVE_2M3_RESULTS = dotenv("2M3_ARCHIVE_RESULTS", default=None)
 
 
 ### ALERT STREAMS SETTINGS ###
+TOPICS = []
 
 #### FINK SETTINGS ####
 USE_FINK = bool(strtobool(dotenv("USE_FINK", default="False")))
 
-# To add a new topic - add one here.
-ZTF_TOPICS = [
-    "fink_early_sn_candidates_ztf",
-    "fink_sn_candidates_ztf",
-    "fink_sso_ztf_candidates_ztf",
-    "fink_sso_fink_candidates_ztf",
-    "fink_kn_candidates_ztf",
-    "fink_early_kn_candidates_ztf",
-    "fink_rate_based_kn_candidates_ztf",
-    "fink_microlensing_candidates_ztf",
-    "fink_blazar_ztf",
-]
-
-LSST_TOPICS = [
-    "fink_early_snia_candidate_lsst",
-    "fink_extragalactic_lt20mag_candidate_lsst",
-    "fink_extragalactic_new_candidate_lsst",
-    "fink_good_quality_lsst",
-    "fink_hostless_candidate_lsst",
-    "fink_in_tns_lsst",
-    "fink_sn_near_galaxy_candidate_lsst",
-]
-
-TOPICS = []
-
-if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
-    TOPICS = TOPICS + ZTF_TOPICS
-
-if dotenv("FINK_CREDENTIAL_LSST_URL", default=None) is not None:
-    TOPICS = TOPICS + LSST_TOPICS
-
 if USE_FINK:
+    from fink_client.consumer import AlertConsumer
+
+    config = {
+        "username": dotenv(
+            "FINK_CREDENTIAL_USERNAME",
+            default="set FINK_CREDENTIAL_USERNAME value in environment",
+        ),
+        "group.id": dotenv(
+            "FINK_CREDENTIAL_GROUP_ID",
+            default="set FINK_CREDENTIAL_GROUP_ID value in environment",
+        ),
+    }
+
+    if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
+        config["bootstrap.servers"] = dotenv(
+            "FINK_CREDENTIAL_URL",
+            default="set FINK_CREDENTIAL_URL value in environment",
+        )
+        consumer = AlertConsumer(survey="ztf", topics=["pie"], config=config)
+        ZTF_TOPICS = consumer.available_topics(service="livestream").sort()  # type: ignore fink-client has incorrect return type
+        TOPICS = TOPICS + ZTF_TOPICS
+
+    if dotenv("FINK_CREDENTIAL_LSST_URL", default=None) is not None:
+        config["bootstrap.servers"] = dotenv(
+            "FINK_CREDENTIAL_LSST_URL",
+            default="set FINK_CREDENTIAL_LSST_URL value in environment",
+        )
+        consumer = AlertConsumer(survey="lsst", topics=["pie"], config=config)
+        LSST_TOPICS = consumer.available_topics(service="livestream").sort()  # type: ignore fink-client has incorrect return type
+        TOPICS = TOPICS + LSST_TOPICS
+
     if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
         finkZTFTopics = [
             {
