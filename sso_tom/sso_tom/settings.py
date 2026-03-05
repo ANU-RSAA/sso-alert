@@ -69,8 +69,10 @@ INSTALLED_APPS = [
 # This is a temporary solution until I decide if the tom_fink import via .gitmodules should be replaced with a required package.
 # Answer is probably yes
 USE_FINK = dotenv("USE_FINK", default="False", cast=bool)
-if USE_FINK:
-    INSTALLED_APPS.append("tom_fink")
+
+# Unused because requires a lower version than fink-client 10.1
+# if USE_FINK:
+#     INSTALLED_APPS.append("tom_fink")
 
 
 SITE_ID = 1
@@ -295,8 +297,9 @@ TOM_ALERT_CLASSES = [
     # "tom_alerts.brokers.fink.FinkBroker",
 ]
 
-if USE_FINK:
-    TOM_ALERT_CLASSES.append("tom_fink.fink.FinkBroker")
+# Unused because requires a lower version than fink-client 10.1
+# if USE_FINK:
+#     TOM_ALERT_CLASSES.append("tom_fink.fink.FinkBroker")
 
 BROKERS = {
     "TNS": {

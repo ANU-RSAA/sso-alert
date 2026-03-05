@@ -80,8 +80,9 @@ if USE_FINK:
             default="set FINK_CREDENTIAL_URL value in environment",
         )
         consumer = AlertConsumer(survey="ztf", topics=["pie"], config=config)
-        ZTF_TOPICS = consumer.available_topics(service="livestream").sort()  # type: ignore fink-client has incorrect return type
-        TOPICS = TOPICS + ZTF_TOPICS
+        ZTF_TOPICS = consumer.available_topics(service="livestream")
+        ZTF_TOPICS.sort()  # type: ignore fink-client has incorrect return type
+        TOPICS = TOPICS + ZTF_TOPICS  # type: ignore fink-client has incorrect return type
 
     if dotenv("FINK_CREDENTIAL_LSST_URL", default=None) is not None:
         config["bootstrap.servers"] = dotenv(
@@ -89,8 +90,9 @@ if USE_FINK:
             default="set FINK_CREDENTIAL_LSST_URL value in environment",
         )
         consumer = AlertConsumer(survey="lsst", topics=["pie"], config=config)
-        LSST_TOPICS = consumer.available_topics(service="livestream").sort()  # type: ignore fink-client has incorrect return type
-        TOPICS = TOPICS + LSST_TOPICS
+        LSST_TOPICS = consumer.available_topics(service="livestream")
+        LSST_TOPICS.sort()  # type: ignore fink-client has incorrect return type
+        TOPICS = TOPICS + LSST_TOPICS  # type: ignore fink-client has incorrect return type
 
     if dotenv("FINK_CREDENTIAL_URL", default=None) is not None:
         finkZTFTopics = [
