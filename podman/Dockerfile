@@ -33,7 +33,7 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.38.0/install.sh | b
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
-RUN pip install --no-cache-dir tom_fink
+# RUN pip install --no-cache-dir tom_fink
 
 # Code directory is now volume mounted.
 # COPY . /code
