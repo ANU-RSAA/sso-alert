@@ -14,13 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.urls import path, include
+from django.urls import include, path
+
 from .views import (
     AboutView,
-    page_not_found,
     CustomObservationCreateView,
     CustomObservationTemplateCreateView,
     CustomObservationTemplateUpdateView,
+    HowToView,
+    page_not_found,
 )
 
 urlpatterns = [
@@ -58,4 +60,5 @@ urlpatterns = [
     path("chains/", include("chained.urls")),
     path("sso_alerts/", include("sso_alerts.urls")),
     path("about/", AboutView.as_view(), name="about"),
+    path("howto/", HowToView.as_view(), name="howto"),
 ]
