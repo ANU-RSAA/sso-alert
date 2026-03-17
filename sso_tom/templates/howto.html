@@ -13,7 +13,7 @@
             <h4>Introduction</h4>
             <p>This page provides basic instructions on how to use the SSO Alert System.</p>
             <p>This system provides the ability to automatically submit observations to the ANU 2.3m as well as other facilities.</p>
-            <p>By the end of this guide, you should be able to submit an observation to the ANU 2.3m</p>
+            <p>By the end of this guide, you should be able to submit an observation to the ANU 2.3m via the SSO Alert System</p>
             <p>In order to use this service you should be familiar with the <a href="https://rsaa.anu.edu.au/observers/applying-23m-time"
                     target="_blank">"Applying for time on
                     the ANU 2.3-metre telescope"</a> page.</p>
@@ -32,9 +32,14 @@
             <ul><a href="#registration">Registration</a></ul>
             <ul><a href="#lens">Connecting to LENS</a></ul>
             <ul><a href="#createtemplate">Creating an observation template</a></ul>
-            <ul><a href="#createtarget">Creating a target</a></ul>
-            <ul><a href="#streamalert">Streaming alerts from an alert stream</a></ul>
-            <ul><a href="#submitobservation">Submitting an observation</a></ul>
+            <ul><a href="#createtarget">Targets for observations</a>
+                <li><a href="#manualtarget">Manually create target</a></li>
+                <li><a href="#brokertarget">Receive alerts from brokers</a></li>
+            </ul>
+            <ul><a href="#submitobservation">Submitting an observation</a>
+                <li><a href="#manualobservation">Manual observations</a></li>
+                <li><a href="#automaticobservation">Automatic observations</a></li>
+            </ul>
             <ul><a href="#updateobservation">Updating an observation status</a></ul>
             <ul><a href="#cancelobservation">Cancelling an observations</a></ul>
             <ul><a href="#chainobservation">Observation Chaining</a></ul>
@@ -46,7 +51,8 @@
     <div class="row">
         <div class="col-md-12">
             <h4>Registration</h4>
-            <p>Register <a href="{% url 'register' %}" target="_blank">here</a> with the email address used with LENS.</p>
+            <p>Register <a href="{% url 'register' %}" target="_blank">here</a> with the email address used with LENS. The same page can be used to log into the
+                SSO Alert System when registered.</p>
             <p>Your account will need to be approved before you are able to access the system.</p>
             <p align="right">(<a href="#top">back to top</a>)</p>
         </div>
@@ -69,7 +75,7 @@
     <div class="row">
         <div class="col-md-12">
             <h4>Creating an observation template</h4>
-            <p>If you are planning to submit multiple observations with similar properties, the first step is to create an <a
+            <p>If you are planning to submit multiple observations with similar configurations, the first step is to create an <a
                     href="{% url 'tom_observations:template-list' %}" target="_blank">observation template</a>.</p>
             <img src="{% static 'howto/images/observation_template.png' %}" class="img-fluid mx-auto">
             <p>Once this template is saved, the information in the template can be easily loaded for each new observation</p>
@@ -81,36 +87,64 @@
     <div class="row">
         <div class="col-md-12">
             <h4>Creating a target</h4>
-            <p>Targets can be created by multiple methods. On the <a href="{% url 'targets:list' %}" target="_blank">targets</a> page, the "Create Targets"
-                dropdown menu contains different options.</p>
-            <p>Targets can also be created by querying various services <a href="{% url 'alerts:list' %}" target="_blank">here</a>.</p>
+            <p>Targets can be created by multiple methods: either manually or automatically by connecting to a broker stream.</p>
             <p align="right">(<a href="#top">back to top</a>)</p>
         </div>
     </div>
-</section>
-<section id="streamalert">
-    <div class="row">
-        <div class="col-md-12">
-            <h4>Streaming Alerts</h4>
-            <p>Targets can be automatically created by listening to different topics from different services <a href="{% url 'sso_alerts:alert_list' %}"
-                    target="_blank">here</a>.</p>
-            <p>If the stream is enabled, when the service emits an alert the target is and its properties are automatically created for you.</p>
-            <p>If automatic observability is selected, the automatically created targets are then automatically scheduled for observation.</p>
-            <p align="right">(<a href="#top">back to top</a>)</p>
+    <section id="manualtarget">
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Manually creating a target</h5>
+                <p>On the <a href="{% url 'targets:list' %}" target="_blank">targets</a> page, the "Create Targets"
+                    dropdown menu contains different options. Target details can be filled in here.</p>
+                <p align="right">(<a href="#top">back to top</a>)</p>
+            </div>
         </div>
-    </div>
+    </section>
+    <section id="brokertarget">
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Receiving alerts from brokers.</h5>
+                <p>Targets can be automatically created by listening to different topics from <a href="https://fink-broker.org/" target="_blank">Fink</a>
+                    broker <a href="{% url 'alerts:list' %}" target="_blank">here</a>. Fink generates a stream of targets based on each topic which will be
+                    automatically added to your account. These targets can be automatically observed without any human intervention by selecting automatic
+                    observability. More details <a href="#automaticobservation">below</a>.</p>
+                <p align="right">(<a href="#top">back to top</a>)</p>
+            </div>
+        </div>
+    </section>
 </section>
 <section id="submitobservation">
     <div class="row">
         <div class="col-md-12">
             <h4>Submitting an observation</h4>
-            <p>An observation can be manually submitted by selecting a target from the <a href="{% url 'targets:list' %}" target="_blank">targets</a> page.</p>
-            <p>Once the target has been selected and the observe tab is selected. Either a previously created template can be utilised or a new observation can
-                be chosen.</p>
-            <img src="{% static 'howto/images/create_observation.png' %}" class="img-fluid mx-auto">
+            <p>An observation can be manually or automatically triggered.</p>
             <p align="right">(<a href="#top">back to top</a>)</p>
         </div>
     </div>
+    <section id="manualobservation">
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Manual observation</h5>
+                <p>From your list of targets, an observation can be manually submitted by selecting a target from the <a href="{% url 'targets:list' %}"
+                        target="_blank">targets</a> page, clicking the observe tab and then either using an existing observation template or manually inputting
+                    the configuration desired for the observation. </p>
+                <img src="{% static 'howto/images/create_observation.png' %}" class="img-fluid mx-auto">
+                <p align="right">(<a href="#top">back to top</a>)</p>
+            </div>
+        </div>
+    </section>
+    <section id="automaticobservation">
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Automatic observation</h5>
+                <p>When subscribing to a broker stream, if "Automatic observability" is selected, an existing observation template is automatically applied to
+                    your saved targets and observations sent to the selected facility. (This feature is not recommended for broker streams with large numbers of
+                    candidates as your observation time may be used up quickly.) </p>
+                <p align="right">(<a href="#top">back to top</a>)</p>
+            </div>
+        </div>
+    </section>
 </section>
 <section id="updateobservation">
     <div class="row">
@@ -123,7 +157,7 @@
         </div>
     </div>
 </section>
-<section id="cancelobservatiton">
+<section id="cancelobservation">
     <div class="row">
         <div class="col-md-12">
             <h4>Cancelling an observation</h4>
@@ -149,7 +183,8 @@
             <h4>More help</h4>
             <p>For additional assistance or enquires please contact: <a href="mailto:sso-alert-system@mso.anu.edu.au">sso-alert-system@mso.anu.edu.au</a></p>
             <p>If you find any issues with the system, please create an <a href="https://github.com/ANU-RSAA/sso-alert/issues" target="_blank">issue</a> on the
-                <a href="https://github.com/ANU-RSAA/sso-alert" target="_blank">GitHub</a> page.</p>
+                <a href="https://github.com/ANU-RSAA/sso-alert" target="_blank">GitHub</a> page.
+            </p>
             <p>If this guide is missing information that you would find helpful, feel free to raise an issue or follow the contributing guidelines on the <a
                     href="https://github.com/ANU-RSAA/sso-alert" target="_blank">GitHub</a>
                 and update it yourself.</p>
