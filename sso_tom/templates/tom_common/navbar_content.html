@@ -5,8 +5,7 @@ For customization instructions, see tom_common/base.html
 {% endcomment %}
 
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'targets' %}active{% endif %}"
-       data-toggle="dropdown">Targets</a>
+    <a class="nav-link dropdown-toggle {% if request.resolver_match.namespace == 'targets' %}active{% endif %}" data-toggle="dropdown">Targets</a>
     <div class="dropdown-menu">
         <a class="dropdown-item" href="{% url 'targets:list' %}">Targets</a>
         <a class="dropdown-item" href="{% url 'targets:targetgrouping' %}">Target Grouping</a>
@@ -36,11 +35,15 @@ For customization instructions, see tom_common/base.html
     <ul class="dropdown-menu">
         <li class="nav-item {% if request.resolver_match.namespace == 'chains' %}active{% endif %}">
             <a class="nav-link" href="{% url 'chains:chain_list' %}" style="color:black">Observation Chains</a>
-        </li><li class="nav-item {% if request.resolver_match.namespace == 'chains' %}active{% endif %}">
+        </li>
+        <li class="nav-item {% if request.resolver_match.namespace == 'chains' %}active{% endif %}">
             <a class="nav-link" href="{% url 'chains:chain_template_list' %}" style="color:black">Chain Templates</a>
         </li>
     </ul>
 </li>
 <li class="nav-item">
     <a class="nav-link" href="{% url 'sso_alerts:alert_list' %}">Stream Alerts</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'howto' %}">User Guide</a>
 </li>

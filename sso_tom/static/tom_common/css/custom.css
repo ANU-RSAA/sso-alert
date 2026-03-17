@@ -30,3 +30,12 @@ a:hover {
     color: #0056b3;
     text-decoration: underline;
 }
+
+section::before {
+    display: block;
+    content: " ";
+    margin-top: -75px;
+    height: 75px;
+    visibility: hidden;
+    pointer-events: none;
+}
