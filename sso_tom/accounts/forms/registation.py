@@ -44,7 +44,7 @@ class RegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
-        self.fields["username"].help_text = None
+        self.fields["username"].help_text = ""
         self.fields["username"].widget.attrs.update({"autofocus": False})
         self.fields["password1"].widget.attrs.update(
             {"class": "form-control", "tabindex": "6"}
@@ -82,7 +82,7 @@ class RegistrationForm(UserCreationForm):
         # Save the user as an inactive user
         # It will be active once the email address is verified by the User
         user = super(RegistrationForm, self).save(commit=False)
-        # user.is_active = False
+        user.is_active = False
         if commit:
             user.save()
         return user
