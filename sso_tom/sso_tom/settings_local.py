@@ -62,24 +62,10 @@ USE_FINK = bool(strtobool(dotenv("USE_FINK", default="False")))
 # To add a new topic - add one here.
 ZTF_TOPICS = [
     "fink_early_sn_candidates_ztf",
-    "fink_sn_candidates_ztf",
-    "fink_sso_ztf_candidates_ztf",
-    "fink_sso_fink_candidates_ztf",
-    "fink_kn_candidates_ztf",
-    "fink_early_kn_candidates_ztf",
-    "fink_rate_based_kn_candidates_ztf",
-    "fink_microlensing_candidates_ztf",
-    "fink_blazar_ztf",
 ]
 
 LSST_TOPICS = [
-    "fink_early_snia_candidate_lsst",
     "fink_extragalactic_lt20mag_candidate_lsst",
-    "fink_extragalactic_new_candidate_lsst",
-    "fink_good_quality_lsst",
-    "fink_hostless_candidate_lsst",
-    "fink_in_tns_lsst",
-    "fink_sn_near_galaxy_candidate_lsst",
 ]
 
 TOPICS = []
