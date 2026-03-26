@@ -64,7 +64,7 @@ INSTALLED_APPS = [
     "chained",
     "tom_alertstreams",
     "sso_alerts",
-    "django_recaptcha"
+    "django_recaptcha",
 ]
 
 # This is a temporary solution until I decide if the tom_fink import via .gitmodules should be replaced with a required package.
@@ -379,6 +379,3 @@ try:
     from .settings_local import *  # noqa
 except ImportError:
     pass
-
-RECAPTCHA_PUBLIC_KEY = dotenv('RECAPTCHA_PUBLIC_KEY')
-RECAPTCHA_PRIVATE_KEY = dotenv('RECAPTCHA_PRIVATE_KEY')

@@ -169,3 +169,12 @@ SKY_DATA_PATH = dotenv(
     "SKY_DATA_PATH", default="set SKY_DATA_PATH value in environment"
 )
 ### END SKY SETTINGS ###
+
+### RECAPTCHA SETTINGS ###
+RECAPTCHA_PUBLIC_KEY = dotenv(
+    "RECAPTCHA_PUBLIC_KEY", default="set RECAPTCHA_PUBLIC_KEY value in environment"
+)
+RECAPTCHA_PRIVATE_KEY = dotenv(
+    "RECAPTCHA_PRIVATE_KEY", default="set RECAPTCHA_PRIVATE_KEY value in environment"
+)
+### END RECAPTCHA SETTINGS ###
