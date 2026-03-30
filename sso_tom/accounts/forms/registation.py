@@ -6,6 +6,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
+from django_recaptcha.fields import ReCaptchaField
 
 FIELDS = [
     "first_name",
@@ -41,6 +42,7 @@ class RegistrationForm(UserCreationForm):
     """
     Customise the User Registration form from default Django UserCreationForm
     """
+    captcha = ReCaptchaField()
 
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
