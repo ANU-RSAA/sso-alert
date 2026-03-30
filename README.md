@@ -8,6 +8,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![License][license-shield]][license-url]
+[![DOI][zenodo-shield]][zenodo-url]
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -253,6 +254,8 @@ If you would like to acknowledge us, an example is:
 [issues-url]: https://github.com/ANU-RSAA/sso-alert/issues
 [license-shield]: https://img.shields.io/github/license/ANU-RSAA/sso-alert.svg?style=for-the-badge
 [license-url]: https://github.com/ANU-RSAA/sso-alert/blob/main/LICENSE
+[zenodo-shield]:https://zenodo.org/badge/1037027680.svg
+[zenodo-url]:https://doi.org/10.5281/zenodo.19328305
 
 [django]: https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white
 [django-url]: https://www.djangoproject.com/
