@@ -19,7 +19,6 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Select</th>
             <th>View</th>
             <th>Target</th>
             <th>Facility</th>
@@ -30,10 +29,8 @@
         <tbody>
           {% for observation in filter.qs %}
           <tr>
-            <td><input type="checkbox" name="selected" value="{{observation.id}}"></td>
             <td><a class="btn btn-success" href="{% url 'tom_observations:detail' observation.id %}">Details</a></td>
-            <td><a href="{% url 'tom_targets:detail' observation.target.id %}?tab=observations" title="{{ observation.target.id }}">{{
-                observation.target.names|join:", " }}</a></td>
+            <td><a href="{% url 'tom_targets:detail' observation.target.id %}?tab=observations" title="{{ observation.target.id }}">{{ observation.target.names|join:", " }}</a></td>
             <td>{{ observation.facility }}</td>
             <td>{{ observation.status }}</td>
             <td>{% for o in observation.observationgroup_set.all %}{{ o.name }} {% endfor %}</td>
