@@ -1205,7 +1205,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
 
             acq=selectAcqStar(obj)
 
-            print(observation_payload)           
+                
         else:
             acq={"acq_ra":None,"acq_dec":None,'acq_pmot':None,'acq_pmdec':None}
             
@@ -1213,6 +1213,7 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
         observation_payload["params"][acq_ra_.lower() + "0"]=acq["acq_ra"]
         observation_payload["params"][acq_dec_.lower() + "0"]=acq["acq_dec"] 
         observation_payload["params"][acq_pmot_.lower() + "0"]='%4.2f %4.2f' % (acq["acq_pmra"],acq["acq_pmdec"])
+        print(observation_payload)       
 
         post_data[acq_ra_ + "0"] = observation_payload["params"].get(
             acq_ra_.lower() + "0", acq["acq_ra"]
