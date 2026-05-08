@@ -1205,26 +1205,42 @@ class ANU230cmFacility(BaseRoboticObservationFacility):
 
             acq=selectAcqStar(obj)
 
-                
+            observation_payload["params"][acq_ra_.lower() + "0"]=acq["acq_ra"]
+            observation_payload["params"][acq_dec_.lower() + "0"]=acq["acq_dec"] 
+            observation_payload["params"][acq_pmot_.lower() + "0"]='%4.2f %4.2f' % (acq["acq_pmra"],acq["acq_pmdec"])
+            post_data[acq_ra_ + "0"] = observation_payload["params"].get(
+                acq_ra_.lower() + "0", acq["acq_ra"]
+            )
+            post_data[acq_dec_ + "0"] = observation_payload["params"].get(
+                acq_dec_.lower() + "0", acq["acq_dec"] 
+            )
+
+            post_data[acq_pmot_ + "0"] = observation_payload["params"].get(
+                acq_pmot_.lower() + "0", '%4.2f %4.2f' % (acq["acq_pmra"],acq["acq_pmdec"])
+            )
+    
+
         else:
-            acq={"acq_ra":None,"acq_dec":None,'acq_pmot':None,'acq_pmdec':None}
-            
+            acq={"acq_ra":None,"acq_dec":None,'acq_pmra':None,'acq_pmdec':None}
+            observation_payload["params"][acq_ra_.lower() + "0"]=acq["acq_ra"]
+            observation_payload["params"][acq_dec_.lower() + "0"]=acq["acq_dec"] 
+            observation_payload["params"][acq_pmot_.lower() + "0"]=acq["acq_pmra"]
 
-        observation_payload["params"][acq_ra_.lower() + "0"]=acq["acq_ra"]
-        observation_payload["params"][acq_dec_.lower() + "0"]=acq["acq_dec"] 
-        observation_payload["params"][acq_pmot_.lower() + "0"]='%4.2f %4.2f' % (acq["acq_pmra"],acq["acq_pmdec"])
-        print(observation_payload)       
+            post_data[acq_ra_ + "0"] = observation_payload["params"].get(
+                acq_ra_.lower() + "0", acq["acq_ra"]
+            )
+            post_data[acq_dec_ + "0"] = observation_payload["params"].get(
+                acq_dec_.lower() + "0", acq["acq_dec"] 
+            )
 
-        post_data[acq_ra_ + "0"] = observation_payload["params"].get(
-            acq_ra_.lower() + "0", acq["acq_ra"]
-        )
-        post_data[acq_dec_ + "0"] = observation_payload["params"].get(
-            acq_dec_.lower() + "0", acq["acq_dec"] 
-        )
-        post_data[acq_pmot_ + "0"] = observation_payload["params"].get(
-            acq_pmot_.lower() + "0", '%4.2f %4.2f' % (acq["acq_pmra"],acq["acq_pmdec"])
-        )
+            post_data[acq_pmot_ + "0"] = observation_payload["params"].get(
+                acq_pmot_.lower() + "0", acq["acq_pmra"]
+            )
+    
+        print(observation_payload) 
+        print(post_data)      
 
+       
         # Remove keys with None values
         post_data = {k: v for k, v in post_data.items() if v not in [None, ""]}
 
