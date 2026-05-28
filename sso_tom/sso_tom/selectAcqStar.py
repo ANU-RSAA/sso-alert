@@ -11,20 +11,23 @@ import astropy.units as u
 def query_ucac4_circle(ra_deg, dec_deg, radius_arcmin, max_rows=50000):
     Vizier.ROW_LIMIT = max_rows
     Vizier.columns = ['RAJ2000', 'DEJ2000', 'f.mag', 'pmRA', 'pmDE']
-
+    
     center = SkyCoord(ra_deg, dec_deg, unit='deg')
 
     result = Vizier.query_region(
         center,
         radius=radius_arcmin * u.arcmin,
         catalog='I/322A',
-        column_filters={"RAJ2000": ">0", "DEJ2000": ">-90"}
+        column_filters={"RAJ2000": ">0", "DEJ2000": ">-90", "pmRA": "!=nan","pmDE": "!=nan",}
     )
 
     if len(result) == 0:
         return None
 
     tbl = result[0]
+    # Clean the result of Nans
+
+    tbl = tbl[~tbl['pmRA'].mask & ~tbl['pmDE'].mask]
 
     for col in tbl.colnames: 
         print(col, "NaNs:", tbl[col].mask.any())
