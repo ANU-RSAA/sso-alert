@@ -33,24 +33,28 @@
                         <a href="{% url 'sso_alerts:alert_streams_update' alert.pk %}" class="btn btn-sm btn-primary">Edit</a>
                         <form method="post" action="{% url 'sso_alerts:toggle_active' alert.pk %}" style="display:inline;">
                             {% csrf_token %}
-                            {% if alert.active %}
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Deactivate
-                            </button>
-                            {% else %}
-                            <button type="submit" class="btn btn-sm btn-success">
-                                Activate
-                            </button>
-                            {% endif %}
+                            <div class="form-group d-flex justify-content-end align-items-baseline">
+                                {% if alert.active %}
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    Deactivate
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    Activate
+                                </button>
+                                {% endif %}
+                            </div>
                         </form>
                         <form method="post" action="{% url 'sso_alerts:delete_stream' alert.pk %}" style="display:inline;">
                             {% csrf_token %}
-                            {% if alert.active %}
-                            {% else %}
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Delete Stream
-                            </button>
-                            {% endif %}
+                            <div class="form-group d-flex justify-content-end align-items-baseline">
+                                {% if alert.active %}
+                                {% else %}
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    Delete Stream
+                                </button>
+                                {% endif %}
+                            </div>
                         </form>
                     </td>
                 </tr>
