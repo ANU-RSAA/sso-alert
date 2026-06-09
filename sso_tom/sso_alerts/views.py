@@ -20,6 +20,11 @@ def toggle_active(request, pk):
     alert_stream.save()
     return redirect("sso_alerts:alert_list")
 
+@login_required
+def delete_stream(request, pk):
+    alert_stream = get_object_or_404(AlertStreams, pk=pk, user=request.user)
+    alert_stream.delete()
+    return redirect("sso_alerts:alert_list")
 
 class AlertListView(LoginRequiredMixin, ListView):
     template_name = "sso_alerts/alerts_list.html"
