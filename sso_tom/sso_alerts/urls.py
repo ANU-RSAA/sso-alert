@@ -5,6 +5,7 @@ from .views import (
     AlertStreamsCreateView,
     AlertStreamsUpdateView,
     toggle_active,
+    delete_stream,
 )
 
 app_name = "sso_alerts"
@@ -18,4 +19,5 @@ urlpatterns = [
         name="alert_streams_update",
     ),
     path("toggle_active/<int:pk>/", toggle_active, name="toggle_active"),
+    path("delete/<int:pk>/", delete_stream, name="delete_stream"),
 ]

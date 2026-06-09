@@ -8,8 +8,8 @@
         <p>
             Create a new alert stream using: <a href="{% url 'sso_alerts:alert_streams_create' %}" class="btn btn-outline-primary">Fink Streams</a>
         </p>
-        <p>There a number of factors that should be taken into account before using the Alert Streams please contact us at <a
-                href="mailto:sso-alert-system@mso.anu.edu.au">sso-alert-system@mso.anu.edu.au</a> and we will be glad to assist you with this.</p>
+        <p>There a number of factors that should be taken into account before using the Alert Streams please contact us at <a href="mailto:sso-alert-system@mso.anu.edu.au">sso-alert-system@mso.anu.edu.au</a> and we will
+            be glad to assist you with this.</p>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -40,6 +40,15 @@
                             {% else %}
                             <button type="submit" class="btn btn-sm btn-success">
                                 Activate
+                            </button>
+                            {% endif %}
+                        </form>
+                        <form method="post" action="{% url 'sso_alerts:delete_stream' alert.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            {% if alert.active %}
+                            {% else %}
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Delete Stream
                             </button>
                             {% endif %}
                         </form>
