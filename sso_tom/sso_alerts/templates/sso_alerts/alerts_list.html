@@ -33,7 +33,7 @@
                         <a href="{% url 'sso_alerts:alert_streams_update' alert.pk %}" class="btn btn-sm btn-primary">Edit</a>
                         <form method="post" action="{% url 'sso_alerts:toggle_active' alert.pk %}" style="display:inline;">
                             {% csrf_token %}
-                            <div class="form-group d-flex justify-content-end align-items-baseline">
+                            <div class="form-group d-flex align-items-baseline">
                                 {% if alert.active %}
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     Deactivate
