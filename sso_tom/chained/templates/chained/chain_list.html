@@ -12,6 +12,7 @@
             <th>Chain ID</th>
             <th>Chain Name</th>
             <th>Status</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -20,12 +21,24 @@
             <td><a href='{% url "chains:view_chain" chain.id %}'>{{ chain.id }}</a></td>
             <td><a href='{% url "chains:view_chain" chain.id %}'>{{ chain.name }} ({{ chain.target }})</a></td>
             <td>{{ chain.status }}</td>
+            <td>
+                <form method="post" action="{% url 'chains:delete_chain' chain.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <div class="form-group d-flex justify-content-end">
+                        {% if chain.status != "COMPLETED" %}
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            Delete Chain
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 <a href='{% url "chains:add_chain" %}' class="btn btn-primary">Add chain</a>
-        {% block extra_javascript %}
+{% block extra_javascript %}
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -40,5 +53,5 @@
         });
     });
 </script>
-        {% endblock %}
+{% endblock %}
 {% endblock content %}
