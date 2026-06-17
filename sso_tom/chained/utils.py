@@ -1,6 +1,6 @@
 import logging
 
-from django.shortcuts import redirect
+from django.shortcuts import get_list_or_404, redirect
 from tom_observations.facility import get_service_class
 from tom_observations.models import ObservationRecord
 
@@ -16,7 +16,10 @@ def delete_chain(chain):
         chain.delete()
         return redirect("chains:chain_list")
 
-    get_chained_observations_from_chain = chain.chained_observations.filter(chain=chain)
+    # I think there's a better way to do this with filter instead.
+    get_chained_observations_from_chain = get_list_or_404(
+        ChainedObservation, chain_id=chain.id
+    )
 
     for chained_observation in get_chained_observations_from_chain:
         facility = get_service_class(chained_observation.facility)()
