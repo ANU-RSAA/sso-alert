@@ -46,7 +46,9 @@ def delete_chain(chain):
 
     # Check if any observations remaining. If yes, they are in terminal state. Do not delete.
     # If no, set to "DRAFT" and delete.
-    remaining_observations = ChainedObservation.objects.get(chain_id=chain.id)
+    remaining_observations = ChainedObservation.objects.filter(
+        chain_id=chain.id
+    ).first()
     if remaining_observations is None:
         chain.status = Chain.DRAFT
     else:
