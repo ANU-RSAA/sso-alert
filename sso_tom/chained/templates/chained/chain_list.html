@@ -22,9 +22,9 @@
             <td><a href='{% url "chains:view_chain" chain.id %}'>{{ chain.name }} ({{ chain.target }})</a></td>
             <td>{{ chain.status }}</td>
             <td>
-                <form method="post" action="{% url 'chains:delete' chain.id %}" style="display:inline;">
+                <form method="post" action="{% url 'chains:delete' chain.id %}">
                     {% csrf_token %}
-                    <div class="form-group d-flex justify-content-end">
+                    <div class="d-flex justify-content-center">
                         {% if chain.status != "COMPLETED" %}
                         <button type="submit" class="btn btn-sm btn-danger">
                             Delete Chain
