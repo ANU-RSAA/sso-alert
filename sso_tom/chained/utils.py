@@ -16,12 +16,15 @@ def delete_chain(chain):
         chain.delete()
         return redirect("chains:chain_list")
 
-    # I think there's a better way to do this with filter instead.
-    get_chained_observations_from_chain = get_list_or_404(
-        ChainedObservation, chain_id=chain.id
+    get_chained_observations_from_chain = (
+        ChainedObservation.objects.select_related().filter(chain_id=chain.id)
     )
 
     for chained_observation in get_chained_observations_from_chain:
+        if chained_observation.observation is None:
+            # chained_observation.delete() # Shouldn't be needed because should cascade.
+            continue
+
         facility = get_service_class(chained_observation.facility)()
 
         # Get facility terminal state.
@@ -39,12 +42,17 @@ def delete_chain(chain):
 
             if current_observation_state not in facility_terminal_states:
                 facility.cancel_observation(observation_id)
+                chained_observation.delete()
 
     # Check if any observations remaining. If yes, they are in terminal state. Do not delete.
     # If no, set to "DRAFT" and delete.
-    remaining_observations = chain.chained_observations.filter(chain=chain)
+    remaining_observations = ChainedObservation.objects.get(chain_id=chain.id)
     if remaining_observations is None:
         chain.status = Chain.DRAFT
+    else:
+        chain.status = Chain.COMPLETED
+
+    chain.save()
 
     if chain.status == Chain.DRAFT:
         chain.delete()
