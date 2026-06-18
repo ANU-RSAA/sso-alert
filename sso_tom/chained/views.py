@@ -60,9 +60,8 @@ def delete_chain_template(request, template_id):
     try:
         chain.delete()
     except ProtectedError:
-        add_hint(
-            redirect("chains:chain_template_list"),
-            "Can't delete as part of existing alert chain",
+        messages.error(
+            request, "Can't delete as template part of existing alert stream."
         )
 
     return redirect("chains:chain_template_list")
