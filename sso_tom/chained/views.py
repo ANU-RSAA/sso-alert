@@ -49,6 +49,17 @@ def delete(request, chain_id):
     return delete_chain(chain)
 
 
+@login_required
+def delete_chain_template(request, template_chain_id):
+    chain = get_object_or_404(
+        TemplatedChain,
+        pk=template_chain_id,
+        user=request.user,
+    )
+    chain.delete()
+    return redirect("chains:chain_template_list")
+
+
 class ChainedTargetDetailView(Raise403PermissionRequiredMixin, DetailView):
     """
     View that handles the display of the target details for chained observations. Requires authorization.

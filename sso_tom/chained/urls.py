@@ -11,6 +11,7 @@ from .views import (
     ChainView,
     SingleObservationCreateView,
     delete,
+    delete_chain_template,
 )
 
 app_name = "chains"
@@ -27,6 +28,11 @@ urlpatterns = [
         "templates/<int:template_id>/",
         ChainTemplateView.as_view(),
         name="view_chain_template",
+    ),
+    path(
+        "templates/delete/<int:template_id>/",
+        delete_chain_template,
+        name="delete_chain_template",
     ),
     path(
         "<int:chain_id>/target/<int:pk>/",
