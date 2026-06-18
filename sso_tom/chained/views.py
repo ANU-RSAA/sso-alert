@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import BadRequest
 from django.core.management import call_command
+from django.db.models import ProtectedError
 from django.forms import HiddenInput
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -50,13 +51,20 @@ def delete(request, chain_id):
 
 
 @login_required
-def delete_chain_template(request, template_chain_id):
+def delete_chain_template(request, template_id):
     chain = get_object_or_404(
         TemplatedChain,
-        pk=template_chain_id,
+        pk=template_id,
         user=request.user,
     )
-    chain.delete()
+    try:
+        chain.delete()
+    except ProtectedError:
+        add_hint(
+            redirect("chains:chain_template_list"),
+            "Can't delete as part of existing alert chain",
+        )
+
     return redirect("chains:chain_template_list")
 
 
