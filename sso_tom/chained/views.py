@@ -61,7 +61,8 @@ def delete_chain_template(request, template_id):
         chain.delete()
     except ProtectedError:
         messages.error(
-            request, "Can't delete as template part of existing alert stream."
+            request,
+            "Can not delete chain template as it is currently being used by an Alert Stream. Delete alert stream to be able to delete template.",
         )
 
     return redirect("chains:chain_template_list")
