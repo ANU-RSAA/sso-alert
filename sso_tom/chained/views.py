@@ -2,38 +2,70 @@ import logging
 from io import StringIO
 from urllib.parse import urlencode
 
+from crispy_forms.layout import ButtonHolder, Div, Fieldset, Layout, Submit
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import BadRequest
 from django.core.management import call_command
+from django.db.models import ProtectedError
 from django.forms import HiddenInput
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-
-from crispy_forms.layout import Div, Layout, ButtonHolder, Submit, Fieldset
 from django.utils.safestring import mark_safe
-from django.views.generic import TemplateView, ListView, CreateView, DetailView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView
 from guardian.mixins import LoginRequiredMixin
 from tom_common.hints import add_hint
 from tom_common.mixins import Raise403PermissionRequiredMixin
 from tom_observations.facility import get_service_class, get_service_classes
-from tom_observations.models import ObservationTemplate, ObservationRecord
-
-# from tom_observations.observation_template import ApplyObservationTemplateForm
-from .forms import ChainedApplyObservationTemplateForm, ChainTemplateForm
-
+from tom_observations.models import ObservationRecord, ObservationTemplate
 from tom_observations.views import ObservationCreateView, ObservationTemplateCreateView
 from tom_targets.models import Target
 from tom_targets.views import TargetDetailView
 
-from .forms import ChainedObservationForm, ChainForm
-from .models import ChainedObservation, Chain, TemplatedChain, ChainedTemplate
-from .utils import submit_chain
 from sso_tom.views import CustomObservationTemplateCreateView
 
+# from tom_observations.observation_template import ApplyObservationTemplateForm
+from .forms import (
+    ChainedApplyObservationTemplateForm,
+    ChainedObservationForm,
+    ChainForm,
+    ChainTemplateForm,
+)
+from .models import Chain, ChainedObservation, ChainedTemplate, TemplatedChain
+from .utils import delete_chain, submit_chain
+
 logger = logging.getLogger(__name__)
+
+
+@login_required
+def delete(request, chain_id):
+    chain = get_object_or_404(
+        Chain,
+        pk=chain_id,
+        user=request.user,
+    )
+    return delete_chain(chain)
+
+
+@login_required
+def delete_chain_template(request, template_id):
+    chain = get_object_or_404(
+        TemplatedChain,
+        pk=template_id,
+        user=request.user,
+    )
+    try:
+        chain.delete()
+    except ProtectedError:
+        messages.error(
+            request,
+            "Can not delete chain template as it is currently being used by an Alert Stream. Delete alert stream to be able to delete template.",
+        )
+
+    return redirect("chains:chain_template_list")
 
 
 class ChainedTargetDetailView(Raise403PermissionRequiredMixin, DetailView):

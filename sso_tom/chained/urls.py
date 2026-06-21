@@ -1,17 +1,17 @@
 from django.urls import path
-from django.conf import settings
-from django.contrib.auth import views as auth_views
 
 from .views import (
-    SingleObservationCreateView,
-    ChainListView,
     ChainCreateView,
-    ChainView,
     ChainedTargetDetailView,
+    ChainedTemplateCreateView,
+    ChainListView,
     ChainTemplateCreateView,
     ChainTemplateListView,
     ChainTemplateView,
-    ChainedTemplateCreateView,
+    ChainView,
+    SingleObservationCreateView,
+    delete,
+    delete_chain_template,
 )
 
 app_name = "chains"
@@ -30,6 +30,11 @@ urlpatterns = [
         name="view_chain_template",
     ),
     path(
+        "templates/delete/<int:template_id>/",
+        delete_chain_template,
+        name="delete_chain_template",
+    ),
+    path(
         "<int:chain_id>/target/<int:pk>/",
         ChainedTargetDetailView.as_view(),
         name="chain_target",
@@ -44,4 +49,5 @@ urlpatterns = [
         ChainedTemplateCreateView.as_view(),
         name="add_template",
     ),
+    path("delete/<int:chain_id>", delete, name="delete"),
 ]

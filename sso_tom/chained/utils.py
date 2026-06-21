@@ -1,5 +1,6 @@
 import logging
 
+from django.shortcuts import get_list_or_404, redirect
 from tom_observations.facility import get_service_class
 from tom_observations.models import ObservationRecord
 
@@ -8,6 +9,57 @@ from sso_tom.utils import submit_to_facility
 from .models import Chain, ChainedObservation
 
 logger = logging.getLogger(__name__)
+
+
+def delete_chain(chain):
+    if chain.status == Chain.DRAFT:
+        chain.delete()
+        return redirect("chains:chain_list")
+
+    get_chained_observations_from_chain = (
+        ChainedObservation.objects.select_related().filter(chain_id=chain.id)
+    )
+
+    for chained_observation in get_chained_observations_from_chain:
+        if chained_observation.observation is None:
+            # chained_observation.delete() # Shouldn't be needed because should cascade.
+            continue
+
+        facility = get_service_class(chained_observation.facility)()
+
+        # Get facility terminal state.
+        facility_terminal_states = facility.get_terminal_observing_states()
+        # Get observation status.
+        chained_observation_status = chained_observation.observation.status
+
+        # If not in terminal state, cancel observation.
+        if chained_observation_status not in facility_terminal_states:
+            observation_id = chained_observation.observation.observation_id
+
+            # First do another check on the observation status.
+            state = facility.get_observation_status(observation_id)
+            current_observation_state = state.get("state")
+
+            if current_observation_state not in facility_terminal_states:
+                facility.cancel_observation(observation_id)
+                chained_observation.delete()
+
+    # Check if any observations remaining. If yes, they are in terminal state. Do not delete.
+    # If no, set to "DRAFT" and delete.
+    remaining_observations = ChainedObservation.objects.filter(
+        chain_id=chain.id
+    ).first()
+    if remaining_observations is None:
+        chain.status = Chain.DRAFT
+    else:
+        chain.status = Chain.COMPLETED
+
+    chain.save()
+
+    if chain.status == Chain.DRAFT:
+        chain.delete()
+
+    return redirect("chains:chain_list")
 
 
 def submit_chain(chain):
